@@ -64,6 +64,7 @@ export default function Entrenar() {
     try { return (localStorage.getItem('titanus-vista') as 'foco' | 'lista') || 'foco'; } catch { return 'foco'; }
   });
   const [pos, setPos] = useState<Posicion | null>(null);
+  const [elegidos, setElegidos] = useState<Record<number, boolean>>({});
   const cambiarVista = (v: 'foco' | 'lista') => { setVista(v); try { localStorage.setItem('titanus-vista', v); } catch { /* nada */ } };
   const u = perfil.unidad;
 
@@ -155,6 +156,23 @@ export default function Entrenar() {
   }
 
   const posActual = pos && b.ejercicios[pos.i]?.series[pos.j] ? pos : siguientePendiente(b) ?? null;
+  // Sobrecarga manual: se pregunta una sola vez, al empezar
+  const pendientesSobrecarga = b.sobrecargaRevisada ? [] : b.ejercicios
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => e.sugerencia && e.sugerencia.accion !== 'mantener' && !e.sugerencia.aplicada && !e.series.some((x) => x.hecha));
+  function cerrarSobrecarga(aplicar: boolean) {
+    cambiar((x) => {
+      if (aplicar) {
+        for (const { i } of pendientesSobrecarga) {
+          if (elegidos[i] === false) continue;
+          const ex = x.ejercicios[i];
+          ex.series = aplicarSugerencia(ex.series, ex.sugerencia!);
+          ex.sugerencia = { ...ex.sugerencia!, aplicada: true };
+        }
+      }
+      x.sobrecargaRevisada = true;
+    });
+  }
   const hechas = b.ejercicios.flatMap((e) => seriesHechas(e));
   const volumen = hechas.reduce((t, s) => t + s.peso * s.reps, 0);
   const pendientes = b.ejercicios.reduce((t, e) => t + e.series.filter((s) => !s.hecha).length, 0);
@@ -169,17 +187,20 @@ export default function Entrenar() {
           <Icono n="abajo" />
         </button>
         <span className="hidden flex-1 font-display text-[17px] font-semibold sm:block">Entrenamiento</span>
-        <div role="radiogroup" aria-label="Vista" className="flex shrink-0 rounded-full border border-ln2 p-0.5 text-[12px] font-semibold">
-          {(['foco', 'lista'] as const).map((v) => (
-            <button key={v} role="radio" aria-checked={vista === v} onClick={() => cambiarVista(v)}
-              className={`h-8 rounded-full px-2.5 ${vista === v ? 'chip-on' : 'text-mu'}`}>{v === 'foco' ? 'Foco' : 'Lista'}</button>
-          ))}
-        </div>
+        {vista === 'foco' ? (
+          <button className="btn-sec h-9 shrink-0 px-3 text-[13px]" onClick={() => cambiarVista('lista')}>
+            <Icono n="rutinas" size={16} />Ver todo
+          </button>
+        ) : (
+          <button className="btn-sec h-9 shrink-0 px-3 text-[13px]" onClick={() => cambiarVista('foco')}>
+            <Icono n="play" size={14} />Modo foco
+          </button>
+        )}
         <span className="ml-auto flex shrink-0 items-center gap-1 text-[13px] text-mu sm:ml-0"><Icono n="reloj" size={15} />{reloj((ahora - b.inicio) / 1000)}</span>
         <button className="btn h-9 shrink-0 px-3 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
       </header>
 
-      <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
+      {!(vista === 'foco' && b.ejercicios.length) && <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
       <input aria-label="Nombre del entrenamiento" value={b.nombre}
         onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
         className="mt-4 w-full bg-transparent font-display text-[26px] font-semibold outline-none lg:mt-0 lg:text-[32px]" />
@@ -189,7 +210,7 @@ export default function Entrenar() {
         <div><div className="etiqueta">Volumen</div><div className="num mt-1 text-[18px]">{formatoNumero(redondear(aUnidad(volumen, u), 0))} {u}</div></div>
         <div><div className="etiqueta">Series</div><div className="num mt-1 text-[18px]">{hechas.length}</div></div>
       </div>
-      </div>
+      </div>}
 
       {b.ejercicios.length === 0 && (
         <div className="tarjeta mt-4 py-8 text-center">
@@ -214,24 +235,20 @@ export default function Entrenar() {
               <div className="flex items-center gap-3">
                 <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={48} />
                 <button className="flex-1 text-left font-display text-[18px] font-semibold oro leading-tight" onClick={() => setMenuEj(i)}>{ej?.nombre ?? 'Ejercicio'}</button>
+                <button className="chip h-8 shrink-0 gap-1 px-2.5 text-[12px]" aria-label={`Entrenar ${ej?.nombre} en modo foco`}
+                  onClick={() => { const j = e.series.findIndex((x) => !x.hecha); setPos({ i, j: j < 0 ? 0 : j }); cambiarVista('foco'); window.scrollTo({ top: 0 }); }}>
+                  <Icono n="play" size={12} />Foco
+                </button>
                 <button aria-label={`Opciones de ${ej?.nombre}`} className="toque -mr-2 flex items-center justify-center text-mu" onClick={() => setMenuEj(i)}>
                   <Icono n="puntos" />
                 </button>
               </div>
               {e.objetivo && <p className="mt-1 text-[13px] text-mu" data-testid="objetivo">Objetivo: <span className="text-tx2">{e.objetivo}</span></p>}
               <UltimaVez ultima={estados.get(e.ejercicioId)?.ultima} u={u} />
-              {e.sugerencia && e.sugerencia.accion !== 'mantener' && (
-                <div className="mt-1 flex items-center gap-2 text-[13px]" data-testid="sugerencia-lista">
-                  <Icono n="progreso" size={14} className="oro shrink-0" />
-                  <span className="flex-1 text-mu">{e.sugerencia.aplicada ? 'Sobrecarga aplicada · ' : ''}{e.sugerencia.texto}</span>
-                  {!e.sugerencia.aplicada && (
-                    <button className="chip chip-on h-7" onClick={() => cambiar((x) => {
-                      const ex = x.ejercicios[i];
-                      ex.series = aplicarSugerencia(ex.series, ex.sugerencia!);
-                      ex.sugerencia = { ...ex.sugerencia!, aplicada: true };
-                    })}>Aplicar</button>
-                  )}
-                </div>
+              {e.sugerencia?.aplicada && (
+                <p className="mt-1 flex items-center gap-1.5 text-[13px] text-mu" data-testid="sugerencia-lista">
+                  <Icono n="progreso" size={14} className="oro shrink-0" />Sobrecarga aplicada: {formatoNumero(redondear(aUnidad(e.sugerencia.peso, u)))} {u}
+                </p>
               )}
               <input aria-label={`Notas de ${ej?.nombre}`} placeholder="Agregar notas aquí…" value={e.nota ?? ''}
                 onChange={(ev) => { const v = ev.target.value; cambiar((x) => { x.ejercicios[i].nota = v; }); }}
@@ -290,7 +307,7 @@ export default function Entrenar() {
       </ol>}
 
       <div className="lg:mx-auto lg:mt-2 lg:flex lg:max-w-[640px] lg:items-center lg:gap-4">
-        <button className="btn mt-5 w-full lg:flex-1" onClick={() => setBiblio(true)}><Icono n="mas" size={18} />Agregar ejercicio</button>
+        <button className={`${vista === 'foco' && b.ejercicios.length ? 'btn-sec h-11' : 'btn'} mt-5 w-full lg:flex-1`} onClick={() => setBiblio(true)}><Icono n="mas" size={18} />Agregar ejercicio</button>
         <button className="mt-4 w-full p-2 text-[14px] font-semibold text-miss lg:mt-5 lg:w-auto" onClick={() => setDescartar(true)}>Descartar entrenamiento</button>
       </div>
 
@@ -372,6 +389,38 @@ export default function Entrenar() {
             </div>
           </div>
         )}
+      </Hoja>
+
+      <Hoja abierta={!!pendientesSobrecarga.length} alCerrar={() => cerrarSobrecarga(false)} etiqueta="Antes de empezar" titulo="Sobrecarga progresiva">
+        <p className="text-[14px] text-mu">La vez pasada cumpliste todas las repeticiones en estos ejercicios. Elegí en cuáles subir hoy:</p>
+        <ul className="mt-3 flex flex-col gap-2" data-testid="hoja-sobrecarga">
+          {pendientesSobrecarga.map(({ e, i }) => {
+            const ej = buscarEjercicio(e.ejercicioId, propios);
+            const desde = estados.get(e.ejercicioId)?.ultima?.series.find((x) => !x.tipo)?.peso ?? 0;
+            const on = elegidos[i] ?? true;
+            return (
+              <li key={i}>
+                <label className={`tarjeta flex cursor-pointer items-center gap-3 py-3 ${on ? 'border-gold' : ''}`}>
+                  <input type="checkbox" className="h-5 w-5 accent-[#e6b84e]" checked={on} aria-label={`Subir ${ej?.nombre}`}
+                    onChange={(ev) => setElegidos((x) => ({ ...x, [i]: ev.target.checked }))} />
+                  <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={36} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{ej?.nombre}</span>
+                    <span className="text-[13px] text-mu">
+                      {e.sugerencia!.accion === 'reps'
+                        ? `${e.sugerencia!.reps} reps por serie`
+                        : <>{formatoNumero(redondear(aUnidad(desde, u)))} → <b className="oro">{formatoNumero(redondear(aUnidad(e.sugerencia!.peso, u)))} {u}</b></>}
+                    </span>
+                  </span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="mt-5 flex flex-col gap-3">
+          <button className="btn" onClick={() => cerrarSobrecarga(true)}>Aplicar y empezar</button>
+          <button className="btn-sec" onClick={() => cerrarSobrecarga(false)}>Empezar sin cambios</button>
+        </div>
       </Hoja>
 
       <Hoja abierta={terminar} alCerrar={() => setTerminar(false)} etiqueta="Terminar" titulo="Guardar entrenamiento">

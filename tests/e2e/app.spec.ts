@@ -12,6 +12,13 @@ async function captura(page: Page, nombre: string) {
 const ir = (page: Page, nombre: 'Inicio' | 'Entreno' | 'Progreso' | 'Perfil') =>
   page.getByRole('link', { name: nombre, exact: true }).filter({ visible: true }).click();
 
+/** Si aparece la pregunta de sobrecarga al empezar, seguir sin cambios */
+async function sinSobrecarga(page: Page) {
+  await page.locator('[data-testid=vista-foco], [data-testid=hoja-sobrecarga]').first().waitFor({ timeout: 4000 }).catch(() => undefined);
+  const b = page.getByRole('button', { name: 'Empezar sin cambios' });
+  if (await b.isVisible().catch(() => false)) await b.click();
+}
+
 async function entrar(page: Page, tema: 'light' | 'dark' = 'dark') {
   await page.emulateMedia({ colorScheme: tema });
   await page.goto('/');
@@ -107,8 +114,9 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await entrar(page);
   await ir(page, 'Entreno');
   await page.getByRole('button', { name: 'Empezar rutina' }).first().click();
+  await sinSobrecarga(page);
+  await page.getByRole('button', { name: 'Ver todo' }).click();
   await expect(page.getByTestId('metricas')).toContainText('Duración');
-  await page.getByRole('radio', { name: 'Lista' }).click();
   await expect(page.getByRole('button', { name: /Copiar serie anterior 1/ }).first()).toContainText('kg ×');
   await expect(page.getByTestId('ultima-vez').first()).toContainText('Última vez');
   for (const j of [1, 2, 3, 4]) await expect(page.getByRole('button', { name: `Copiar serie anterior ${j}` }).first()).not.toHaveText('—');
@@ -142,7 +150,8 @@ test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ pa
   await ir(page, 'Entreno');
   await page.getByRole('button', { name: 'Empezar entrenamiento libre' }).click();
   await expect(page.getByText('Empezá agregando un ejercicio')).toBeVisible();
-  await page.getByRole('radio', { name: 'Lista' }).click();
+  await sinSobrecarga(page);
+  await page.getByRole('button', { name: 'Ver todo' }).click();
   await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
   await page.getByLabel('Buscar ejercicio').fill('dominadas');
   await page.getByRole('button', { name: /Dominadas/ }).first().click();
@@ -182,7 +191,7 @@ test('progreso: resumen, calendario, historial, repetir, récords y medidas', as
   await page.getByTestId('entreno-historial').first().getByRole('button').click();
   await captura(page, '16-detalle-entreno');
   await page.getByRole('button', { name: 'Repetir entrenamiento' }).click();
-  await expect(page.getByTestId('metricas')).toBeVisible();
+  await expect(page.getByTestId('vista-foco')).toBeVisible();
   await page.getByRole('button', { name: 'Descartar entrenamiento' }).click();
   await page.getByRole('button', { name: 'Sí, descartar' }).click();
   await ir(page, 'Progreso');
@@ -233,29 +242,38 @@ test('plantilla Full body principiante: ver, cargar y entrenar el día A', async
   await expect(page.getByRole('heading', { name: 'A · Full body' })).toHaveCount(2);
   await captura(page, '23-rutinas-cargadas');
   await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).last().getByRole('button', { name: 'Empezar rutina' }).click();
-  await page.getByRole('radio', { name: 'Lista' }).click();
+  await sinSobrecarga(page);
+  await page.getByRole('button', { name: 'Ver todo' }).click();
   await expect(page.getByTestId('objetivo').first()).toContainText('3×6 + 1 al fallo');
   await expect(page.getByRole('button', { name: 'Tipo de la serie 4' }).first()).toHaveText('F');
   await captura(page, '24-entrenar-full-body');
 });
 
-test('vista de foco: serie a pantalla completa, sobrecarga, cronómetro grande y lo que sigue', async ({ page }) => {
+test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que sigue y ver todo', async ({ page }) => {
   await entrar(page);
   await ir(page, 'Entreno');
   await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).getByRole('button', { name: 'Empezar rutina' }).click();
+  await expect(page.getByTestId('hoja-sobrecarga')).toContainText('Sentadilla');
+  await expect(page.getByTestId('hoja-sobrecarga')).toContainText('80 kg');
+  await captura(page, '26-sobrecarga-al-empezar');
+  await page.getByRole('button', { name: 'Aplicar y empezar' }).click();
   await expect(page.getByTestId('vista-foco')).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Cómo se hace: Sentadilla' })).toBeVisible();
   await expect(page.getByTestId('posicion')).toHaveText('Serie 1 de 4');
-  await expect(page.getByTestId('sugerencia')).toContainText('subí 2,5 kg');
-  await expect(page.getByTestId('a-continuacion')).toContainText('Serie 2');
-  await captura(page, '26-foco');
-  await page.getByTestId('sugerencia').getByRole('button', { name: 'Aplicar' }).click();
   await expect(page.getByLabel('Peso', { exact: true })).toHaveValue('80');
+  await expect(page.getByTestId('a-continuacion')).toContainText('Serie 2');
+  // Lo esencial entra en la pantalla sin bajar: el botón y el cronómetro
+  await expect(page.getByRole('button', { name: 'Serie hecha' })).toBeInViewport();
+  await expect(page.getByTestId('cronometro')).toBeInViewport();
+  await captura(page, '27-foco');
   await page.getByRole('button', { name: 'Serie hecha' }).click();
   await expect(page.getByRole('timer', { name: 'Descanso' })).toBeVisible();
   await expect(page.getByTestId('posicion')).toHaveText('Serie 2 de 4');
-  await captura(page, '27-foco-descanso');
+  await captura(page, '28-foco-descanso');
   for (let k = 0; k < 3; k++) await page.getByRole('button', { name: 'Serie hecha' }).click();
   await expect(page.getByRole('heading', { name: 'Press de banca' })).toBeVisible();
-  await expect(page.getByTestId('a-continuacion')).toContainText('Próximo ejercicio');
+  await page.getByRole('button', { name: 'Ver todo' }).click();
+  await expect(page.getByRole('button', { name: 'Desmarcar serie 1' }).first()).toBeVisible();
+  await captura(page, '29-ver-todo');
+  await page.getByRole('button', { name: 'Entrenar Peso muerto en modo foco' }).click();
+  await expect(page.getByRole('heading', { name: 'Peso muerto' })).toBeVisible();
 });

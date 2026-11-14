@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.5.0',
+    fecha: '2026-11-14',
+    cambios: [
+      'Vista de foco rehecha: serie actual, peso y reps alineados, "Serie hecha" grande, cronómetro y lo que sigue, sin bajar la pantalla.',
+      'La sobrecarga progresiva se pregunta al empezar la rutina, ejercicio por ejercicio.',
+      'Botón "Ver todo" para ver el entrenamiento completo y volver al foco en cualquier ejercicio.',
+    ],
+  },
+  {
     version: '1.4.0',
     fecha: '2026-11-14',
     cambios: [

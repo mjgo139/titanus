@@ -7,6 +7,8 @@ export interface Borrador {
   inicio: number;
   ejercicios: EjercicioEntreno[];
   nota?: string;
+  /** Ya se preguntó qué sobrecargas aplicar al empezar */
+  sobrecargaRevisada?: boolean;
 }
 
 const clave = (uid: string) => `titanus-borrador-${uid}`;
