@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { borrarBorrador, guardarBorrador, leerBorrador, type Borrador } from '../lib/borrador';
-import { DESCANSO_POR_DEFECTO, anteriorPara, cerrarEntrenamiento, ejercicioNuevo } from '../lib/entreno';
+import { DESCANSO_POR_DEFECTO, anteriorPara, aplicarSugerencia, cerrarEntrenamiento, ejercicioNuevo } from '../lib/entreno';
 import { aKg, aUnidad, formatoNumero, redondear, reloj, seriesHechas } from '../lib/logica';
 import { avisoFinDescanso, prepararAudio } from '../lib/sonido';
 import type { Ejercicio, EstadoEjercicio, Sensacion, TipoSerie } from '../lib/tipos';
@@ -11,6 +11,7 @@ import { Icono } from '../ui/Icono';
 import { Cargando, Hoja } from '../ui/piezas';
 import { Biblioteca } from './Biblioteca';
 import { Animacion, Miniatura } from './Miniatura';
+import { Foco, siguientePendiente, type Posicion } from './Foco';
 
 const TIPOS: { v: TipoSerie; t: string; l: string; c: string }[] = [
   { v: 'calentamiento', t: 'Calentamiento', l: 'C', c: '#e0b04a' },
@@ -59,12 +60,18 @@ export default function Entrenar() {
   const [descartar, setDescartar] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const sono = useRef(false);
+  const [vista, setVista] = useState<'foco' | 'lista'>(() => {
+    try { return (localStorage.getItem('titanus-vista') as 'foco' | 'lista') || 'foco'; } catch { return 'foco'; }
+  });
+  const [pos, setPos] = useState<Posicion | null>(null);
+  const cambiarVista = (v: 'foco' | 'lista') => { setVista(v); try { localStorage.setItem('titanus-vista', v); } catch { /* nada */ } };
   const u = perfil.unidad;
 
   useEffect(() => {
     const previo = leerBorrador(usuario.uid);
     if (!previo) { nav('/entreno', { replace: true }); return; }
     setB(previo);
+    setPos(siguientePendiente(previo) ?? null);
     repo.leerPropios(usuario.uid).then(setPropios);
     repo.leerEstados(usuario.uid, previo.ejercicios.map((e) => e.ejercicioId)).then(setEstados);
   }, [repo, usuario.uid, nav]);
@@ -109,6 +116,13 @@ export default function Entrenar() {
       sono.current = false;
       setDescanso({ fin: Date.now() + seg * 1000, total: seg });
     }
+    // En la vista de foco, al marcar pasa sola a la próxima serie pendiente
+    if (hecha && vista === 'foco') {
+      const copia = structuredClone(b!);
+      copia.ejercicios[i].series[j].hecha = true;
+      const sig = siguientePendiente(copia, { i, j });
+      if (sig && !copia.ejercicios[sig.i].series[sig.j].hecha) setPos(sig);
+    }
   }
 
   async function agregarEjercicio(e: Ejercicio) {
@@ -121,6 +135,7 @@ export default function Entrenar() {
     }
     const nuevo = ejercicioNuevo(e.id, est, 3, 10, e.musculo === 'Cardio' ? 60 : DESCANSO_POR_DEFECTO);
     cambiar((x) => { x.ejercicios.push(nuevo); });
+    setPos({ i: b!.ejercicios.length, j: 0 });
   }
 
   async function finalizar() {
@@ -139,6 +154,7 @@ export default function Entrenar() {
     nav('/resumen', { replace: true, state: { entreno: c.entreno } });
   }
 
+  const posActual = pos && b.ejercicios[pos.i]?.series[pos.j] ? pos : siguientePendiente(b) ?? null;
   const hechas = b.ejercicios.flatMap((e) => seriesHechas(e));
   const volumen = hechas.reduce((t, s) => t + s.peso * s.reps, 0);
   const pendientes = b.ejercicios.reduce((t, e) => t + e.series.filter((s) => !s.hecha).length, 0);
@@ -152,9 +168,15 @@ export default function Entrenar() {
         <button aria-label="Minimizar" className="toque -ml-3 flex items-center justify-center oro" onClick={() => nav('/entreno')}>
           <Icono n="abajo" />
         </button>
-        <span className="flex-1 font-display text-[17px] font-semibold">Entrenamiento</span>
-        <span className="flex items-center gap-1 text-[13px] text-mu"><Icono n="reloj" size={16} />{reloj((ahora - b.inicio) / 1000)}</span>
-        <button className="btn h-9 px-4 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
+        <span className="hidden flex-1 font-display text-[17px] font-semibold sm:block">Entrenamiento</span>
+        <div role="radiogroup" aria-label="Vista" className="flex shrink-0 rounded-full border border-ln2 p-0.5 text-[12px] font-semibold">
+          {(['foco', 'lista'] as const).map((v) => (
+            <button key={v} role="radio" aria-checked={vista === v} onClick={() => cambiarVista(v)}
+              className={`h-8 rounded-full px-2.5 ${vista === v ? 'chip-on' : 'text-mu'}`}>{v === 'foco' ? 'Foco' : 'Lista'}</button>
+          ))}
+        </div>
+        <span className="ml-auto flex shrink-0 items-center gap-1 text-[13px] text-mu sm:ml-0"><Icono n="reloj" size={15} />{reloj((ahora - b.inicio) / 1000)}</span>
+        <button className="btn h-9 shrink-0 px-3 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
       </header>
 
       <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
@@ -177,7 +199,12 @@ export default function Entrenar() {
         </div>
       )}
 
-      <ol className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-stretch">
+      {vista === 'foco' && posActual && b.ejercicios.length > 0 && (
+        <Foco b={b} pos={posActual} setPos={setPos} estados={estados} propios={propios} u={u} ahora={ahora}
+          descanso={descanso} setDescanso={setDescanso} marcar={marcar} cambiar={cambiar} />
+      )}
+
+      {vista === 'lista' && <ol className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-stretch">
         {b.ejercicios.map((e, i) => {
           const ej = buscarEjercicio(e.ejercicioId, propios);
           const ant = estados.get(e.ejercicioId)?.ultima?.series ?? [];
@@ -193,6 +220,19 @@ export default function Entrenar() {
               </div>
               {e.objetivo && <p className="mt-1 text-[13px] text-mu" data-testid="objetivo">Objetivo: <span className="text-tx2">{e.objetivo}</span></p>}
               <UltimaVez ultima={estados.get(e.ejercicioId)?.ultima} u={u} />
+              {e.sugerencia && e.sugerencia.accion !== 'mantener' && (
+                <div className="mt-1 flex items-center gap-2 text-[13px]" data-testid="sugerencia-lista">
+                  <Icono n="progreso" size={14} className="oro shrink-0" />
+                  <span className="flex-1 text-mu">{e.sugerencia.aplicada ? 'Sobrecarga aplicada · ' : ''}{e.sugerencia.texto}</span>
+                  {!e.sugerencia.aplicada && (
+                    <button className="chip chip-on h-7" onClick={() => cambiar((x) => {
+                      const ex = x.ejercicios[i];
+                      ex.series = aplicarSugerencia(ex.series, ex.sugerencia!);
+                      ex.sugerencia = { ...ex.sugerencia!, aplicada: true };
+                    })}>Aplicar</button>
+                  )}
+                </div>
+              )}
               <input aria-label={`Notas de ${ej?.nombre}`} placeholder="Agregar notas aquí…" value={e.nota ?? ''}
                 onChange={(ev) => { const v = ev.target.value; cambiar((x) => { x.ejercicios[i].nota = v; }); }}
                 className="mt-2 w-full bg-transparent text-[14px] text-tx2 outline-none placeholder:text-mu2" />
@@ -247,26 +287,28 @@ export default function Entrenar() {
             </li>
           );
         })}
-      </ol>
+      </ol>}
 
       <div className="lg:mx-auto lg:mt-2 lg:flex lg:max-w-[640px] lg:items-center lg:gap-4">
         <button className="btn mt-5 w-full lg:flex-1" onClick={() => setBiblio(true)}><Icono n="mas" size={18} />Agregar ejercicio</button>
         <button className="mt-4 w-full p-2 text-[14px] font-semibold text-miss lg:mt-5 lg:w-auto" onClick={() => setDescartar(true)}>Descartar entrenamiento</button>
       </div>
 
-      {descanso && (
+      {descanso && vista === 'lista' && (
         <div className="fixed inset-x-0 bottom-0 z-40 lg:pl-[248px]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="mx-auto max-w-[480px] px-3 pb-3">
             <div role="timer" aria-label="Descanso" className="entrar overflow-hidden rounded-[14px] border border-gold2 bg-sf" style={{ boxShadow: 'var(--sombra)' }}>
               <div className="h-1 bg-ln2"><div className="h-full" style={{ width: `${(restante / descanso.total) * 100}%`, background: 'var(--oro-grad)' }} /></div>
-              <div className="flex items-center gap-2 px-4 py-3">
-                <div className="flex-1">
-                  <div className="etiqueta">{restante > 0 ? 'Descanso' : '¡A la siguiente serie!'}</div>
+              <div className="flex items-center gap-2 px-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <div className="etiqueta truncate">{restante > 0 ? 'Descanso' : '¡A la siguiente serie!'}</div>
                   <div className="num oro mt-0.5 text-[30px] leading-none">{reloj(restante)}</div>
                 </div>
-                <button className="chip" onClick={() => setDescanso((d) => d && { ...d, fin: Math.max(Date.now(), d.fin - 15_000) })}>−15</button>
-                <button className="chip" onClick={() => setDescanso((d) => d && { fin: d.fin + 15_000, total: d.total + 15 })}>+15</button>
-                <button className="chip chip-on" onClick={() => setDescanso(null)}>Saltar</button>
+                <div className="flex shrink-0 gap-1.5">
+                  <button className="chip px-2.5" onClick={() => setDescanso((d) => d && { ...d, fin: Math.max(Date.now(), d.fin - 15_000) })}>−15</button>
+                  <button className="chip px-2.5" onClick={() => setDescanso((d) => d && { fin: d.fin + 15_000, total: d.total + 15 })}>+15</button>
+                  <button className="chip chip-on px-3" onClick={() => setDescanso(null)}>Saltar</button>
+                </div>
               </div>
             </div>
           </div>

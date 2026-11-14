@@ -60,7 +60,15 @@ function ResumenProgreso() {
     const a = suma(ult4, k), b = suma(prev4, k);
     return b ? Math.round(((a - b) / b) * 100) : null;
   };
-  const datos = semanasEnRango(sem, RANGOS_TIEMPO[tiempo], ahora).map((x) => ({ fecha: x.fecha, y: medida === 'v' ? aUnidad(x.v, u) : x[medida] }));
+  const lista = semanasEnRango(sem, RANGOS_TIEMPO[tiempo], ahora);
+  const previo = semanasEnRango(sem, RANGOS_TIEMPO[tiempo] * 2, ahora).slice(0, RANGOS_TIEMPO[tiempo]);
+  const valor = (x: { v: number; n: number; m: number }) => (medida === 'v' ? aUnidad(x.v, u) : x[medida]);
+  const datos = lista.map((x) => ({ fecha: x.fecha, y: valor(x) }));
+  const total = lista.reduce((t, x) => t + valor(x), 0);
+  const totalPrevio = previo.reduce((t, x) => t + valor(x), 0);
+  const activas = lista.filter((x) => x.n > 0).length;
+  const varPeriodo = totalPrevio ? Math.round(((total - totalPrevio) / totalPrevio) * 100) : null;
+  const diaMes = new Intl.DateTimeFormat('es-PY', { day: 'numeric', month: 'short' });
   const r = rango(perfil.resumen.total);
   const racha = rachaSemanas(perfil.resumen.dias, ahora);
   const fmt = (n: number) => (medida === 'v' ? `${formatoNumero(redondear(n, 0))} ${u}` : medida === 'n' ? `${n} entrenos` : `${n} min`);
@@ -98,7 +106,35 @@ function ResumenProgreso() {
           ))}
         </div>
         <div className="mt-2 px-1">
-          <GraficoBarras datos={datos} etiqueta={`Gráfico semanal de ${medida === 'v' ? 'volumen' : medida === 'n' ? 'entrenamientos' : 'minutos'}`} formato={fmt} />
+          <GraficoBarras datos={datos} etiqueta={`Gráfico semanal de ${medida === 'v' ? 'volumen' : medida === 'n' ? 'entrenamientos' : 'minutos'}`} formato={fmt}
+            formatoCorto={medida === 'n' ? (n) => String(Math.round(n)) : undefined}
+            detalle={(i) => {
+              const x = lista[i];
+              const fin = x.fecha + 6 * 86_400_000;
+              return (
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                  <span className="text-mu">Semana del {diaMes.format(x.fecha).replace('.', '')} al {diaMes.format(fin).replace('.', '')}</span>
+                  <span className="flex gap-3">
+                    <b className="oro">{formatoNumero(redondear(aUnidad(x.v, u), 0))} {u}</b>
+                    <span>{x.n} {x.n === 1 ? 'entreno' : 'entrenos'}</span>
+                    <span>{duracion(x.m * 60000)}</span>
+                  </span>
+                </div>
+              );
+            }} />
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2 px-1 xl:grid-cols-4" data-testid="totales-periodo">
+          {[
+            ['Total', fmt(total)],
+            ['Promedio semanal', fmt(Math.round(total / RANGOS_TIEMPO[tiempo]))],
+            ['Semanas activas', `${activas} de ${RANGOS_TIEMPO[tiempo]}`],
+            ['Vs. período anterior', varPeriodo === null ? '—' : `${varPeriodo >= 0 ? '↑' : '↓'} ${Math.abs(varPeriodo)} %`],
+          ].map(([t, v]) => (
+            <div key={t} className="rounded-[10px] bg-sf2 px-2 py-2 text-center">
+              <div className="text-[11px] uppercase tracking-[.08em] text-mu2">{t}</div>
+              <div className={`num mt-0.5 text-[16px] ${t.startsWith('Vs') && varPeriodo !== null ? (varPeriodo >= 0 ? 'oro' : 'text-miss') : ''}`}>{v}</div>
+            </div>
+          ))}
         </div>
       </div>
 

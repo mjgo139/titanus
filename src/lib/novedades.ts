@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.4.0',
+    fecha: '2026-11-14',
+    cambios: [
+      'Vista de foco: la serie actual a pantalla completa, con la animación grande, cronómetro grande y lo que sigue abajo.',
+      'Sobrecarga progresiva automática o manual (Perfil): sugiere subir el peso cuando cumplís todas las repeticiones.',
+      'Gráfico semanal con valores, fechas, detalle de cada semana y totales del período.',
+      'Arreglo: en celulares la barra del entrenamiento ya no achica la pantalla.',
+    ],
+  },
+  {
     version: '1.3.1',
     fecha: '2026-11-14',
     cambios: [

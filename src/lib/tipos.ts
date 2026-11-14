@@ -55,6 +55,8 @@ export interface EjercicioEntreno {
   descanso?: number; // segundos
   /** Solo mientras se entrena: lo que pide la rutina ("3×6 + 1 al fallo") */
   objetivo?: string;
+  /** Solo mientras se entrena: sugerencia de sobrecarga progresiva */
+  sugerencia?: Sugerencia;
 }
 
 export interface Entrenamiento {
@@ -117,6 +119,7 @@ export interface Perfil {
   tema: Tema;
   unidad: Unidad;
   recordatorio: Recordatorio;
+  sobrecarga?: AjustesSobrecarga;
   creado: number;
   /** Fechas (ms) de los entrenamientos de las últimas semanas, para Hoy con 1 sola lectura */
   resumen: Resumen;
@@ -130,4 +133,21 @@ export interface Resumen {
   dias: number[];
   total: number;
   semanas?: Semanas;
+}
+
+export type ModoSobrecarga = 'auto' | 'manual' | 'apagada';
+
+/** Sobrecarga progresiva: cuánto subir (en kg) cuando se cumplen todas las repeticiones */
+export interface AjustesSobrecarga {
+  modo: ModoSobrecarga;
+  superior: number; // tren superior, kg
+  inferior: number; // piernas, glúteos y peso muerto, kg
+}
+
+export interface Sugerencia {
+  peso: number; // kg
+  reps: number;
+  accion: 'subir' | 'mantener' | 'reps';
+  texto: string;
+  aplicada?: boolean;
 }

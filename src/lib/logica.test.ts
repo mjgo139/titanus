@@ -247,3 +247,39 @@ describe('columna ANTERIOR por tipo de serie', () => {
     expect(anteriorPara(previas, hoy, 3)).toEqual({ peso: 60, reps: 12, tipo: 'fallo' });
   });
 });
+
+describe('sobrecarga progresiva', async () => {
+  const { sugerirSobrecarga } = await import('./sobrecarga');
+  const { aplicarSugerencia } = await import('./entreno');
+  const aj = { modo: 'manual' as const, superior: 1.25, inferior: 2.5 };
+  const ult = (series: [number, number, ('fallo' | undefined)?][]) => ({ fecha: 1, series: series.map(([peso, reps, tipo]) => ({ peso, reps, ...(tipo ? { tipo } : {}) })) });
+  it('sube el peso si cumplió todas las reps (piernas +2,5, tren superior +1,25)', () => {
+    expect(sugerirSobrecarga('sentadilla', ult([[80, 6], [80, 6], [80, 6], [80, 9, 'fallo']]), { reps: 6 }, aj)).toMatchObject({ accion: 'subir', peso: 82.5, reps: 6 });
+    expect(sugerirSobrecarga('press-banca', ult([[60, 6], [60, 6]]), { reps: 6 }, aj)).toMatchObject({ accion: 'subir', peso: 61.25 });
+  });
+  it('con rango, sube solo al llegar al máximo', () => {
+    expect(sugerirSobrecarga('curl-barra', ult([[25, 12], [25, 11]]), { reps: 8, repsMax: 12 }, aj)).toMatchObject({ accion: 'mantener', peso: 25, reps: 12 });
+    expect(sugerirSobrecarga('curl-barra', ult([[25, 12], [25, 12]]), { reps: 8, repsMax: 12 }, aj)).toMatchObject({ accion: 'subir', peso: 26.25, reps: 8 });
+  });
+  it('si faltaron reps mantiene el peso y dice cuántas', () => {
+    const s = sugerirSobrecarga('sentadilla', ult([[80, 6], [80, 5], [80, 4]]), { reps: 6 }, aj)!;
+    expect(s).toMatchObject({ accion: 'mantener', peso: 80 });
+    expect(s.texto).toContain('3 repeticiones');
+  });
+  it('peso corporal progresa con repeticiones; apagada o sin historial no sugiere', () => {
+    expect(sugerirSobrecarga('dominadas', ult([[0, 8], [0, 8]]), { reps: 8 }, aj)).toMatchObject({ accion: 'reps', reps: 9 });
+    expect(sugerirSobrecarga('sentadilla', ult([[80, 6]]), { reps: 6 }, { ...aj, modo: 'apagada' })).toBeUndefined();
+    expect(sugerirSobrecarga('sentadilla', undefined, { reps: 6 }, aj)).toBeUndefined();
+  });
+  it('en automático la rutina ya arranca con el peso nuevo; en manual no', () => {
+    const r = { id: 'r', nombre: 'A', dias: [1], orden: 0, creado: 0, ejercicios: [{ ejercicioId: 'sentadilla', series: 3, reps: 6, alFallo: 1, descanso: 120 }] };
+    const est = new Map([['sentadilla', { ejercicioId: 'sentadilla', mejorPeso: 80, mejorVolumen: 0, puntos: [], ultima: ult([[80, 6], [80, 6], [80, 6], [80, 10, 'fallo']]) }]]);
+    const auto = iniciarDesdeRutina(r, est, 0, { ...aj, modo: 'auto' });
+    expect(auto.ejercicios[0].series.map((s) => s.peso)).toEqual([82.5, 82.5, 82.5, 82.5]);
+    expect(auto.ejercicios[0].sugerencia?.aplicada).toBe(true);
+    const manual = iniciarDesdeRutina(r, est, 0, aj);
+    expect(manual.ejercicios[0].series[0].peso).toBe(80);
+    expect(manual.ejercicios[0].sugerencia).toMatchObject({ accion: 'subir', aplicada: false });
+    expect(aplicarSugerencia(manual.ejercicios[0].series, manual.ejercicios[0].sugerencia!).map((s) => s.peso)).toEqual([82.5, 82.5, 82.5, 82.5]);
+  });
+});

@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icono } from './Icono';
 
@@ -170,36 +170,62 @@ export function GraficoLinea({ puntos, etiqueta, formato }: {
   );
 }
 
-/** Barras por semana (volumen o entrenamientos) */
-export function GraficoBarras({ datos, etiqueta, formato }: {
+/** Barras por semana: valor sobre cada barra, fecha de cada semana y detalle al tocar */
+export function GraficoBarras({ datos, etiqueta, formato, formatoCorto, detalle }: {
   datos: { fecha: number; y: number }[]; etiqueta: string; formato: (n: number) => string;
+  formatoCorto?: (n: number) => string; detalle?: (i: number) => ReactNode;
 }) {
-  const W = 330, H = 150, py = 18;
+  const [sel, setSel] = useState<number | null>(null);
+  const W = 340, H = 190, top = 22, base = 158;
   const max = Math.max(1, ...datos.map((d) => d.y));
-  const ancho = (W - 4) / datos.length;
-  const meses = new Intl.DateTimeFormat('es-PY', { month: 'short' });
+  const ancho = W / datos.length;
+  const pocos = datos.length <= 14;
+  const conValores = datos.length <= 8;
+  const cadaCuanto = datos.length <= 7 ? 1 : 2;
+  const dia = new Intl.DateTimeFormat('es-PY', { day: 'numeric', month: 'short' });
+  const mes = new Intl.DateTimeFormat('es-PY', { month: 'short' });
+  const corto = formatoCorto ?? ((n: number) => (n >= 1000 ? `${Math.round(n / 100) / 10}k` : String(Math.round(n))));
+  const elegido = sel ?? datos.length - 1;
   return (
     <figure aria-label={etiqueta}>
-      <svg viewBox={`0 0 ${W} ${H + 14}`} className="w-full h-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto select-none">
         <defs>
           <linearGradient id="barraOro" x1="0" y1="0" x2="0" y2="1">
             <stop stopColor="var(--goldh)" /><stop offset="1" stopColor="var(--gold2)" />
           </linearGradient>
         </defs>
-        <line x1={0} x2={W} y1={H - py + 0.5} y2={H - py + 0.5} stroke="var(--ln2)" />
+        {[0.5, 1].map((f) => (
+          <g key={f}>
+            <line x1={0} x2={W} y1={base - f * (base - top)} y2={base - f * (base - top)} stroke="var(--ln2)" strokeDasharray="3 4" />
+            <text x={2} y={base - f * (base - top) - 3} fontSize="9" fill="var(--mu2)">{corto(max * f)}</text>
+          </g>
+        ))}
+        <line x1={0} x2={W} y1={base + 0.5} y2={base + 0.5} stroke="var(--ln)" />
         {datos.map((d, i) => {
-          const h = (d.y / max) * (H - 2 * py);
-          const x = 2 + i * ancho + ancho * 0.18;
+          const h = (d.y / max) * (base - top);
+          const x = i * ancho + ancho * 0.16;
+          const w = ancho * 0.68;
+          const on = i === elegido;
           const nuevoMes = i === 0 || new Date(d.fecha).getMonth() !== new Date(datos[i - 1].fecha).getMonth();
           return (
-            <g key={d.fecha}>
-              <rect x={x} y={H - py - h} width={ancho * 0.64} height={Math.max(h, d.y ? 2 : 0)} rx={2} fill="url(#barraOro)" />
-              {nuevoMes && datos.length > 6 && <text x={x} y={H + 8} fontSize="10" fill="var(--mu)">{meses.format(d.fecha).replace('.', '')}</text>}
+            <g key={d.fecha} onClick={() => setSel(i)} style={{ cursor: 'pointer' }}>
+              <rect x={i * ancho} y={top - 10} width={ancho} height={base - top + 34} fill="transparent" />
+              <rect x={x} y={base - h} width={w} height={Math.max(h, d.y ? 2 : 0)} rx={3} fill="url(#barraOro)" opacity={on ? 1 : 0.62} />
+              {(conValores || on) && d.y > 0 && (
+                <text x={x + w / 2} y={base - h - 5} fontSize="10" textAnchor="middle" fill={on ? 'var(--gold)' : 'var(--mu)'} fontWeight={on ? 700 : 400}>{corto(d.y)}</text>
+              )}
+              {(pocos ? (datos.length - 1 - i) % cadaCuanto === 0 || on : nuevoMes) && (
+                <text x={x + w / 2} y={base + 14} fontSize="9.5" textAnchor="middle" fill={on ? 'var(--gold)' : 'var(--mu)'}>
+                  {(pocos ? dia.format(d.fecha) : mes.format(d.fecha)).replace('.', '')}
+                </text>
+              )}
+              {!pocos && d.y === 0 && <circle cx={x + w / 2} cy={base - 2} r={1.2} fill="var(--ln3)" />}
             </g>
           );
         })}
       </svg>
-      <figcaption className="mt-1 text-right text-[12px] text-mu">Mejor semana: {formato(max === 1 && !datos.some((d) => d.y) ? 0 : max)}</figcaption>
+      {detalle && <figcaption className="mt-2 rounded-[10px] border border-ln2 px-3 py-2 text-[13px]" data-testid="detalle-semana">{detalle(elegido)}</figcaption>}
+      {!detalle && <figcaption className="mt-1 text-right text-[12px] text-mu">Mejor semana: {formato(max)}</figcaption>}
     </figure>
   );
 }

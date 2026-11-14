@@ -2,6 +2,9 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function captura(page: Page, nombre: string) {
   await expect(page.getByText('Cargando…')).toHaveCount(0);
+  // Nada puede ser más ancho que la pantalla (si no, el celular achica toda la página)
+  const ancho = page.viewportSize()!.width;
+  expect(await page.evaluate(() => document.documentElement.scrollWidth), `${nombre}: la página es más ancha que la pantalla`).toBeLessThanOrEqual(ancho);
   await page.screenshot({ path: `capturas/${test.info().project.name}/${nombre}.png`, fullPage: true, animations: 'disabled' });
 }
 
@@ -105,6 +108,7 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await ir(page, 'Entreno');
   await page.getByRole('button', { name: 'Empezar rutina' }).first().click();
   await expect(page.getByTestId('metricas')).toContainText('Duración');
+  await page.getByRole('radio', { name: 'Lista' }).click();
   await expect(page.getByRole('button', { name: /Copiar serie anterior 1/ }).first()).toContainText('kg ×');
   await expect(page.getByTestId('ultima-vez').first()).toContainText('Última vez');
   for (const j of [1, 2, 3, 4]) await expect(page.getByRole('button', { name: `Copiar serie anterior ${j}` }).first()).not.toHaveText('—');
@@ -114,13 +118,13 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await page.getByRole('button', { name: 'Marcar serie 1 como hecha' }).first().click();
   await expect(page.getByRole('timer', { name: 'Descanso' })).toBeVisible();
   await page.getByRole('button', { name: 'Marcar serie 2 como hecha' }).first().click();
+  await captura(page, '09-entrenar');
+  await page.getByRole('button', { name: 'Saltar' }).click();
   await page.getByLabel('Notas de Sentadilla').fill('Buena profundidad');
   await page.getByRole('button', { name: 'Tipo de la serie 3' }).first().click();
   await page.getByRole('button', { name: 'Al fallo' }).click();
   await page.getByRole('button', { name: 'Agregar serie' }).first().click();
   expect(await page.getByTestId('serie').count()).toBeGreaterThan(4);
-  await captura(page, '09-entrenar');
-  await page.getByRole('button', { name: 'Saltar' }).click();
   await page.getByRole('button', { name: 'Terminar', exact: true }).click();
   await captura(page, '10-guardar');
   await page.getByRole('button', { name: 'Guardar y terminar' }).click();
@@ -138,6 +142,7 @@ test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ pa
   await ir(page, 'Entreno');
   await page.getByRole('button', { name: 'Empezar entrenamiento libre' }).click();
   await expect(page.getByText('Empezá agregando un ejercicio')).toBeVisible();
+  await page.getByRole('radio', { name: 'Lista' }).click();
   await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
   await page.getByLabel('Buscar ejercicio').fill('dominadas');
   await page.getByRole('button', { name: /Dominadas/ }).first().click();
@@ -168,6 +173,8 @@ test('progreso: resumen, calendario, historial, repetir, récords y medidas', as
   await entrar(page);
   await ir(page, 'Progreso');
   await expect(page.getByRole('heading', { name: 'Tu evolución' })).toBeVisible();
+  await expect(page.getByTestId('totales-periodo')).toContainText('Promedio semanal');
+  await expect(page.getByTestId('detalle-semana')).toContainText('Semana del');
   await expect(page.getByLabel('Calendario de entrenamientos')).toBeVisible();
   await captura(page, '14-progreso');
   await page.getByRole('radio', { name: 'Historial' }).click();
@@ -198,6 +205,8 @@ test('perfil: rango, apariencia, unidades, versión de admin y salir', async ({ 
   await entrar(page);
   await ir(page, 'Perfil');
   await expect(page.getByTestId('completados')).not.toHaveText('0');
+  await page.getByRole('radio', { name: 'Automática' }).click();
+  await expect(page.getByText('la rutina ya arranca con más peso')).toBeVisible();
   await page.getByRole('radio', { name: 'Libras (lb)' }).click();
   await expect(page.getByTestId('version')).toContainText('commit');
   await captura(page, '20-perfil');
@@ -224,7 +233,29 @@ test('plantilla Full body principiante: ver, cargar y entrenar el día A', async
   await expect(page.getByRole('heading', { name: 'A · Full body' })).toHaveCount(2);
   await captura(page, '23-rutinas-cargadas');
   await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).last().getByRole('button', { name: 'Empezar rutina' }).click();
+  await page.getByRole('radio', { name: 'Lista' }).click();
   await expect(page.getByTestId('objetivo').first()).toContainText('3×6 + 1 al fallo');
   await expect(page.getByRole('button', { name: 'Tipo de la serie 4' }).first()).toHaveText('F');
   await captura(page, '24-entrenar-full-body');
+});
+
+test('vista de foco: serie a pantalla completa, sobrecarga, cronómetro grande y lo que sigue', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Entreno');
+  await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).getByRole('button', { name: 'Empezar rutina' }).click();
+  await expect(page.getByTestId('vista-foco')).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Cómo se hace: Sentadilla' })).toBeVisible();
+  await expect(page.getByTestId('posicion')).toHaveText('Serie 1 de 4');
+  await expect(page.getByTestId('sugerencia')).toContainText('subí 2,5 kg');
+  await expect(page.getByTestId('a-continuacion')).toContainText('Serie 2');
+  await captura(page, '26-foco');
+  await page.getByTestId('sugerencia').getByRole('button', { name: 'Aplicar' }).click();
+  await expect(page.getByLabel('Peso', { exact: true })).toHaveValue('80');
+  await page.getByRole('button', { name: 'Serie hecha' }).click();
+  await expect(page.getByRole('timer', { name: 'Descanso' })).toBeVisible();
+  await expect(page.getByTestId('posicion')).toHaveText('Serie 2 de 4');
+  await captura(page, '27-foco-descanso');
+  for (let k = 0; k < 3; k++) await page.getByRole('button', { name: 'Serie hecha' }).click();
+  await expect(page.getByRole('heading', { name: 'Press de banca' })).toBeVisible();
+  await expect(page.getByTestId('a-continuacion')).toContainText('Próximo ejercicio');
 });

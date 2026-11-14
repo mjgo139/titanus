@@ -3,7 +3,10 @@ import {
   actualizarEstado, agregarDia, detectarRecords, nuevoId, seriesHechas, sumarSemana, volumenTotal,
 } from './logica';
 import { textoObjetivo } from './plantillas';
-import type { EjercicioEntreno, Entrenamiento, EstadoEjercicio, Resumen, Rutina, Serie, TipoSerie } from './tipos';
+import { SOBRECARGA_POR_DEFECTO, sugerirSobrecarga } from './sobrecarga';
+import type {
+  AjustesSobrecarga, EjercicioEntreno, Entrenamiento, EstadoEjercicio, Resumen, Rutina, Serie, Sugerencia, TipoSerie,
+} from './tipos';
 
 export const DESCANSO_POR_DEFECTO = 90;
 
@@ -40,7 +43,12 @@ export function ejercicioNuevo(ejercicioId: string, estado: EstadoEjercicio | un
 }
 
 /** Arma el entrenamiento a partir de la rutina y de lo que hizo la última vez */
-export function iniciarDesdeRutina(r: Rutina, estados: Map<string, EstadoEjercicio>, ahora = Date.now()): Borrador {
+export function iniciarDesdeRutina(
+  r: Rutina,
+  estados: Map<string, EstadoEjercicio>,
+  ahora = Date.now(),
+  ajustes: AjustesSobrecarga = SOBRECARGA_POR_DEFECTO,
+): Borrador {
   return {
     rutinaId: r.id,
     nombre: r.nombre,
@@ -58,9 +66,22 @@ export function iniciarDesdeRutina(r: Rutina, estados: Map<string, EstadoEjercic
         return a ? { ...s, peso: a.peso } : s;
       });
       e.objetivo = textoObjetivo(er) + (er.nota ? ` · ${er.nota}` : '');
+      // Sobrecarga progresiva: en modo automático ya se carga el peso sugerido; en manual solo se muestra
+      const sug = sugerirSobrecarga(er.ejercicioId, est?.ultima, er, ajustes);
+      if (sug) {
+        e.sugerencia = { ...sug, aplicada: ajustes.modo === 'auto' };
+        if (ajustes.modo === 'auto') e.series = aplicarSugerencia(e.series, sug);
+      }
       return e;
     }),
   };
+}
+
+/** Aplica la sugerencia a las series normales que todavía no se hicieron */
+export function aplicarSugerencia(series: Serie[], sug: Sugerencia): Serie[] {
+  return series.map((s) => (s.hecha || s.tipo === 'calentamiento' ? s
+    : s.tipo === 'fallo' ? { ...s, peso: sug.peso }
+      : { ...s, peso: sug.peso, reps: sug.reps }));
 }
 
 export function nombreLibre(ahora = Date.now()): string {

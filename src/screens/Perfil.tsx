@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { mensajeError } from '../data/repo';
 import avatar from '../assets/avatar.webp';
-import { NOMBRES_DIA, rachaSemanas, rango, romano } from '../lib/logica';
+import { NOMBRES_DIA, aUnidad, formatoNumero, rachaSemanas, rango, redondear, romano } from '../lib/logica';
+import { SOBRECARGA_POR_DEFECTO } from '../lib/sobrecarga';
 import { FormAcceso } from './Acceso';
 import { COMMIT, FECHA_ARMADO, NOVEDADES, VERSION } from '../lib/novedades';
 import { esNativo, programarRecordatorios } from '../lib/recordatorios';
-import type { Recordatorio, Tema, Unidad } from '../lib/tipos';
+import type { ModoSobrecarga, Recordatorio, Tema, Unidad } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Hoja, Seccion, Selector } from '../ui/piezas';
@@ -20,6 +21,7 @@ export default function Perfil() {
   const [crear, setCrear] = useState(false);
   const r = perfil.recordatorio;
   const rg = rango(perfil.resumen.total);
+  const sc = perfil.sobrecarga ?? SOBRECARGA_POR_DEFECTO;
   const racha = rachaSemanas(perfil.resumen.dias);
 
   async function guardarRecordatorio(n: Recordatorio) {
@@ -98,6 +100,34 @@ export default function Perfil() {
       <Seccion titulo="Unidades">
         <Selector<Unidad> nombre="Unidades" valor={perfil.unidad} alCambiar={(u) => cambiarPerfil({ unidad: u })}
           opciones={[{ v: 'kg', t: 'Kilos (kg)' }, { v: 'lb', t: 'Libras (lb)' }]} />
+      </Seccion>
+
+      <Seccion titulo="Sobrecarga progresiva">
+        <div className="tarjeta">
+          <Selector<ModoSobrecarga> nombre="Sobrecarga progresiva" valor={sc.modo}
+            alCambiar={(m) => cambiarPerfil({ sobrecarga: { ...sc, modo: m } })}
+            opciones={[{ v: 'auto', t: 'Automática' }, { v: 'manual', t: 'Manual' }, { v: 'apagada', t: 'Apagada' }]} />
+          <p className="mt-3 text-[13px] text-mu">
+            {sc.modo === 'auto' ? 'Cuando cumplís todas las repeticiones, la próxima vez la rutina ya arranca con más peso.'
+              : sc.modo === 'manual' ? 'Te sugiere cuándo subir y vos decidís si aplicarlo con un toque.'
+                : 'No se sugieren cambios de peso.'}
+          </p>
+          {sc.modo !== 'apagada' && (
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {([['superior', 'Tren superior', [1, 1.25, 2.5]], ['inferior', 'Piernas y peso muerto', [2.5, 5]]] as const).map(([k, t, ops]) => (
+                <div key={k}>
+                  <div className="etiqueta">{t}</div>
+                  <div className="mt-2 flex gap-1.5">
+                    {ops.map((v) => (
+                      <button key={v} className={`chip flex-1 px-1 ${sc[k] === v ? 'chip-on' : ''}`}
+                        onClick={() => cambiarPerfil({ sobrecarga: { ...sc, [k]: v } })}>+{formatoNumero(redondear(aUnidad(v, perfil.unidad), 2))}</button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </Seccion>
 
       <Seccion titulo="Recordatorios">

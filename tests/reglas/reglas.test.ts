@@ -35,6 +35,8 @@ describe('reglas de Firestore', () => {
     await assertSucceeds(setDoc(doc(db, 'users/ana'), perfil('ana')));
     await assertSucceeds(getDoc(doc(db, 'users/ana')));
     await assertSucceeds(setDoc(doc(db, 'users/ana'), { tema: 'oscuro' }, { merge: true }));
+    await assertSucceeds(setDoc(doc(db, 'users/ana'), { sobrecarga: { modo: 'auto', superior: 1.25, inferior: 2.5 } }, { merge: true }));
+    await assertFails(setDoc(doc(db, 'users/ana'), { sobrecarga: { modo: 'loco', superior: 1, inferior: 2 } }, { merge: true }));
   });
 
   it('nadie lee ni escribe el perfil de otro', async () => {
