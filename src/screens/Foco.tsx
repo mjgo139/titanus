@@ -36,7 +36,7 @@ function Control({ etiqueta, valor, unidad, alCambiar, paso }: {
       <div className="mt-1 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-1">
         <button aria-label={`Menos ${etiqueta}`} className={btn} onClick={() => alCambiar(Math.max(0, redondear(valor - paso, 2)))}>−</button>
         <input aria-label={etiqueta} type="number" inputMode="decimal" step={paso}
-          className="h-11 w-full min-w-0 bg-transparent text-center num text-[32px] leading-none outline-none"
+          className={`h-11 w-full min-w-0 bg-transparent text-center num leading-none outline-none ${String(redondear(valor, 2)).length > 4 ? 'text-[26px]' : String(redondear(valor, 2)).length > 3 ? 'text-[30px]' : 'text-[36px]'}`}
           value={valor ? redondear(valor, 2) : ''} placeholder="0"
           onChange={(e) => alCambiar(Math.max(0, Number(e.target.value) || 0))} />
         <button aria-label={`Más ${etiqueta}`} className={btn} onClick={() => alCambiar(redondear(valor + paso, 2))}>+</button>
@@ -92,14 +92,9 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
           : <div className="flex h-full min-h-[300px] items-center justify-center rounded-[16px] border border-ln bg-sf"><Miniatura musculo={ej?.musculo} tam={120} /></div>}
       </div>
 
-      <div className="flex flex-col gap-3">
-        {/* Ejercicio, serie y avance (en el celular, con la animación al costado) */}
+      {/* En el celular ocupa todo el alto de la pantalla: la animación crece en el espacio libre */}
+      <div className="flex min-h-[calc(100dvh-132px)] flex-col gap-3 lg:min-h-0">
         <div className="flex items-center gap-3">
-          <div className="shrink-0 lg:hidden">
-            {conFoto
-              ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} className="h-[84px] w-[112px] rounded-[12px] border border-ln" />
-              : <Miniatura musculo={ej?.musculo} tam={84} />}
-          </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-display text-[24px] font-semibold leading-tight oro lg:text-[30px]">{ej?.nombre}</h2>
             <p className="mt-0.5 truncate text-[13px] text-mu">{e.objetivo ?? `${e.series.length} series`}</p>
@@ -109,8 +104,30 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
             </p>
           </div>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-ln2" aria-label={`${hechas} de ${lista.length} series hechas`}>
+        {/* Series de este ejercicio: hechas, actual y pendientes */}
+        <div className="flex items-center gap-2" aria-label="Series del ejercicio">
+          {e.series.map((x, j) => {
+            const actual = j === pos.j;
+            return (
+              <button key={j} onClick={() => setPos({ i: pos.i, j })} aria-label={`Ir a la serie ${j + 1}`}
+                className={`num flex h-9 min-w-9 flex-1 items-center justify-center rounded-[10px] border text-[15px] ${x.hecha ? 'border-goldh' : actual ? 'border-gold oro' : 'border-ln2 text-mu'}`}
+                style={x.hecha ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
+                {x.hecha ? <Icono n="check" size={16} /> : x.tipo === 'fallo' ? 'F' : x.tipo === 'calentamiento' ? 'C' : j + 1}
+              </button>
+            );
+          })}
+        </div>
+        <div className="h-1 overflow-hidden rounded-full bg-ln2" aria-label={`${hechas} de ${lista.length} series hechas en total`}>
           <div className="h-full transition-all" style={{ width: `${(hechas / lista.length) * 100}%`, background: 'var(--oro-grad)' }} />
+        </div>
+
+        {/* Celular: animación que llena el espacio libre */}
+        <div className="relative min-h-[150px] flex-1 overflow-hidden rounded-[16px] border border-ln lg:hidden">
+          <div className="absolute inset-0">
+            {conFoto
+              ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} className="h-full w-full" />
+              : <div className="flex h-full items-center justify-center bg-sf"><Miniatura musculo={ej?.musculo} tam={96} /></div>}
+          </div>
         </div>
 
         {/* La serie actual */}

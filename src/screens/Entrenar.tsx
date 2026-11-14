@@ -65,6 +65,8 @@ export default function Entrenar() {
   });
   const [pos, setPos] = useState<Posicion | null>(null);
   const [elegidos, setElegidos] = useState<Record<number, boolean>>({});
+  /** Valor elegido por el usuario en la hoja de sobrecarga (kg o reps, según el caso) */
+  const [valores, setValores] = useState<Record<number, number>>({});
   const cambiarVista = (v: 'foco' | 'lista') => { setVista(v); try { localStorage.setItem('titanus-vista', v); } catch { /* nada */ } };
   const u = perfil.unidad;
 
@@ -166,8 +168,11 @@ export default function Entrenar() {
         for (const { i } of pendientesSobrecarga) {
           if (elegidos[i] === false) continue;
           const ex = x.ejercicios[i];
-          ex.series = aplicarSugerencia(ex.series, ex.sugerencia!);
-          ex.sugerencia = { ...ex.sugerencia!, aplicada: true };
+          const sug = ex.sugerencia!;
+          const v = valores[i];
+          const final = v === undefined ? sug : sug.accion === 'reps' ? { ...sug, reps: v } : { ...sug, peso: v };
+          ex.series = aplicarSugerencia(ex.series, final);
+          ex.sugerencia = { ...final, aplicada: true };
         }
       }
       x.sobrecargaRevisada = true;
@@ -392,27 +397,39 @@ export default function Entrenar() {
       </Hoja>
 
       <Hoja abierta={!!pendientesSobrecarga.length} alCerrar={() => cerrarSobrecarga(false)} etiqueta="Antes de empezar" titulo="Sobrecarga progresiva">
-        <p className="text-[14px] text-mu">La vez pasada cumpliste todas las repeticiones en estos ejercicios. Elegí en cuáles subir hoy:</p>
+        <p className="text-[14px] text-mu">La vez pasada cumpliste todas las repeticiones en estos ejercicios. Elegí en cuáles subir hoy y cuánto (con − y +):</p>
         <ul className="mt-3 flex flex-col gap-2" data-testid="hoja-sobrecarga">
           {pendientesSobrecarga.map(({ e, i }) => {
             const ej = buscarEjercicio(e.ejercicioId, propios);
+            const sug = e.sugerencia!;
             const desde = estados.get(e.ejercicioId)?.ultima?.series.find((x) => !x.tipo)?.peso ?? 0;
             const on = elegidos[i] ?? true;
+            const porReps = sug.accion === 'reps';
+            const valor = valores[i] ?? (porReps ? sug.reps : sug.peso);
+            const paso = porReps ? 1 : u === 'kg' ? 1.25 : aKg(2.5, 'lb');
+            const mostrado = porReps ? valor : redondear(aUnidad(valor, u), 2);
+            const dif = porReps ? valor - (sug.reps - 1) : aUnidad(valor - desde, u);
+            const cambiarValor = (d: number) => setValores((x) => ({ ...x, [i]: Math.max(porReps ? 1 : 0, redondear(valor + d * paso, 3)) }));
+            const btn = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ln3 text-[18px] oro disabled:opacity-30';
             return (
-              <li key={i}>
-                <label className={`tarjeta flex cursor-pointer items-center gap-3 py-3 ${on ? 'border-gold' : ''}`}>
-                  <input type="checkbox" className="h-5 w-5 accent-[#e6b84e]" checked={on} aria-label={`Subir ${ej?.nombre}`}
-                    onChange={(ev) => setElegidos((x) => ({ ...x, [i]: ev.target.checked }))} />
-                  <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={36} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold">{ej?.nombre}</span>
-                    <span className="text-[13px] text-mu">
-                      {e.sugerencia!.accion === 'reps'
-                        ? `${e.sugerencia!.reps} reps por serie`
-                        : <>{formatoNumero(redondear(aUnidad(desde, u)))} → <b className="oro">{formatoNumero(redondear(aUnidad(e.sugerencia!.peso, u)))} {u}</b></>}
-                    </span>
+              <li key={i} className={`tarjeta flex items-center gap-3 px-3 py-2.5 ${on ? 'border-gold' : 'opacity-70'}`}>
+                <input type="checkbox" className="h-5 w-5 shrink-0 accent-[#e6b84e]" checked={on} aria-label={`Subir ${ej?.nombre}`}
+                  onChange={(ev) => setElegidos((x) => ({ ...x, [i]: ev.target.checked }))} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-semibold">{ej?.nombre}</span>
+                  <span className="text-[12px] text-mu">
+                    {porReps ? `Antes ${sug.reps - 1} reps` : `Antes ${formatoNumero(redondear(aUnidad(desde, u), 2))} ${u}`}
+                    {' · '}<span className={dif > 0 ? 'oro' : dif < 0 ? 'text-miss' : ''}>{dif > 0 ? '+' : ''}{formatoNumero(redondear(dif, 2))} {porReps ? 'reps' : u}</span>
                   </span>
-                </label>
+                </span>
+                <div className="flex shrink-0 items-center gap-1" aria-label={`Nuevo valor de ${ej?.nombre}`}>
+                  <button className={btn} disabled={!on} aria-label={`Bajar ${ej?.nombre}`} onClick={() => cambiarValor(-1)}>−</button>
+                  <span className="w-[62px] text-center leading-tight" data-testid={`sobrecarga-valor-${e.ejercicioId}`}>
+                    <b className="num block text-[19px] oro">{formatoNumero(mostrado)}</b>
+                    <span className="text-[11px] text-mu">{porReps ? 'reps' : u}</span>
+                  </span>
+                  <button className={btn} disabled={!on} aria-label={`Subir más ${ej?.nombre}`} onClick={() => cambiarValor(1)}>+</button>
+                </div>
               </li>
             );
           })}

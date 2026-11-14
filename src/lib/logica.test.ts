@@ -79,7 +79,7 @@ describe('volumen y récords', () => {
     const r = detectarRecords([ej('a', [[55, 10], [50, 10]])], new Map([['a', prev]]));
     expect(r).toEqual([
       { ejercicioId: 'a', tipo: 'peso', valor: 55 },
-      { ejercicioId: 'a', tipo: '1rm', valor: 73.3 },
+      { ejercicioId: 'a', tipo: '1rm', valor: 73.33 },
       { ejercicioId: 'a', tipo: 'volumen', valor: 1050 },
     ]);
   });

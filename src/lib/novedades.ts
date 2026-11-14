@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.5.1',
+    fecha: '2026-11-14',
+    cambios: [
+      'Sobrecarga editable al empezar: con − y + elegís cuánto subir (o bajar) en cada ejercicio.',
+      'Foco en el celular usa toda la pantalla: animación grande, series del ejercicio como botones y controles más grandes.',
+      'Pesos con dos decimales (53,75 kg) en toda la app.',
+    ],
+  },
+  {
     version: '1.5.0',
     fecha: '2026-11-14',
     cambios: [

@@ -254,12 +254,17 @@ test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que si
   await ir(page, 'Entreno');
   await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).getByRole('button', { name: 'Empezar rutina' }).click();
   await expect(page.getByTestId('hoja-sobrecarga')).toContainText('Sentadilla');
-  await expect(page.getByTestId('hoja-sobrecarga')).toContainText('80 kg');
+  await expect(page.getByTestId('sobrecarga-valor-sentadilla')).toContainText('80');
+  // Se puede ajustar cuánto subir: +1,25 kg más en sentadilla y −1,25 en press de banca
+  await page.getByRole('button', { name: 'Subir más Sentadilla' }).click();
+  await expect(page.getByTestId('sobrecarga-valor-sentadilla')).toContainText('81,25');
+  await page.getByRole('button', { name: 'Bajar Press de banca' }).click();
+  await expect(page.getByTestId('sobrecarga-valor-press-banca')).toContainText('53,75');
   await captura(page, '26-sobrecarga-al-empezar');
   await page.getByRole('button', { name: 'Aplicar y empezar' }).click();
   await expect(page.getByTestId('vista-foco')).toBeVisible();
   await expect(page.getByTestId('posicion')).toHaveText('Serie 1 de 4');
-  await expect(page.getByLabel('Peso', { exact: true })).toHaveValue('80');
+  await expect(page.getByLabel('Peso', { exact: true })).toHaveValue('81.25');
   await expect(page.getByTestId('a-continuacion')).toContainText('Serie 2');
   // Lo esencial entra en la pantalla sin bajar: el botón y el cronómetro
   await expect(page.getByRole('button', { name: 'Serie hecha' })).toBeInViewport();

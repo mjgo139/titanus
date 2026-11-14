@@ -232,15 +232,15 @@ export function aUnidad(kg: number, u: Unidad): number {
 export function aKg(valor: number, u: Unidad): number {
   return u === 'kg' ? valor : valor / LB;
 }
-export function redondear(n: number, dec = 1): number {
+export function redondear(n: number, dec = 2): number {
   const f = 10 ** dec;
   return Math.round(n * f) / f;
 }
-export function formatoPeso(kg: number, u: Unidad, dec = 1): string {
+export function formatoPeso(kg: number, u: Unidad, dec = 2): string {
   return `${formatoNumero(redondear(aUnidad(kg, u), dec))} ${u}`;
 }
 export function formatoNumero(n: number): string {
-  return new Intl.NumberFormat('es-PY', { maximumFractionDigits: 1 }).format(n);
+  return new Intl.NumberFormat('es-PY', { maximumFractionDigits: 2 }).format(n);
 }
 
 /* ───────── Textos ───────── */
