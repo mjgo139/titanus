@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.3.0',
+    fecha: '2026-11-14',
+    cambios: [
+      'Fotos animadas de cada ejercicio (inicio y final del movimiento), de free-exercise-db, dominio público.',
+      'PC: Inicio con filas alineadas entre columnas; tarjetas de entrenamiento de igual alto y tabla más pareja.',
+      'La columna ANTERIOR compara por tipo de serie: la serie al fallo con la de fallo.',
+      'Modo prueba: la rutina Full body aparece como ya hecha durante 8 semanas (datos inventados).',
+    ],
+  },
+  {
     version: '1.2.0',
     fecha: '2026-11-14',
     cambios: [

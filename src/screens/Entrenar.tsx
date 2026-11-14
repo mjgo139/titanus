@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { borrarBorrador, guardarBorrador, leerBorrador, type Borrador } from '../lib/borrador';
-import { DESCANSO_POR_DEFECTO, cerrarEntrenamiento, ejercicioNuevo } from '../lib/entreno';
+import { DESCANSO_POR_DEFECTO, anteriorPara, cerrarEntrenamiento, ejercicioNuevo } from '../lib/entreno';
 import { aKg, aUnidad, formatoNumero, redondear, reloj, seriesHechas } from '../lib/logica';
 import { avisoFinDescanso, prepararAudio } from '../lib/sonido';
 import type { Ejercicio, EstadoEjercicio, Sensacion, TipoSerie } from '../lib/tipos';
@@ -10,7 +10,7 @@ import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando, Hoja } from '../ui/piezas';
 import { Biblioteca } from './Biblioteca';
-import { Miniatura } from './Miniatura';
+import { Animacion, Miniatura } from './Miniatura';
 
 const TIPOS: { v: TipoSerie; t: string; l: string; c: string }[] = [
   { v: 'calentamiento', t: 'Calentamiento', l: 'C', c: '#e0b04a' },
@@ -85,7 +85,7 @@ export default function Entrenar() {
       const t = x.ejercicios[i].series[j];
       t.hecha = hecha;
       // Si no cargó nada, toma lo de la vez anterior
-      const ant = estados.get(x.ejercicios[i].ejercicioId)?.ultima?.series[j];
+      const ant = anteriorPara(estados.get(x.ejercicios[i].ejercicioId)?.ultima?.series, x.ejercicios[i].series, j);
       if (hecha && !t.reps && ant) { t.reps = ant.reps; if (!t.peso) t.peso = ant.peso; }
     });
     const seg = b!.ejercicios[i].descanso ?? DESCANSO_POR_DEFECTO;
@@ -161,15 +161,15 @@ export default function Entrenar() {
         </div>
       )}
 
-      <ol className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start">
+      <ol className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-stretch">
         {b.ejercicios.map((e, i) => {
           const ej = buscarEjercicio(e.ejercicioId, propios);
           const ant = estados.get(e.ejercicioId)?.ultima?.series ?? [];
           let n = 0;
           return (
-            <li key={e.ejercicioId + i} className="tarjeta px-3" data-testid="ejercicio">
+            <li key={e.ejercicioId + i} className="tarjeta flex flex-col px-3 lg:px-4" data-testid="ejercicio">
               <div className="flex items-center gap-3">
-                <Miniatura musculo={ej?.musculo} />
+                <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={48} />
                 <button className="flex-1 text-left font-display text-[18px] font-semibold oro leading-tight" onClick={() => setMenuEj(i)}>{ej?.nombre ?? 'Ejercicio'}</button>
                 <button aria-label={`Opciones de ${ej?.nombre}`} className="toque -mr-2 flex items-center justify-center text-mu" onClick={() => setMenuEj(i)}>
                   <Icono n="puntos" />
@@ -183,16 +183,16 @@ export default function Entrenar() {
                 <Icono n="reloj" size={15} />Descanso: {textoDescanso(e.descanso ?? DESCANSO_POR_DEFECTO)}
               </button>
 
-              <div className="mt-3 grid grid-cols-[40px_1fr_64px_56px_40px] gap-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
+              <div className="mt-3 grid grid-cols-[38px_minmax(0,1fr)_64px_56px_40px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px] gap-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
                 <span className="text-center">Serie</span><span>Anterior</span><span className="text-center">{u}</span><span className="text-center">Reps</span><span className="text-center">✓</span>
               </div>
               {e.series.map((s, j) => {
                 const tipo = TIPOS.find((t) => t.v === (s.tipo ?? 'normal'))!;
                 if (tipo.v !== 'calentamiento') n++;
-                const a = ant[j];
+                const a = anteriorPara(ant, e.series, j);
                 return (
                   <div key={j} data-testid="serie"
-                    className={`mt-1.5 grid grid-cols-[40px_1fr_64px_56px_40px] items-center gap-1.5 rounded-[8px] px-0.5 py-1 ${s.hecha ? 'bg-okbg' : ''}`}>
+                    className={`mt-1.5 grid grid-cols-[38px_minmax(0,1fr)_64px_56px_40px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px] items-center gap-1.5 rounded-[8px] px-0.5 py-1 ${s.hecha ? 'bg-okbg' : ''}`}>
                     <button aria-label={`Tipo de la serie ${j + 1}`} onClick={() => setMenuSerie({ i, j })}
                       className="h-9 rounded-[8px] text-center num text-[15px] font-bold" style={{ color: tipo.c }}>
                       {tipo.l || n}
@@ -218,6 +218,7 @@ export default function Entrenar() {
                   </div>
                 );
               })}
+              <div className="flex-1" />
               <button className="btn-sec mt-3 h-10 w-full text-[14px]"
                 onClick={() => cambiar((x) => {
                   const ss = x.ejercicios[i].series;
@@ -287,6 +288,8 @@ export default function Entrenar() {
         titulo={menuEj !== null ? buscarEjercicio(b.ejercicios[menuEj]?.ejercicioId ?? '', propios)?.nombre ?? '' : ''}>
         {menuEj !== null && b.ejercicios[menuEj] && (
           <div>
+            <Animacion id={b.ejercicios[menuEj].ejercicioId} nombre={buscarEjercicio(b.ejercicios[menuEj].ejercicioId, propios)?.nombre}
+              className="mb-4 aspect-[3/2] w-full rounded-[12px] border border-ln" />
             <div className="etiqueta">Descanso entre series</div>
             <div className="mt-2 flex flex-wrap gap-2">
               {DESCANSOS.map((d) => (

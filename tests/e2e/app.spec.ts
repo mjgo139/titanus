@@ -104,7 +104,7 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await page.getByRole('button', { name: 'Marcar serie 1 como hecha' }).first().click();
   await expect(page.getByRole('timer', { name: 'Descanso' })).toBeVisible();
   await page.getByRole('button', { name: 'Marcar serie 2 como hecha' }).first().click();
-  await page.getByLabel('Notas de Press de banca').fill('Buen agarre');
+  await page.getByLabel('Notas de Sentadilla').fill('Buena profundidad');
   await page.getByRole('button', { name: 'Tipo de la serie 3' }).first().click();
   await page.getByRole('button', { name: 'Al fallo' }).click();
   await page.getByRole('button', { name: 'Agregar serie' }).first().click();
@@ -143,6 +143,15 @@ test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ pa
   await page.getByRole('button', { name: 'Volver al inicio' }).click();
   await ir(page, 'Entreno');
   await expect(page.getByRole('heading', { name: /Entrenamiento de la/ })).toBeVisible();
+});
+
+test('ejercicio: ver la animación de cómo se hace', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Progreso');
+  await page.getByRole('radio', { name: 'Récords' }).click();
+  await page.getByRole('link', { name: /Sentadilla/ }).first().click();
+  await expect(page.getByRole('img', { name: 'Cómo se hace: Sentadilla' })).toBeVisible();
+  await captura(page, '25-ejercicio-animacion');
 });
 
 test('progreso: resumen, calendario, historial, repetir, récords y medidas', async ({ page }) => {
@@ -202,9 +211,9 @@ test('plantilla Full body principiante: ver, cargar y entrenar el día A', async
   await captura(page, '22-plantilla');
   await page.getByRole('button', { name: 'Cargar las 3 rutinas' }).click();
   await expect(page.getByRole('status')).toContainText('3 rutinas cargadas');
-  await expect(page.getByRole('heading', { name: 'A · Full body' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'A · Full body' })).toHaveCount(2);
   await captura(page, '23-rutinas-cargadas');
-  await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).getByRole('button', { name: 'Empezar rutina' }).click();
+  await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).last().getByRole('button', { name: 'Empezar rutina' }).click();
   await expect(page.getByTestId('objetivo').first()).toContainText('3×6 + 1 al fallo');
   await expect(page.getByRole('button', { name: 'Tipo de la serie 4' }).first()).toHaveText('F');
   await captura(page, '24-entrenar-full-body');

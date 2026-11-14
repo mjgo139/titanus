@@ -92,3 +92,10 @@ export function buscarEjercicio(id: string, propios: Ejercicio[] = []): Ejercici
 export function normalizar(s: string): string {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
+
+/** Ejercicios con fotos de free-exercise-db (dominio público): /ejercicios/<id>-0.webp y -1.webp */
+const CON_IMAGEN = new Set<string>(["abductores", "aperturas", "bicicleta", "cinta", "cruce-poleas", "crunch", "crunch-polea", "curl-barra", "curl-concentrado", "curl-femoral", "curl-mancuernas", "curl-martillo", "curl-polea", "curl-predicador", "dominadas", "dominadas-neutras", "dominadas-supinas", "elevacion-piernas", "elevaciones-frontales", "elevaciones-laterales", "eliptica", "extension-cuadriceps", "extension-nuca", "extension-polea", "extension-triceps-mancuerna", "face-pull", "flexiones", "fondos-banco", "fondos-pecho", "gemelos-pie", "giro-ruso", "hip-thrust", "jalon-pecho", "pajaros", "patada-gluteo", "patada-triceps", "peso-muerto", "peso-muerto-rumano", "plancha", "prensa", "press-banca", "press-cerrado", "press-declinado", "press-frances", "press-hombro-mancuernas", "press-inclinado-barra", "press-inclinado-mancuernas", "press-mancuernas", "press-maquina", "press-militar", "puente-gluteo", "pullover-polea", "remo-al-menton", "remo-barra", "remo-ergometro", "remo-mancuerna", "remo-maquina", "remo-pendlay", "remo-polea", "rueda-abdominal", "saltar-soga", "sentadilla", "sentadilla-bulgara", "sentadilla-frontal", "sentadilla-goblet", "zancadas"]);
+
+export function imagenesEjercicio(id: string): [string, string] | null {
+  return CON_IMAGEN.has(id) ? [`/ejercicios/${id}-0.webp`, `/ejercicios/${id}-1.webp`] : null;
+}

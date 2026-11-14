@@ -161,6 +161,7 @@ export default function Perfil() {
         </Seccion>
       )}
 
+      <p className="mt-6 text-[11px] text-mu2">Fotos de ejercicios: free-exercise-db (dominio público).</p>
       </div>
       </div>
       <Hoja abierta={crear} alCerrar={() => setCrear(false)} titulo="Crear cuenta">

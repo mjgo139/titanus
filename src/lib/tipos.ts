@@ -87,7 +87,7 @@ export interface PuntoGrafico {
 /** Resumen por ejercicio: evita recorrer todo el historial (ahorra lecturas) */
 export interface EstadoEjercicio {
   ejercicioId: string;
-  ultima?: { fecha: number; series: { peso: number; reps: number }[] };
+  ultima?: { fecha: number; series: { peso: number; reps: number; tipo?: TipoSerie }[] };
   mejorPeso: number;
   mejorVolumen: number;
   mejor1RM?: number;

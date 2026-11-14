@@ -25,15 +25,20 @@ export class RepoMemoria implements Repo {
   private cuentas = new Map<string, { u: Usuario; clave: string }>();
   private datos = new Map<string, Datos>();
 
-  constructor(ahora = Date.now()) {
+  constructor(private ahora = Date.now()) {
     this.cuentas.set(USUARIO_PRUEBA.email, { u: USUARIO_PRUEBA, clave: CLAVE_PRUEBA });
-    const s = datosDePrueba(ahora);
-    const perfil = perfilInicial(USUARIO_PRUEBA);
-    perfil.nombre = 'Marco';
+    this.cargarEjemplo(USUARIO_PRUEBA, 'Marco');
+  }
+
+  /** Carga la rutina Full body ya hecha durante 8 semanas (datos inventados) */
+  private cargarEjemplo(u: Usuario, nombre: string) {
+    const s = datosDePrueba(this.ahora);
+    const perfil = perfilInicial(u);
+    perfil.nombre = nombre;
     perfil.tema = 'oscuro';
     perfil.resumen = { dias: s.dias, total: s.historial.length, semanas: s.semanas };
-    perfil.creado = ahora - 60 * 86_400_000;
-    this.datos.set(USUARIO_PRUEBA.uid, {
+    perfil.creado = this.ahora - 60 * 86_400_000;
+    this.datos.set(u.uid, {
       perfil,
       rutinas: new Map(s.rutinas.map((r) => [r.id, r])),
       propios: new Map(),
@@ -99,6 +104,8 @@ export class RepoMemoria implements Repo {
   async ingresarComoInvitado() {
     await espera();
     this.usuario = { uid: 'inv-' + Math.random().toString(36).slice(2, 9), email: '', nombre: 'Legionario', invitado: true };
+    // En el modo prueba, el invitado ve la rutina Full body como si ya la hubiera hecho
+    this.cargarEjemplo(this.usuario, 'Legionario');
     this.avisar();
   }
 

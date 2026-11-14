@@ -100,7 +100,7 @@ export default function EditarRutina() {
           {r.ejercicios.map((e, i) => (
             <li key={e.ejercicioId} className="tarjeta">
               <div className="flex items-center gap-2">
-                <Miniatura musculo={buscarEjercicio(e.ejercicioId, propios)?.musculo} tam={34} />
+                <Miniatura musculo={buscarEjercicio(e.ejercicioId, propios)?.musculo} id={e.ejercicioId} tam={38} />
                 <span className="flex-1 font-semibold oro">{buscarEjercicio(e.ejercicioId, propios)?.nombre ?? 'Ejercicio'}</span>
                 <button aria-label="Subir" className="h-8 w-8 flex items-center justify-center text-mu" onClick={() => mover(i, -1)}><Icono n="arriba" size={18} /></button>
                 <button aria-label="Bajar" className="h-8 w-8 flex items-center justify-center text-mu" onClick={() => mover(i, 1)}><Icono n="abajo" size={18} /></button>

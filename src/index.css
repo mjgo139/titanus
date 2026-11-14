@@ -117,3 +117,8 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 @media (min-width: 1024px) { .pb-seguro { padding-bottom: 48px; } }
 .mascara-izq { mask-image: linear-gradient(to right, transparent, #000 40%); -webkit-mask-image: linear-gradient(to right, transparent, #000 40%); }
 .mascara-vert { mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 82%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 82%, transparent 100%); }
+
+/* Animación de ejercicio: alterna inicio y final del movimiento */
+@keyframes movimiento { 0%, 35% { opacity: 0; } 50%, 85% { opacity: 1; } 100% { opacity: 0; } }
+.animar-movimiento { animation: movimiento 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .animar-movimiento { animation: none; opacity: 0; } }

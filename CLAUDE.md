@@ -43,7 +43,8 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 - **Seguimiento estilo Hevy:** duración/volumen/series en vivo, tabla SERIE · ANTERIOR · KG · REPS · ✓, tipos de serie (calentamiento C, fallo F, drop D), descanso por ejercicio, notas, 1RM (Epley), libre, minimizar, repetir y guardar como rutina.
 - **PC (≥1024px):** contenido hasta 1180px en dos columnas; celular sigue con máximo 480px.
 - **Plantillas** en `src/lib/plantillas.ts` (Full body principiante A/B/C). Las rutinas admiten `repsMax` (rango), `alFallo` (series 1×Máx) y `nota` (alternativa).
-- **GIFs de ejercicios (pendiente de decisión del dueño):** free-exercise-db (dominio público, 2 fotos por ejercicio, se pueden animar), RepDB gratis (atribución), ExerciseDB/AscendAPI (GIFs reales, pago, prohíbe guardarlos). No usar datasets con GIFs de Gymvisual sin licencia propia.
+- **Animaciones de ejercicios (v1.3.0):** fotos de free-exercise-db (dominio público) en `public/ejercicios/<id>-0.webp` y `-1.webp`, alternadas con CSS (`Animacion` en `src/screens/Miniatura.tsx`). El mapeo id propio → id de free-exercise-db se hizo a mano; ejercicios nuevos de la biblioteca necesitan sus fotos o muestran la sigla. Para GIFs reales: ExerciseDB/AscendAPI (pago, prohíbe guardarlos) o un paquete con licencia. No usar datasets con GIFs de Gymvisual sin licencia propia.
+- **Modo prueba:** la cuenta de ejemplo y el invitado ven la plantilla Full body hecha 8 semanas (`datosDePrueba`).
 - Rangos por entrenamientos: Recluta 0, Legionario 10, Decurión 30, Centurión 60, Tribuno 120, Legado 200, César 365. Nivel = total/5 + 1.
 
 ## Reglas de trabajo

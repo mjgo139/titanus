@@ -75,7 +75,7 @@ export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alC
                   const ya = elegidos.includes(e.id);
                   return (
                     <button key={e.id} disabled={ya} onClick={() => alElegir(e)} className="fila w-full text-left disabled:opacity-50">
-                      <Miniatura musculo={e.musculo} tam={38} />
+                      <Miniatura musculo={e.musculo} id={e.id} tam={42} />
                       <span className="flex-1">
                         <span className="block font-semibold text-tx">{e.nombre}</span>
                         <span className="text-[12px] text-mu">{e.propio ? 'Propio' : e.equipo}</span>

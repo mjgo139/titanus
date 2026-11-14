@@ -3,9 +3,23 @@ import {
   actualizarEstado, agregarDia, detectarRecords, nuevoId, seriesHechas, sumarSemana, volumenTotal,
 } from './logica';
 import { textoObjetivo } from './plantillas';
-import type { EjercicioEntreno, Entrenamiento, EstadoEjercicio, Resumen, Rutina } from './tipos';
+import type { EjercicioEntreno, Entrenamiento, EstadoEjercicio, Resumen, Rutina, Serie, TipoSerie } from './tipos';
 
 export const DESCANSO_POR_DEFECTO = 90;
+
+type Previa = { peso: number; reps: number; tipo?: TipoSerie };
+const clase = (t?: TipoSerie) => (t === 'fallo' || t === 'calentamiento' ? t : 'normal');
+
+/**
+ * Qué hizo la vez anterior en esta serie. Se compara por tipo, como Hevy:
+ * la 1.ª serie normal con la 1.ª normal, la serie al fallo con la serie al fallo.
+ */
+export function anteriorPara(previas: Previa[] | undefined, series: Serie[], j: number): Previa | undefined {
+  if (!previas?.length) return undefined;
+  const c = clase(series[j]?.tipo);
+  const k = series.slice(0, j).filter((s) => clase(s.tipo) === c).length;
+  return previas.filter((p) => clase(p.tipo) === c)[k];
+}
 
 /** Un ejercicio nuevo dentro del entrenamiento, con los pesos de la última vez */
 export function ejercicioNuevo(ejercicioId: string, estado: EstadoEjercicio | undefined, series = 3, reps = 10, descanso = DESCANSO_POR_DEFECTO): EjercicioEntreno {
@@ -31,9 +45,16 @@ export function iniciarDesdeRutina(r: Rutina, estados: Map<string, EstadoEjercic
     inicio: ahora,
     ejercicios: r.ejercicios.map((er) => {
       const fallo = er.alFallo ?? 0;
-      const e = ejercicioNuevo(er.ejercicioId, estados.get(er.ejercicioId), er.series + fallo, er.reps, er.descanso);
+      const est = estados.get(er.ejercicioId);
+      const e = ejercicioNuevo(er.ejercicioId, est, er.series + fallo, er.reps, er.descanso);
       // En una rutina mandan las repeticiones planificadas; las últimas son al fallo (1×Máx)
       e.series = e.series.map((s, i) => (i < er.series ? { ...s, reps: er.reps } : { ...s, reps: 0, tipo: 'fallo' as const }));
+      // El peso inicial sale de la misma serie (por tipo) de la vez anterior
+      const ult = est?.ultima?.series;
+      e.series = e.series.map((s, j) => {
+        const a = anteriorPara(ult, e.series, j) ?? anteriorPara(ult, e.series.map((x) => ({ ...x, tipo: 'normal' as const })), j);
+        return a ? { ...s, peso: a.peso } : s;
+      });
       e.objetivo = textoObjetivo(er) + (er.nota ? ` · ${er.nota}` : '');
       return e;
     }),

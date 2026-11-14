@@ -235,3 +235,14 @@ describe('plantilla Full body principiante', () => {
     expect(c.entreno.ejercicios[0]).not.toHaveProperty('objetivo');
   });
 });
+
+describe('columna ANTERIOR por tipo de serie', () => {
+  it('compara normal con normal y fallo con fallo', async () => {
+    const { anteriorPara } = await import('./entreno');
+    const previas = [{ peso: 60, reps: 8 }, { peso: 60, reps: 8 }, { peso: 60, reps: 12, tipo: 'fallo' as const }];
+    const hoy = [0, 1, 2, 3].map((i) => ({ peso: 0, reps: 0, hecha: false, tipo: (i === 3 ? 'fallo' : 'normal') as 'fallo' | 'normal' }));
+    expect(anteriorPara(previas, hoy, 0)).toEqual({ peso: 60, reps: 8 });
+    expect(anteriorPara(previas, hoy, 2)).toBeUndefined();
+    expect(anteriorPara(previas, hoy, 3)).toEqual({ peso: 60, reps: 12, tipo: 'fallo' });
+  });
+});

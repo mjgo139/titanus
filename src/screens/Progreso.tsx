@@ -205,7 +205,7 @@ function Historial() {
               <ul className="flex flex-col gap-1.5 text-[14px]">
                 {e.ejercicios.slice(0, 3).map((x) => (
                   <li key={x.ejercicioId} className="flex items-center gap-2">
-                    <Miniatura musculo={buscarEjercicio(x.ejercicioId, propios)?.musculo} tam={26} />
+                    <Miniatura musculo={buscarEjercicio(x.ejercicioId, propios)?.musculo} id={x.ejercicioId} tam={28} />
                     <span className="flex-1 truncate">{x.series.length} series · {buscarEjercicio(x.ejercicioId, propios)?.nombre}</span>
                   </li>
                 ))}
@@ -266,7 +266,7 @@ function Records() {
         return (
           <li key={s.ejercicioId}>
             <Link to={`/progreso/ejercicio/${s.ejercicioId}`} className="tarjeta flex items-center gap-3">
-              <Miniatura musculo={ej?.musculo} />
+              <Miniatura musculo={ej?.musculo} id={s.ejercicioId} tam={48} />
               <span className="flex-1">
                 <span className="block font-semibold">{ej?.nombre ?? s.ejercicioId}</span>
                 <span className="text-[12px] text-mu">{s.puntos.length} sesiones{s.mejor1RM ? ` · 1RM ${formatoPeso(s.mejor1RM, u)}` : ''}</span>

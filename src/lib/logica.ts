@@ -167,7 +167,7 @@ export function actualizarEstado(
   const puntos = [...(previo?.puntos ?? []), { fecha, pesoMax: p, volumen: v, e1rm: u, reps: repsTotales(e) }].slice(-MAX_PUNTOS);
   return {
     ejercicioId: e.ejercicioId,
-    ultima: { fecha, series: hechas.map((s) => ({ peso: s.peso, reps: s.reps })) },
+    ultima: { fecha, series: hechas.map((s) => ({ peso: s.peso, reps: s.reps, ...(s.tipo && s.tipo !== 'normal' ? { tipo: s.tipo } : {}) })) },
     mejorPeso: Math.max(previo?.mejorPeso ?? 0, p),
     mejorVolumen: Math.max(previo?.mejorVolumen ?? 0, v),
     mejor1RM: Math.max(previo?.mejor1RM ?? 0, u),

@@ -5,7 +5,7 @@ import { aUnidad, fechaCorta, formatoNumero, formatoPeso, redondear } from '../l
 import type { Ejercicio, EstadoEjercicio } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Cargando, Encabezado, GraficoLinea, Seccion, Selector, Vacio } from '../ui/piezas';
-import { Miniatura } from './Miniatura';
+import { Animacion } from './Miniatura';
 
 export default function DetalleEjercicio() {
   const { id = '' } = useParams();
@@ -26,7 +26,8 @@ export default function DetalleEjercicio() {
   return (
     <div>
       <Encabezado atras="/progreso?v=records" etiqueta={ej?.musculo ?? 'Ejercicio'} titulo={ej?.nombre ?? 'Ejercicio'}
-        linea="Cómo evolucionó tu fuerza en cada sesión." accion={<Miniatura musculo={ej?.musculo} />} />
+        linea="Cómo evolucionó tu fuerza en cada sesión." />
+      <Animacion id={id} nombre={ej?.nombre} className="mb-4 aspect-[3/2] w-full rounded-[14px] border border-ln lg:max-w-[520px]" />
       {!est ? <Vacio titulo="Sin datos" linea="Todavía no registraste este ejercicio." /> : (
         <>
           <div className="grid grid-cols-3 gap-2">
