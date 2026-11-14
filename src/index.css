@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables de color copiadas de la guía de estilo de Stoica (página 12) */
+:root {
+  --bg:#ece6db; --sf:#faf7f1; --nav:#f6f2ea; --ln:#e0d7c5; --ln2:#e9e2d4; --ln3:#cdc1a7;
+  --tx:#16120d; --tx2:#2b261e; --mu:#4a4337; --mu2:#5a5244;
+  --gold:#7e5d22; --goldh:#674b1a; --goldbg:#eadbb8; --on:#fbf8f1;
+  --ok:#3f6e38; --okbg:#dce9d3; --miss:#9c3f2e; --missbg:#f4ded6;
+  --hero1:#e7d9b9; --hero2:#f6efdf;
+  --f-display:'Playfair Display', Georgia, serif; --f-body:Inter, system-ui, sans-serif;
+  --sombra: 0 1px 2px rgba(60, 45, 20, .05), 0 6px 18px rgba(60, 45, 20, .06);
+  --lateral:#16130e;
+}
+:root[data-theme='dark'] {
+  --bg:#14120e; --sf:#1a1812; --nav:#110f0b; --ln:#302b23; --ln2:#26221b; --ln3:#40382c;
+  --tx:#f3eddf; --tx2:#ddd6c6; --mu:#bdb5a4; --mu2:#a39b89;
+  --gold:#c9a66b; --goldh:#ddbe85; --goldbg:#3a3122; --on:#14120e;
+  --ok:#86b07e; --okbg:#233221; --miss:#cf8473; --missbg:#3a2420;
+  --hero1:#2c2518; --hero2:#1c1a14;
+  --sombra: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+  --lateral:#0d0c09;
+}
+
+html, body, #root { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: var(--f-body);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+input, select, textarea, button { font: inherit; color: inherit; }
+::selection { background: var(--goldbg); }
+
+@layer components {
+  .etiqueta { @apply text-[11.5px] font-bold uppercase text-mu; letter-spacing: .14em; }
+  .titulo { @apply font-display font-bold text-tx; font-size: 34px; line-height: 1.1; }
+  .titulo-tarjeta { @apply font-display font-semibold text-tx text-[20px] leading-tight; }
+  .num { @apply font-display font-semibold; font-variant-numeric: tabular-nums; }
+  .tarjeta { @apply bg-sf rounded-card border border-ln2; box-shadow: var(--sombra); padding: 18px 20px; }
+  .hero { @apply rounded-hero border border-ln2 relative overflow-hidden; background: linear-gradient(160deg, var(--hero1), var(--hero2)); padding: 22px 22px; }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[26px] bg-gold text-on font-bold uppercase text-[14px] px-6 transition-colors select-none;
+    height: 52px; letter-spacing: .1em;
+  }
+  .btn:hover { background: var(--goldh); }
+  .btn:disabled { opacity: .5; }
+  .btn-sec {
+    @apply inline-flex items-center justify-center gap-2 rounded-[22px] border border-ln3 text-gold font-bold uppercase text-[11.5px] px-5 transition-colors select-none;
+    height: 44px; letter-spacing: .12em;
+  }
+  .btn-sec:hover { background: var(--goldbg); }
+  .campo { @apply w-full rounded-[10px] border border-ln bg-sf px-3 outline-none text-tx; height: 46px; }
+  .campo:focus { border-color: var(--gold); }
+  .campo-linea { @apply w-full bg-transparent border-0 border-b border-ln3 outline-none px-0 text-tx; height: 46px; }
+  .campo-linea:focus { border-color: var(--gold); }
+  .fila { @apply flex items-center gap-3 border-b border-ln2; min-height: 56px; }
+  .chip { @apply inline-flex items-center rounded-full border border-ln px-3 h-8 text-[13px] font-semibold text-mu; }
+  .chip-on { @apply border-gold bg-goldbg text-gold; }
+  .toque { min-width: 44px; min-height: 44px; }
+}
+
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.entrar { animation: entrar .32s ease both; }
+@keyframes rebote { 0% { transform: scale(.6); opacity: 0 } 60% { transform: scale(1.08); opacity: 1 } 100% { transform: scale(1) } }
+.rebote { animation: rebote .38s ease both; }
+@keyframes subir { from { transform: translateY(100%); } to { transform: none; } }
+.subir { animation: subir .28s ease both; }
+.pb-seguro { padding-bottom: calc(env(safe-area-inset-bottom) + 84px); }
+@media (min-width: 1024px) { .pb-seguro { padding-bottom: 48px; } }

@@ -1,0 +1,111 @@
+name: Publicar
+
+# En cada push a main: pruebas web → pruebas de reglas → APK → deploy a Firebase.
+# Si una prueba falla, no se publica.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+env:
+  PROYECTO: titanus-10398
+
+jobs:
+  pruebas-web:
+    name: 1 · Pruebas web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - name: Lógica (vitest)
+        run: npm test
+      - name: Tipos y armado
+        run: npm run build
+      - name: Instalar navegador de pruebas
+        run: npx playwright install --with-deps chromium
+      - name: Pantallas en celular y PC (Playwright)
+        run: npm run test:e2e
+      - name: Guardar capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: |
+            capturas/
+            playwright-report/
+          retention-days: 14
+
+  pruebas-reglas:
+    name: 2 · Pruebas de reglas (emulador)
+    needs: pruebas-web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - name: Reglas de Firestore
+        run: npm run test:reglas
+
+  apk:
+    name: 3 · APK de Android
+    needs: pruebas-reglas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17, cache: gradle }
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Armar APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk titanus.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: titanus-apk
+          path: titanus.apk
+          retention-days: 30
+
+  deploy:
+    name: 4 · Deploy a Firebase
+    needs: apk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - name: Sumar la APK a la web (descarga en /titanus.apk)
+        uses: actions/download-artifact@v4
+        with:
+          name: titanus-apk
+          path: dist
+      - name: Revisar credencial
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA" ]; then
+            echo "::error::Falta el secreto FIREBASE_SERVICE_ACCOUNT en GitHub (Settings → Secrets and variables → Actions). Las pruebas pasaron, pero no se puede publicar sin él."
+            exit 1
+          fi
+      - name: Publicar hosting, reglas e índices
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx firebase deploy --only hosting,firestore --project "$PROYECTO" --non-interactive --force
+          rm -f "$RUNNER_TEMP/sa.json"
