@@ -7,6 +7,7 @@ import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando, Encabezado, Hoja, Seccion } from '../ui/piezas';
 import { Biblioteca } from './Biblioteca';
+import { Miniatura } from './Miniatura';
 
 function Paso({ etiqueta, valor, alCambiar, min, max, paso = 1, sufijo = '' }: {
   etiqueta: string; valor: number; alCambiar: (n: number) => void; min: number; max: number; paso?: number; sufijo?: string;
@@ -15,9 +16,9 @@ function Paso({ etiqueta, valor, alCambiar, min, max, paso = 1, sufijo = '' }: {
     <div className="flex flex-col items-center">
       <span className="text-[11px] font-bold uppercase tracking-[.1em] text-mu2">{etiqueta}</span>
       <div className="mt-1 flex items-center gap-1">
-        <button aria-label={`Menos ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln text-mu" onClick={() => alCambiar(Math.max(min, valor - paso))}>−</button>
+        <button aria-label={`Menos ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln oro" onClick={() => alCambiar(Math.max(min, valor - paso))}>−</button>
         <span className="num w-12 text-center text-[16px]">{valor}{sufijo}</span>
-        <button aria-label={`Más ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln text-mu" onClick={() => alCambiar(Math.min(max, valor + paso))}>+</button>
+        <button aria-label={`Más ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln oro" onClick={() => alCambiar(Math.min(max, valor + paso))}>+</button>
       </div>
     </div>
   );
@@ -58,19 +59,19 @@ export default function EditarRutina() {
     const final = { ...r, nombre: r.nombre.trim() || 'Mi rutina' };
     await repo.guardarRutina(usuario.uid, final);
     aviso('Rutina guardada');
-    nav('/rutinas');
+    nav('/entreno');
   }
 
   async function borrar() {
     if (!r) return;
     await repo.borrarRutina(usuario.uid, r.id);
     aviso('Rutina borrada');
-    nav('/rutinas');
+    nav('/entreno');
   }
 
   return (
     <div>
-      <Encabezado atras="/rutinas" etiqueta={nueva ? 'Rutina nueva' : 'Editar rutina'} titulo={r.nombre || 'Sin nombre'}
+      <Encabezado atras="/entreno" etiqueta={nueva ? 'Rutina nueva' : 'Editar rutina'} titulo={r.nombre || 'Sin nombre'}
         linea="Nombre, días y ejercicios con sus series." />
 
       <label className="block">
@@ -85,7 +86,7 @@ export default function EditarRutina() {
             const on = r.dias.includes(d);
             return (
               <button key={d} aria-pressed={on} onClick={() => setR({ ...r, dias: on ? r.dias.filter((x) => x !== d) : [...r.dias, d].sort() })}
-                className={`h-11 flex-1 rounded-full border text-[13px] font-bold ${on ? 'border-gold bg-goldbg text-gold' : 'border-ln text-mu'}`}>
+                className={`chip h-11 flex-1 px-0 text-[13px] ${on ? 'chip-on' : ''}`}>
                 {NOMBRES_DIA[d]}
               </button>
             );
@@ -98,8 +99,8 @@ export default function EditarRutina() {
           {r.ejercicios.map((e, i) => (
             <li key={e.ejercicioId} className="tarjeta">
               <div className="flex items-center gap-2">
-                <span className="num text-gold w-6">{i + 1}</span>
-                <span className="flex-1 font-semibold">{buscarEjercicio(e.ejercicioId, propios)?.nombre ?? 'Ejercicio'}</span>
+                <Miniatura musculo={buscarEjercicio(e.ejercicioId, propios)?.musculo} tam={34} />
+                <span className="flex-1 font-semibold oro">{buscarEjercicio(e.ejercicioId, propios)?.nombre ?? 'Ejercicio'}</span>
                 <button aria-label="Subir" className="h-8 w-8 flex items-center justify-center text-mu" onClick={() => mover(i, -1)}><Icono n="arriba" size={18} /></button>
                 <button aria-label="Bajar" className="h-8 w-8 flex items-center justify-center text-mu" onClick={() => mover(i, 1)}><Icono n="abajo" size={18} /></button>
                 <button aria-label="Quitar" className="h-8 w-8 flex items-center justify-center text-miss"
@@ -118,7 +119,7 @@ export default function EditarRutina() {
 
       <div className="mt-8 flex flex-col gap-3">
         <button className="btn" onClick={guardar}>Guardar rutina</button>
-        {!nueva && <button className="btn-sec border-miss/40 text-miss" onClick={() => setConfirmar(true)}>Borrar rutina</button>}
+        {!nueva && <button className="btn-sec text-miss" onClick={() => setConfirmar(true)}>Borrar rutina</button>}
       </div>
 
       <Biblioteca abierta={biblio} alCerrar={() => setBiblio(false)} propios={propios}
@@ -135,7 +136,7 @@ export default function EditarRutina() {
       <Hoja abierta={confirmar} alCerrar={() => setConfirmar(false)} etiqueta="Confirmar" titulo="¿Borrar esta rutina?">
         <p className="text-mu">Tu historial de entrenamientos no se borra.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn bg-miss" onClick={borrar}>Sí, borrar</button>
+          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }} onClick={borrar}>Sí, borrar</button>
           <button className="btn-sec" onClick={() => setConfirmar(false)}>Cancelar</button>
         </div>
       </Hoja>

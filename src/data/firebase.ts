@@ -1,7 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import {
-  GoogleAuthProvider, createUserWithEmailAndPassword, deleteUser, getAuth, onAuthStateChanged,
-  sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile,
+  EmailAuthProvider, GoogleAuthProvider, createUserWithEmailAndPassword, deleteUser, getAuth, linkWithCredential,
+  linkWithPopup, onIdTokenChanged, sendPasswordResetEmail, signInAnonymously, signInWithEmailAndPassword,
+  signInWithPopup, signOut, updateProfile,
 } from 'firebase/auth';
 import {
   collection, deleteDoc, doc, getDoc, getDocs, initializeFirestore, limit, orderBy,
@@ -45,8 +46,9 @@ export class RepoFirebase implements Repo {
   private col(uid: string, nombre: string) { return collection(this.db, 'users', uid, nombre); }
 
   escucharSesion(cb: (u: Usuario | null) => void) {
-    return onAuthStateChanged(this.auth, (fu) => {
-      cb(fu ? { uid: fu.uid, email: fu.email ?? '', nombre: fu.displayName ?? '' } : null);
+    // onIdTokenChanged también avisa cuando un invitado se convierte en cuenta
+    return onIdTokenChanged(this.auth, (fu) => {
+      cb(fu ? { uid: fu.uid, email: fu.email ?? '', nombre: fu.displayName ?? '', invitado: fu.isAnonymous } : null);
     });
   }
 
@@ -55,6 +57,15 @@ export class RepoFirebase implements Repo {
   }
 
   async registrar(nombre: string, email: string, clave: string) {
+    const actual = this.auth.currentUser;
+    if (actual?.isAnonymous) {
+      // El invitado pasa a tener cuenta y conserva todo lo que registró
+      const c = await linkWithCredential(actual, EmailAuthProvider.credential(email.trim(), clave));
+      if (nombre) await updateProfile(c.user, { displayName: nombre });
+      await setDoc(this.u(c.user.uid), { email: c.user.email ?? '', ...(nombre ? { nombre } : {}) }, { merge: true });
+      await c.user.reload();
+      return;
+    }
     const c = await createUserWithEmailAndPassword(this.auth, email.trim(), clave);
     if (nombre) await updateProfile(c.user, { displayName: nombre });
     await setDoc(this.u(c.user.uid), limpio(perfilInicial({ uid: c.user.uid, email: c.user.email ?? '', nombre })));
@@ -65,7 +76,18 @@ export class RepoFirebase implements Repo {
   }
 
   async ingresarConGoogle() {
+    const actual = this.auth.currentUser;
+    if (actual?.isAnonymous) {
+      const c = await linkWithPopup(actual, new GoogleAuthProvider());
+      await setDoc(this.u(c.user.uid), { email: c.user.email ?? '', nombre: c.user.displayName ?? 'Legionario' }, { merge: true });
+      await c.user.reload();
+      return;
+    }
     await signInWithPopup(this.auth, new GoogleAuthProvider());
+  }
+
+  async ingresarComoInvitado() {
+    await signInAnonymously(this.auth);
   }
 
   async salir() {

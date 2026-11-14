@@ -6,7 +6,7 @@ import { useApp } from './ui/contexto';
 import { Marco } from './ui/Marco';
 import { Cargando } from './ui/piezas';
 
-const Rutinas = lazy(() => import('./screens/Rutinas'));
+const Entreno = lazy(() => import('./screens/Entreno'));
 const EditarRutina = lazy(() => import('./screens/EditarRutina'));
 const Entrenar = lazy(() => import('./screens/Entrenar'));
 const Resumen = lazy(() => import('./screens/Resumen'));
@@ -26,9 +26,10 @@ export default function App() {
           <Routes>
             <Route element={<Marco />}>
               <Route index element={<Hoy />} />
-              <Route path="rutinas" element={<Rutinas />} />
+              <Route path="entreno" element={<Entreno />} />
+              <Route path="rutinas" element={<Navigate to="/entreno" replace />} />
               <Route path="rutinas/:id" element={<EditarRutina />} />
-              <Route path="entrenar/:rutinaId" element={<Entrenar />} />
+              <Route path="entrenar" element={<Entrenar />} />
               <Route path="resumen" element={<Resumen />} />
               <Route path="progreso" element={<Progreso />} />
               <Route path="progreso/ejercicio/:id" element={<DetalleEjercicio />} />

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
-  aKg, aUnidad, actualizarEstado, agregarDia, detectarRecords, duracion, inicioSemana,
-  rachaSemanas, reloj, romano, rutinaDeHoy, saludo, semanaActual, volumenTotal, MAX_PUNTOS,
+  aKg, aUnidad, actualizarEstado, agregarDia, detectarRecords, duracion, e1rm, inicioSemana, mejorSerie,
+  rachaSemanas, rango, reloj, romano, rutinaDeHoy, saludo, semanaActual, semanasEnRango, sumarSemana,
+  volumenTotal, MAX_PUNTOS, MAX_SEMANAS,
 } from './logica';
-import { cerrarEntrenamiento, iniciarDesdeRutina } from './entreno';
+import { cerrarEntrenamiento, ejercicioNuevo, iniciarDesdeRutina, iniciarLibre, iniciarRepeticion, rutinaDesdeEntreno } from './entreno';
 import { BIBLIOTECA, MUSCULOS } from './biblioteca';
 import { FRASES, fraseDelDia } from './frases';
 import type { EjercicioEntreno, EstadoEjercicio, Rutina } from './tipos';
@@ -77,6 +78,7 @@ describe('volumen y récords', () => {
     const r = detectarRecords([ej('a', [[55, 10], [50, 10]])], new Map([['a', prev]]));
     expect(r).toEqual([
       { ejercicioId: 'a', tipo: 'peso', valor: 55 },
+      { ejercicioId: 'a', tipo: '1rm', valor: 73.3 },
       { ejercicioId: 'a', tipo: 'volumen', valor: 1050 },
     ]);
   });
@@ -113,7 +115,9 @@ describe('entrenamiento completo', () => {
     const c = cerrarEntrenamiento(b, prev, { dias: [dia(10)], total: 4 }, SAB + 3600_000);
     expect(c.entreno.ejercicios).toHaveLength(1);
     expect(c.entreno.volumen).toBe(520);
-    expect(c.entreno.records.map((r) => r.tipo)).toEqual(['peso', 'volumen']);
+    expect(c.entreno.records.map((r) => r.tipo)).toEqual(['peso', '1rm', 'volumen']);
+    expect(c.entreno.numero).toBe(5);
+    expect(Object.values(c.resumen.semanas!)[0]).toEqual({ v: 520, n: 1, m: 60 });
     expect(c.estados[0].mejorPeso).toBe(65);
     expect(c.resumen.total).toBe(5);
     expect(c.resumen.dias).toHaveLength(2);
@@ -145,5 +149,63 @@ describe('biblioteca y frases', () => {
     expect(fraseDelDia(dia(14, 7))).toEqual(fraseDelDia(dia(14, 22)));
     expect(fraseDelDia(dia(14))).not.toEqual(fraseDelDia(dia(15)));
     expect(FRASES.every((f) => ['Séneca', 'Marco Aurelio', 'Epicteto'].includes(f.autor))).toBe(true);
+  });
+});
+
+describe('estilo Hevy: 1RM, tipos de serie y repetir', () => {
+  it('1RM estimado con Epley', () => {
+    expect(e1rm(100, 1)).toBe(100);
+    expect(e1rm(100, 10)).toBeCloseTo(133.33, 1);
+    expect(e1rm(0, 10)).toBe(0);
+  });
+  it('las series de calentamiento no cuentan para récords pero sí para el volumen', () => {
+    const prev = actualizarEstado(undefined, ej('a', [[50, 10]]), 1)!;
+    const hoy: EjercicioEntreno = { ejercicioId: 'a', series: [
+      { peso: 80, reps: 5, hecha: true, tipo: 'calentamiento' }, { peso: 50, reps: 10, hecha: true, tipo: 'normal' },
+    ] };
+    expect(detectarRecords([hoy], new Map([['a', prev]])).map((r) => r.tipo)).toEqual(['volumen']);
+    expect(volumenTotal([hoy])).toBe(900);
+    expect(mejorSerie(hoy)?.peso).toBe(50);
+  });
+  it('ejercicio nuevo toma pesos y reps de la última vez', () => {
+    const est = actualizarEstado(undefined, ej('a', [[40, 12], [45, 10]]), 1)!;
+    const e = ejercicioNuevo('a', est, 3, 8, 60);
+    expect(e.series.map((s) => [s.peso, s.reps])).toEqual([[40, 12], [45, 10], [45, 10]]);
+    expect(e.descanso).toBe(60);
+    expect(ejercicioNuevo('b', undefined).series[0]).toMatchObject({ peso: 0, reps: 10, hecha: false });
+  });
+  it('entrenamiento libre, repetir y guardar como rutina', () => {
+    expect(iniciarLibre(new Date(2026, 10, 14, 8).getTime()).nombre).toBe('Entrenamiento de la mañana');
+    const c = cerrarEntrenamiento({ nombre: 'Libre', inicio: SAB, ejercicios: [{ ejercicioId: 'a', descanso: 75, series: [
+      { peso: 50, reps: 10, hecha: true, tipo: 'fallo' }, { peso: 50, reps: 8, hecha: true },
+    ] }] }, new Map(), { dias: [], total: 0 }, SAB + 1000);
+    const rep = iniciarRepeticion(c.entreno);
+    expect(rep.ejercicios[0].series.every((s) => !s.hecha)).toBe(true);
+    expect(rep.ejercicios[0].series[0].tipo).toBe('fallo');
+    const r = rutinaDesdeEntreno(c.entreno, 2);
+    expect(r.ejercicios[0]).toMatchObject({ ejercicioId: 'a', series: 2, reps: 8, descanso: 75 });
+    expect(r.orden).toBe(2);
+  });
+});
+
+describe('semanas, rango y nivel', () => {
+  it('suma por semana y recorta a las últimas', () => {
+    let s = sumarSemana(undefined, dia(10), 1000, 50);
+    s = sumarSemana(s, dia(12), 500, 40);
+    expect(Object.values(s)).toEqual([{ v: 1500, n: 2, m: 90 }]);
+    for (let i = 1; i <= MAX_SEMANAS + 5; i++) s = sumarSemana(s, dia(10) - i * 7 * 86_400_000, 1, 1);
+    expect(Object.keys(s)).toHaveLength(MAX_SEMANAS);
+  });
+  it('semanasEnRango rellena las semanas vacías', () => {
+    const s = sumarSemana(undefined, dia(10), 1000, 50);
+    const r = semanasEnRango(s, 4, SAB);
+    expect(r).toHaveLength(4);
+    expect(r[3].v).toBe(1000);
+    expect(r[0].v).toBe(0);
+  });
+  it('rango por hitos y nivel cada 5', () => {
+    expect(rango(0)).toMatchObject({ nombre: 'Recluta', nivel: 1, siguiente: 'Legionario', faltan: 10 });
+    expect(rango(23)).toMatchObject({ nombre: 'Legionario', nivel: 5 });
+    expect(rango(400)).toMatchObject({ nombre: 'César', progreso: 1 });
   });
 });

@@ -1,15 +1,16 @@
 import type { Entrenamiento, EstadoEjercicio, Perfil, RegistroCuerpo, Rutina } from '../lib/tipos';
 import {
-  actualizarEstado, agregarDia, claveDia, detectarRecords, inicioDia, volumenTotal,
+  actualizarEstado, agregarDia, claveDia, detectarRecords, inicioDia, sumarSemana, volumenTotal,
 } from '../lib/logica';
+import type { Semanas } from '../lib/tipos';
 import type { Usuario } from './repo';
 
 export function perfilInicial(u: Usuario): Perfil {
   return {
     uid: u.uid,
-    nombre: u.nombre || u.email.split('@')[0],
+    nombre: u.nombre || (u.email ? u.email.split('@')[0] : 'Legionario'),
     email: u.email,
-    tema: 'sistema',
+    tema: 'oscuro',
     unidad: 'kg',
     recordatorio: { activo: false, hora: '18:30', dias: [1, 3, 5] },
     creado: Date.now(),
@@ -62,6 +63,7 @@ export function datosDePrueba(ahora = Date.now()) {
   const historial: Entrenamiento[] = [];
   const estados = new Map<string, EstadoEjercicio>();
   let dias: number[] = [];
+  let semanas: Semanas = {};
   const hoy = inicioDia(ahora);
   // Entrena 3 veces por semana durante 8 semanas, sin incluir hoy
   for (let d = 56; d >= 1; d--) {
@@ -75,8 +77,10 @@ export function datosDePrueba(ahora = Date.now()) {
       const p = base[er.ejercicioId] + semana * (er.ejercicioId === 'dominadas' ? 0 : 2.5);
       return {
         ejercicioId: er.ejercicioId,
+        descanso: er.descanso,
         series: Array.from({ length: er.series }, (_, i) => ({
-          peso: p,
+          tipo: (i === 0 && er.series > 3 ? 'calentamiento' : 'normal') as 'calentamiento' | 'normal',
+          peso: i === 0 && er.series > 3 ? Math.round(p * 0.6) : p,
           reps: Math.max(1, er.reps - (i > 1 ? 1 : 0) + (semana > 4 ? 1 : 0)),
           sensacion: (i === er.series - 1 ? 4 : 3) as 3 | 4,
           hecha: true,
@@ -86,7 +90,7 @@ export function datosDePrueba(ahora = Date.now()) {
     const records = detectarRecords(ejercicios, estados);
     const e: Entrenamiento = {
       id: 'h' + d, rutinaId: r.id, nombre: r.nombre, inicio, fin: inicio + (52 + (d % 4) * 6) * 60_000,
-      ejercicios, volumen: volumenTotal(ejercicios), records,
+      ejercicios, volumen: volumenTotal(ejercicios), records, numero: historial.length + 1,
     };
     historial.push(e);
     for (const ej of ejercicios) {
@@ -94,6 +98,7 @@ export function datosDePrueba(ahora = Date.now()) {
       if (n) estados.set(ej.ejercicioId, n);
     }
     dias = agregarDia(dias, inicio);
+    semanas = sumarSemana(semanas, inicio, e.volumen, (e.fin - e.inicio) / 60000);
   }
   historial.reverse();
 
@@ -110,5 +115,5 @@ export function datosDePrueba(ahora = Date.now()) {
     });
   }
 
-  return { rutinas, historial, estados, dias, cuerpo };
+  return { rutinas, historial, estados, dias, semanas, cuerpo };
 }

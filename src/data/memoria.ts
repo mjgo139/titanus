@@ -30,7 +30,8 @@ export class RepoMemoria implements Repo {
     const s = datosDePrueba(ahora);
     const perfil = perfilInicial(USUARIO_PRUEBA);
     perfil.nombre = 'Marco';
-    perfil.resumen = { dias: s.dias, total: s.historial.length };
+    perfil.tema = 'oscuro';
+    perfil.resumen = { dias: s.dias, total: s.historial.length, semanas: s.semanas };
     perfil.creado = ahora - 60 * 86_400_000;
     this.datos.set(USUARIO_PRUEBA.uid, {
       perfil,
@@ -74,7 +75,11 @@ export class RepoMemoria implements Repo {
     const e = email.trim().toLowerCase();
     if (this.cuentas.has(e)) throw Object.assign(new ErrorApp('x'), { code: 'auth/email-already-in-use' });
     if (clave.length < 6) throw Object.assign(new ErrorApp('x'), { code: 'auth/weak-password' });
-    const u: Usuario = { uid: 'u-' + Math.random().toString(36).slice(2, 9), email: e, nombre };
+    // Si era invitado, la cuenta nueva conserva sus datos (mismo uid)
+    const uid = this.usuario?.invitado ? this.usuario.uid : 'u-' + Math.random().toString(36).slice(2, 9);
+    const u: Usuario = { uid, email: e, nombre };
+    const d = this.datos.get(uid);
+    if (d?.perfil) { d.perfil.email = e; d.perfil.nombre = nombre || d.perfil.nombre; }
     this.cuentas.set(e, { u, clave });
     this.usuario = u;
     this.avisar();
@@ -88,6 +93,12 @@ export class RepoMemoria implements Repo {
   async ingresarConGoogle() {
     await espera();
     this.usuario = USUARIO_PRUEBA;
+    this.avisar();
+  }
+
+  async ingresarComoInvitado() {
+    await espera();
+    this.usuario = { uid: 'inv-' + Math.random().toString(36).slice(2, 9), email: '', nombre: 'Legionario', invitado: true };
     this.avisar();
   }
 

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Repo, Usuario } from '../data/repo';
 import type { Perfil, Tema } from '../lib/tipos';
 
@@ -20,7 +20,7 @@ export function aplicarTema(t: Tema) {
   try { localStorage.setItem('titanus-tema', t); } catch { /* sin almacenamiento */ }
   const oscuro = t === 'oscuro' || (t === 'sistema' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = oscuro ? 'dark' : 'light';
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', oscuro ? '#14120E' : '#ECE6DB');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', oscuro ? '#090909' : '#ECE6DB');
 }
 
 export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNode }) {
@@ -30,7 +30,10 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
   const [cargando, setCargando] = useState(true);
   const [mensaje, setMensaje] = useState<string | null>(null);
 
+  const previo = useRef<Usuario | null>(null);
   useEffect(() => repo.escucharSesion(async (u) => {
+    const antes = previo.current;
+    previo.current = u;
     setUsuario(u);
     if (!u) {
       setPerfil(null);
@@ -38,7 +41,10 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
       setCargando(false);
       return;
     }
-    setCargando(true);
+    // Renovación del token sin cambios: no hace falta volver a leer
+    if (antes && antes.uid === u.uid && antes.invitado === u.invitado) return;
+    const mismo = antes?.uid === u.uid;
+    if (!mismo) setCargando(true);
     try {
       const [p, a] = await Promise.all([repo.leerPerfil(u), repo.esAdmin(u.uid)]);
       setPerfil(p);

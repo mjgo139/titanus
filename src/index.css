@@ -2,65 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables de color copiadas de la guía de estilo de Stoica (página 12) */
-:root {
-  --bg:#ece6db; --sf:#faf7f1; --nav:#f6f2ea; --ln:#e0d7c5; --ln2:#e9e2d4; --ln3:#cdc1a7;
-  --tx:#16120d; --tx2:#2b261e; --mu:#4a4337; --mu2:#5a5244;
-  --gold:#7e5d22; --goldh:#674b1a; --goldbg:#eadbb8; --on:#fbf8f1;
-  --ok:#3f6e38; --okbg:#dce9d3; --miss:#9c3f2e; --missbg:#f4ded6;
-  --hero1:#e7d9b9; --hero2:#f6efdf;
-  --f-display:'Playfair Display', Georgia, serif; --f-body:Inter, system-ui, sans-serif;
-  --sombra: 0 1px 2px rgba(60, 45, 20, .05), 0 6px 18px rgba(60, 45, 20, .06);
-  --lateral:#16130e;
+/*
+  TITANUS · "Noche romana" (principal) y "Mármol" (claro).
+  La esencia viene del diseño propio de TITANUS (negro, oro y estatuas).
+  El modo Mármol usa la piedra y el bronce de Stoica: son apps hermanas.
+*/
+:root, :root[data-theme='dark'] {
+  --bg:#090909; --bg2:#1c1712; --bg3:#25211e;
+  --sf:#141311; --sf2:#1a1918; --nav:#0b0b0a;
+  --ln:#685338; --ln2:#3b3226; --ln3:#74572e;
+  --tx:#f7f1e7; --tx2:#e6dccb; --mu:#c9bda7; --mu2:#9d917c;
+  --gold:#f2c55c; --goldh:#ffd67a; --gold2:#a66c16; --goldbg:#2a2113; --on:#0b0b0b;
+  --oro-grad: linear-gradient(#ffe7a0, #e6b84e 55%, #b77c22);
+  --panel-grad: linear-gradient(125deg, rgba(26,25,24,.92), rgba(9,9,9,.92));
+  --ok:#f2c55c; --okbg:#2b2210; --miss:#d9826f; --missbg:#331b16;
+  --vena: rgba(154,113,55,.16);
+  --sombra: 0 8px 25px rgba(0,0,0,.45);
+  --lateral:#050505;
+  --f-marca:'Cinzel', Georgia, serif;
+  --f-display:'Playfair Display', Georgia, serif;
+  --f-body:Inter, system-ui, sans-serif;
+  color-scheme: dark;
 }
-:root[data-theme='dark'] {
-  --bg:#14120e; --sf:#1a1812; --nav:#110f0b; --ln:#302b23; --ln2:#26221b; --ln3:#40382c;
-  --tx:#f3eddf; --tx2:#ddd6c6; --mu:#bdb5a4; --mu2:#a39b89;
-  --gold:#c9a66b; --goldh:#ddbe85; --goldbg:#3a3122; --on:#14120e;
-  --ok:#86b07e; --okbg:#233221; --miss:#cf8473; --missbg:#3a2420;
-  --hero1:#2c2518; --hero2:#1c1a14;
-  --sombra: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
-  --lateral:#0d0c09;
+:root[data-theme='light'] {
+  --bg:#ece6db; --bg2:#e4dccd; --bg3:#f3eee5;
+  --sf:#faf7f1; --sf2:#f6f1e8; --nav:#f6f2ea;
+  --ln:#d8ccb4; --ln2:#e5ddcd; --ln3:#c5b48f;
+  --tx:#16120d; --tx2:#2b261e; --mu:#4a4337; --mu2:#6a604f;
+  --gold:#7e5d22; --goldh:#674b1a; --gold2:#a07a35; --goldbg:#eadbb8; --on:#fbf8f1;
+  --oro-grad: linear-gradient(#9a7333, #7e5d22 60%, #664a19);
+  --panel-grad: linear-gradient(125deg, #fbf8f2, #f4eee3);
+  --ok:#7e5d22; --okbg:#efe3c6; --miss:#9c3f2e; --missbg:#f4ded6;
+  --vena: rgba(126,93,34,.10);
+  --sombra: 0 1px 2px rgba(60,45,20,.05), 0 6px 18px rgba(60,45,20,.08);
+  --lateral:#16130e;
+  color-scheme: light;
 }
 
 html, body, #root { min-height: 100%; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--tx);
   font-family: var(--f-body);
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  background:
+    radial-gradient(ellipse at 100% 20%, var(--bg3) 0%, transparent 40%),
+    radial-gradient(ellipse at 0% 75%, var(--bg2) 0%, transparent 40%),
+    var(--bg);
+  background-attachment: fixed;
 }
+/* Vetas doradas finas, como mármol */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(115deg, transparent 22%, var(--vena) 22.2%, transparent 22.5%, transparent 62%, var(--vena) 62.1%, transparent 62.4%),
+    linear-gradient(30deg, transparent 38%, var(--vena) 38.1%, transparent 38.3%);
+  background-size: 370px 520px, 290px 430px;
+}
+#root { position: relative; z-index: 1; }
 input, select, textarea, button { font: inherit; color: inherit; }
 ::selection { background: var(--goldbg); }
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 @layer components {
+  .marca { font-family: var(--f-marca); font-weight: 700; letter-spacing: .06em; }
   .etiqueta { @apply text-[11.5px] font-bold uppercase text-mu; letter-spacing: .14em; }
-  .titulo { @apply font-display font-bold text-tx; font-size: 34px; line-height: 1.1; }
-  .titulo-tarjeta { @apply font-display font-semibold text-tx text-[20px] leading-tight; }
-  .num { @apply font-display font-semibold; font-variant-numeric: tabular-nums; }
-  .tarjeta { @apply bg-sf rounded-card border border-ln2; box-shadow: var(--sombra); padding: 18px 20px; }
-  .hero { @apply rounded-hero border border-ln2 relative overflow-hidden; background: linear-gradient(160deg, var(--hero1), var(--hero2)); padding: 22px 22px; }
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[26px] bg-gold text-on font-bold uppercase text-[14px] px-6 transition-colors select-none;
-    height: 52px; letter-spacing: .1em;
+  .titulo { font-family: var(--f-marca); @apply font-bold text-tx; font-size: 28px; line-height: 1.15; letter-spacing: .02em; }
+  .titulo-tarjeta { font-family: var(--f-display); @apply font-semibold text-tx text-[20px] leading-tight; }
+  .num { font-family: var(--f-display); @apply font-semibold; font-variant-numeric: tabular-nums; }
+  .oro { color: var(--gold); }
+  .tarjeta {
+    background: var(--panel-grad);
+    @apply rounded-[14px] border border-ln; box-shadow: var(--sombra); padding: 15px 16px;
   }
-  .btn:hover { background: var(--goldh); }
+  .hero {
+    @apply rounded-[14px] border border-gold2 relative overflow-hidden text-center;
+    background: linear-gradient(130deg, var(--bg2), var(--sf), var(--bg));
+    padding: 20px 14px;
+  }
+  .divisor { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[12px] font-bold text-[16px] px-5 transition-transform select-none border;
+    height: 52px; background: var(--oro-grad); color: var(--on); border-color: var(--goldh);
+    box-shadow: 0 3px 14px rgba(0,0,0,.35);
+  }
+  .btn:active { transform: scale(.98); }
   .btn:disabled { opacity: .5; }
   .btn-sec {
-    @apply inline-flex items-center justify-center gap-2 rounded-[22px] border border-ln3 text-gold font-bold uppercase text-[11.5px] px-5 transition-colors select-none;
-    height: 44px; letter-spacing: .12em;
+    @apply inline-flex items-center justify-center gap-2 rounded-[12px] border border-ln text-tx font-semibold text-[14px] px-4 transition-colors select-none;
+    height: 44px; background: var(--sf);
   }
-  .btn-sec:hover { background: var(--goldbg); }
-  .campo { @apply w-full rounded-[10px] border border-ln bg-sf px-3 outline-none text-tx; height: 46px; }
+  .btn-sec:hover { border-color: var(--gold); }
+  .btn-redondo {
+    @apply inline-flex items-center justify-center rounded-full border shrink-0;
+    width: 48px; height: 48px; background: var(--oro-grad); color: var(--on); border-color: var(--goldh);
+  }
+  .campo { @apply w-full rounded-[9px] border border-ln bg-sf px-3 outline-none text-tx; height: 46px; }
   .campo:focus { border-color: var(--gold); }
-  .campo-linea { @apply w-full bg-transparent border-0 border-b border-ln3 outline-none px-0 text-tx; height: 46px; }
-  .campo-linea:focus { border-color: var(--gold); }
   .fila { @apply flex items-center gap-3 border-b border-ln2; min-height: 56px; }
-  .chip { @apply inline-flex items-center rounded-full border border-ln px-3 h-8 text-[13px] font-semibold text-mu; }
-  .chip-on { @apply border-gold bg-goldbg text-gold; }
+  .chip { @apply inline-flex items-center justify-center rounded-full border border-ln px-3 h-8 text-[13px] font-medium text-tx2; background: var(--sf); }
+  .chip-on { border-color: var(--goldh); color: var(--on); font-weight: 700; background: var(--oro-grad); }
   .toque { min-width: 44px; min-height: 44px; }
 }
 
@@ -70,5 +113,7 @@ input, select, textarea, button { font: inherit; color: inherit; }
 .rebote { animation: rebote .38s ease both; }
 @keyframes subir { from { transform: translateY(100%); } to { transform: none; } }
 .subir { animation: subir .28s ease both; }
-.pb-seguro { padding-bottom: calc(env(safe-area-inset-bottom) + 84px); }
+.pb-seguro { padding-bottom: calc(env(safe-area-inset-bottom) + 92px); }
 @media (min-width: 1024px) { .pb-seguro { padding-bottom: 48px; } }
+.mascara-izq { mask-image: linear-gradient(to right, transparent, #000 40%); -webkit-mask-image: linear-gradient(to right, transparent, #000 40%); }
+.mascara-vert { mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 82%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 82%, transparent 100%); }

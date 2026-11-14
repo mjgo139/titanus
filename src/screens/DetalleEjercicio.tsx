@@ -5,13 +5,14 @@ import { aUnidad, fechaCorta, formatoNumero, formatoPeso, redondear } from '../l
 import type { Ejercicio, EstadoEjercicio } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Cargando, Encabezado, GraficoLinea, Seccion, Selector, Vacio } from '../ui/piezas';
+import { Miniatura } from './Miniatura';
 
 export default function DetalleEjercicio() {
   const { id = '' } = useParams();
   const { repo, usuario, perfil } = useSesion();
   const [est, setEst] = useState<EstadoEjercicio | null | undefined>(undefined);
   const [propios, setPropios] = useState<Ejercicio[]>([]);
-  const [medida, setMedida] = useState<'peso' | 'volumen'>('peso');
+  const [medida, setMedida] = useState<'peso' | 'e1rm' | 'volumen' | 'reps'>('peso');
   const u = perfil.unidad;
 
   useEffect(() => {
@@ -25,27 +26,33 @@ export default function DetalleEjercicio() {
   return (
     <div>
       <Encabezado atras="/progreso?v=records" etiqueta={ej?.musculo ?? 'Ejercicio'} titulo={ej?.nombre ?? 'Ejercicio'}
-        linea="Cómo evolucionó tu fuerza en cada sesión." />
+        linea="Cómo evolucionó tu fuerza en cada sesión." accion={<Miniatura musculo={ej?.musculo} />} />
       {!est ? <Vacio titulo="Sin datos" linea="Todavía no registraste este ejercicio." /> : (
         <>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="tarjeta">
-              <div className="etiqueta">Peso máximo</div>
-              <div className="num text-[28px] mt-1 text-gold">{formatoPeso(est.mejorPeso, u)}</div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="tarjeta px-3">
+              <div className="etiqueta">Peso máx.</div>
+              <div className="num mt-1 text-[20px] oro">{formatoPeso(est.mejorPeso, u)}</div>
             </div>
-            <div className="tarjeta">
-              <div className="etiqueta">Mejor volumen</div>
-              <div className="num text-[28px] mt-1">{formatoPeso(est.mejorVolumen, u, 0)}</div>
+            <div className="tarjeta px-3">
+              <div className="etiqueta">1RM est.</div>
+              <div className="num mt-1 text-[20px]">{est.mejor1RM ? formatoPeso(est.mejor1RM, u) : '—'}</div>
+            </div>
+            <div className="tarjeta px-3">
+              <div className="etiqueta">Volumen</div>
+              <div className="num mt-1 text-[20px]">{formatoPeso(est.mejorVolumen, u, 0)}</div>
             </div>
           </div>
+          <p className="mt-2 text-[12px] text-mu">1RM: el peso que podrías levantar una sola vez, estimado con tus series.</p>
           <Seccion titulo="Gráfico">
             <div className="tarjeta">
               <Selector nombre="Medida" valor={medida} alCambiar={setMedida}
-                opciones={[{ v: 'peso', t: 'Peso máximo' }, { v: 'volumen', t: 'Volumen' }]} />
+                opciones={[{ v: 'peso', t: 'Peso' }, { v: 'e1rm', t: '1RM' }, { v: 'volumen', t: 'Volumen' }, { v: 'reps', t: 'Reps' }]} />
               <div className="mt-4">
-                <GraficoLinea etiqueta={medida === 'peso' ? 'Peso máximo por sesión' : 'Volumen por sesión'}
-                  puntos={est.puntos.map((p) => ({ x: p.fecha, y: aUnidad(medida === 'peso' ? p.pesoMax : p.volumen, u) }))}
-                  formato={(n) => `${formatoNumero(redondear(n, medida === 'peso' ? 1 : 0))} ${u}`} />
+                <GraficoLinea etiqueta={{ peso: 'Peso máximo por sesión', e1rm: '1RM estimado por sesión', volumen: 'Volumen por sesión', reps: 'Repeticiones por sesión' }[medida]}
+                  puntos={est.puntos.filter((p) => medida === 'peso' || medida === 'volumen' || p[medida] !== undefined)
+                    .map((p) => ({ x: p.fecha, y: medida === 'reps' ? p.reps ?? 0 : aUnidad(medida === 'peso' ? p.pesoMax : medida === 'e1rm' ? p.e1rm ?? 0 : p.volumen, u) }))}
+                  formato={(n) => (medida === 'reps' ? `${n} reps` : `${formatoNumero(redondear(n, medida === 'volumen' ? 0 : 1))} ${u}`)} />
               </div>
             </div>
           </Seccion>
@@ -54,7 +61,7 @@ export default function DetalleEjercicio() {
               {[...est.puntos].reverse().slice(0, 10).map((p) => (
                 <li key={p.fecha} className="fila last:border-0">
                   <span className="flex-1 text-mu">{fechaCorta(p.fecha)}</span>
-                  <span className="num">{formatoPeso(p.pesoMax, u)}</span>
+                  <span className="num oro">{formatoPeso(p.pesoMax, u)}</span>
                   <span className="num w-24 text-right text-mu">{formatoNumero(redondear(aUnidad(p.volumen, u), 0))} vol.</span>
                 </li>
               ))}

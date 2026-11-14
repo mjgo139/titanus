@@ -12,12 +12,12 @@ export function Encabezado({ etiqueta, titulo, linea, atras, accion }: {
       <div className="flex items-center justify-between min-h-[28px]">
         <div className="flex items-center gap-1">
           {atras && (
-            <button aria-label="Volver" className="toque -ml-3 flex items-center justify-center text-mu"
+            <button aria-label="Volver" className="toque -ml-3 flex items-center justify-center oro"
               onClick={() => (typeof atras === 'string' ? nav(atras) : nav(-1))}>
               <Icono n="atras" />
             </button>
           )}
-          <span className="etiqueta">{etiqueta}</span>
+          <span className="etiqueta oro">{etiqueta}</span>
         </div>
         {accion}
       </div>
@@ -108,7 +108,7 @@ export function Vacio({ titulo, linea, children }: { titulo: string; linea: stri
   return (
     <div className="tarjeta text-center py-10">
       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-goldbg text-gold">
-        <Icono n="laurel" />
+        <Icono n="corona" />
       </div>
       <div className="titulo-tarjeta">{titulo}</div>
       <p className="mt-2 text-mu">{linea}</p>
@@ -121,10 +121,10 @@ export function Selector<T extends string>({ opciones, valor, alCambiar, nombre 
   opciones: { v: T; t: string }[]; valor: T; alCambiar: (v: T) => void; nombre: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={nombre} className="flex rounded-full border border-ln bg-bg p-1">
+    <div role="radiogroup" aria-label={nombre} className="flex gap-[5px]">
       {opciones.map((o) => (
         <button key={o.v} role="radio" aria-checked={valor === o.v} onClick={() => alCambiar(o.v)}
-          className={`flex-1 h-9 rounded-full text-[13px] font-semibold transition-colors ${valor === o.v ? 'bg-sf text-tx shadow-sm border border-ln2' : 'text-mu'}`}>
+          className={`chip flex-1 h-10 ${valor === o.v ? 'chip-on' : ''}`}>
           {o.t}
         </button>
       ))}
@@ -132,14 +132,14 @@ export function Selector<T extends string>({ opciones, valor, alCambiar, nombre 
   );
 }
 
-/** Gráfico de línea simple en SVG */
+/** Gráfico de línea en oro, con relleno degradado y puntos */
 export function GraficoLinea({ puntos, etiqueta, formato }: {
   puntos: { x: number; y: number }[]; etiqueta: string; formato: (n: number) => string;
 }) {
   if (puntos.length < 2) {
-    return <p className="text-mu text-[14px] py-6 text-center">Hacen falta al menos dos entrenamientos para dibujar el gráfico.</p>;
+    return <p className="text-mu text-[14px] py-6 text-center">Hacen falta al menos dos registros para dibujar el gráfico.</p>;
   }
-  const W = 320, H = 150, px = 8, py = 14;
+  const W = 330, H = 160, px = 10, py = 16;
   const xs = puntos.map((p) => p.x), ys = puntos.map((p) => p.y);
   const x0 = Math.min(...xs), x1 = Math.max(...xs);
   const y0 = Math.min(...ys), y1 = Math.max(...ys);
@@ -147,19 +147,59 @@ export function GraficoLinea({ puntos, etiqueta, formato }: {
   const ry = (y: number) => H - py - ((y - y0) / (y1 - y0 || 1)) * (H - 2 * py);
   const d = puntos.map((p, i) => `${i ? 'L' : 'M'}${rx(p.x).toFixed(1)},${ry(p.y).toFixed(1)}`).join(' ');
   const ult = puntos[puntos.length - 1];
+  const id = 'g' + etiqueta.replace(/[^a-z]/gi, '').slice(0, 12);
   return (
     <figure aria-label={etiqueta}>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
+        <defs>
+          <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+            <stop stopColor="var(--gold2)" stopOpacity=".55" /><stop offset="1" stopColor="var(--gold2)" stopOpacity=".02" />
+          </linearGradient>
+        </defs>
         {[0.25, 0.5, 0.75].map((f) => (
-          <line key={f} x1={px} x2={W - px} y1={py + f * (H - 2 * py)} y2={py + f * (H - 2 * py)} stroke="var(--ln2)" />
+          <line key={f} x1={px} x2={W - px} y1={py + f * (H - 2 * py)} y2={py + f * (H - 2 * py)} stroke="var(--ln2)" strokeWidth={0.6} />
         ))}
-        <path d={`${d} L${rx(ult.x)},${H - py} L${rx(puntos[0].x)},${H - py} Z`} fill="var(--goldbg)" opacity={0.55} />
-        <path d={d} fill="none" stroke="var(--gold)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-        <circle cx={rx(ult.x)} cy={ry(ult.y)} r={4} fill="var(--gold)" />
+        <path d={`${d} L${rx(ult.x)},${H - py} L${rx(puntos[0].x)},${H - py} Z`} fill={`url(#${id})`} />
+        <path d={d} fill="none" stroke="var(--gold)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+        {puntos.length <= 24 && puntos.map((p, i) => <circle key={i} cx={rx(p.x)} cy={ry(p.y)} r={3.2} fill="var(--gold)" />)}
       </svg>
       <figcaption className="mt-1 flex justify-between text-[12px] text-mu">
         <span>Mín. {formato(y0)}</span><span>Máx. {formato(y1)}</span>
       </figcaption>
+    </figure>
+  );
+}
+
+/** Barras por semana (volumen o entrenamientos) */
+export function GraficoBarras({ datos, etiqueta, formato }: {
+  datos: { fecha: number; y: number }[]; etiqueta: string; formato: (n: number) => string;
+}) {
+  const W = 330, H = 150, py = 18;
+  const max = Math.max(1, ...datos.map((d) => d.y));
+  const ancho = (W - 4) / datos.length;
+  const meses = new Intl.DateTimeFormat('es-PY', { month: 'short' });
+  return (
+    <figure aria-label={etiqueta}>
+      <svg viewBox={`0 0 ${W} ${H + 14}`} className="w-full h-auto">
+        <defs>
+          <linearGradient id="barraOro" x1="0" y1="0" x2="0" y2="1">
+            <stop stopColor="var(--goldh)" /><stop offset="1" stopColor="var(--gold2)" />
+          </linearGradient>
+        </defs>
+        <line x1={0} x2={W} y1={H - py + 0.5} y2={H - py + 0.5} stroke="var(--ln2)" />
+        {datos.map((d, i) => {
+          const h = (d.y / max) * (H - 2 * py);
+          const x = 2 + i * ancho + ancho * 0.18;
+          const nuevoMes = i === 0 || new Date(d.fecha).getMonth() !== new Date(datos[i - 1].fecha).getMonth();
+          return (
+            <g key={d.fecha}>
+              <rect x={x} y={H - py - h} width={ancho * 0.64} height={Math.max(h, d.y ? 2 : 0)} rx={2} fill="url(#barraOro)" />
+              {nuevoMes && datos.length > 6 && <text x={x} y={H + 8} fontSize="10" fill="var(--mu)">{meses.format(d.fecha).replace('.', '')}</text>}
+            </g>
+          );
+        })}
+      </svg>
+      <figcaption className="mt-1 text-right text-[12px] text-mu">Mejor semana: {formato(max === 1 && !datos.some((d) => d.y) ? 0 : max)}</figcaption>
     </figure>
   );
 }

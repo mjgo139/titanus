@@ -6,7 +6,7 @@ export interface Borrador {
   nombre: string;
   inicio: number;
   ejercicios: EjercicioEntreno[];
-  actual: number;
+  nota?: string;
 }
 
 const clave = (uid: string) => `titanus-borrador-${uid}`;

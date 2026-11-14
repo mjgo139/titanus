@@ -4,6 +4,7 @@ import { nuevoId } from '../lib/logica';
 import type { Ejercicio, Musculo } from '../lib/tipos';
 import { Icono } from '../ui/Icono';
 import { Hoja } from '../ui/piezas';
+import { Miniatura } from './Miniatura';
 
 export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alCrear }: {
   abierta: boolean;
@@ -74,11 +75,12 @@ export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alC
                   const ya = elegidos.includes(e.id);
                   return (
                     <button key={e.id} disabled={ya} onClick={() => alElegir(e)} className="fila w-full text-left disabled:opacity-50">
+                      <Miniatura musculo={e.musculo} tam={38} />
                       <span className="flex-1">
                         <span className="block font-semibold text-tx">{e.nombre}</span>
                         <span className="text-[12px] text-mu">{e.propio ? 'Propio' : e.equipo}</span>
                       </span>
-                      <span className="text-gold">{ya ? <Icono n="check" size={18} /> : <Icono n="mas" size={18} />}</span>
+                      <span className="oro">{ya ? <Icono n="check" size={18} /> : <Icono n="mas" size={18} />}</span>
                     </button>
                   );
                 })}

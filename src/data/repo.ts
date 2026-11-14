@@ -6,6 +6,8 @@ export interface Usuario {
   uid: string;
   email: string;
   nombre: string;
+  /** Entró como invitado: puede crear su cuenta después sin perder lo registrado */
+  invitado?: boolean;
 }
 
 /**
@@ -22,6 +24,7 @@ export interface Repo {
   registrar(nombre: string, email: string, clave: string): Promise<void>;
   recuperarClave(email: string): Promise<void>;
   ingresarConGoogle(): Promise<void>;
+  ingresarComoInvitado(): Promise<void>;
   salir(): Promise<void>;
   borrarCuenta(): Promise<void>;
 
@@ -67,6 +70,8 @@ export function mensajeError(e: unknown): string {
     'auth/too-many-requests': 'Demasiados intentos. Esperá un momento y probá de nuevo.',
     'auth/popup-closed-by-user': 'Cerraste la ventana de Google antes de terminar.',
     'auth/network-request-failed': 'Sin conexión. Revisá tu internet.',
+    'auth/credential-already-in-use': 'Esa cuenta de Google ya existe. Salí del modo invitado e ingresá con ella.',
+    'auth/operation-not-allowed': 'Ese modo de acceso no está habilitado todavía.',
     'auth/requires-recent-login': 'Por seguridad, salí y volvé a ingresar antes de borrar la cuenta.',
   };
   if (mapa[code]) return mapa[code];

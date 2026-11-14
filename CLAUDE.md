@@ -6,10 +6,10 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 
 | Dato | Valor |
 |---|---|
-| Fase | 1 (lo esencial) publicada como v1.0.0 |
+| Fase | 1 (lo esencial) publicada; v1.1.0 = rediseño romano + seguimiento estilo Hevy |
 | Proyecto Firebase | `titanus-10398` (plan Spark, gratis) |
 | Firestore | modo nativo, edición Standard, región `southamerica-east1` (São Paulo) |
-| Auth | correo/contraseña y Google habilitados |
+| Auth | correo/contraseña, Google y anónimo ("Continuar como invitado") habilitados. Limpieza automática de anónimos: apagada |
 | Web | https://titanus-10398.web.app |
 | APK | se arma en cada push y se publica en el Release `apk-ultima`: https://github.com/mjgo139/titanus/releases/tag/apk-ultima (el plan Spark no permite `.apk` en Hosting) |
 | Admin | uids listados en el documento `config/admins` (`{ uids: [...] }`), cargado a mano en la consola. Nunca en el código. |
@@ -30,9 +30,18 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 
 - `src/lib/` lógica pura con pruebas (`logica.ts`, `entreno.ts`, `biblioteca.ts`, `frases.ts`).
 - `src/data/repo.ts` interfaz única de datos. `memoria.ts` = modo prueba; `firebase.ts` = real.
-- `src/screens/` pantallas. `src/ui/` piezas comunes (encabezado, hoja que sube, celebración, gráfico).
+- `src/screens/` pantallas: `Acceso` (portada), `Hoy` (Inicio), `Entreno` (libre + rutinas), `Entrenar` (en vivo, estilo Hevy), `Resumen`, `Progreso`, `DetalleEjercicio`, `Perfil`. `src/ui/` piezas comunes.
+- `src/assets/` imágenes de estatuas del diseño del dueño (TITANUS_app.html).
 - Firestore: `users/{uid}` + subcolecciones `routines`, `customExercises`, `workouts`, `exerciseStats`, `bodyLogs`. Reglas en `firestore.rules`.
 - Para ahorrar lecturas: el perfil guarda `resumen` (días entrenados) y `exerciseStats` guarda la última vez y los puntos del gráfico. El entrenamiento en curso se guarda en el teléfono y se sube una sola vez al terminar.
+
+## Dirección de diseño (decidida por el dueño el 14/11/2026, manda sobre la sección "Estilo visual" de abajo)
+
+- **La esencia es su diseño propio (TITANUS_app.html):** fondo negro con vetas y oro (`#f2c55c`, botones con degradé dorado), estatuas romanas, marca y títulos en **Cinzel**, rango y nivel ("Legionario · Nivel 5"), "Continuar como invitado".
+- **Hermana de Stoica, no copia:** se mantienen Playfair para números, números romanos, frases estoicas y celebraciones breves. El modo claro se llama **"Mármol"** y usa la piedra/bronce de Stoica. El oscuro **"Noche romana"** es el predeterminado.
+- **Sin** Mente ni Hábitos. Pestañas: Inicio · Entreno · Progreso · Perfil.
+- **Seguimiento estilo Hevy:** duración/volumen/series en vivo, tabla SERIE · ANTERIOR · KG · REPS · ✓, tipos de serie (calentamiento C, fallo F, drop D), descanso por ejercicio, notas, 1RM (Epley), libre, minimizar, repetir y guardar como rutina.
+- Rangos por entrenamientos: Recluta 0, Legionario 10, Decurión 30, Centurión 60, Tribuno 120, Legado 200, César 365. Nivel = total/5 + 1.
 
 ## Reglas de trabajo
 

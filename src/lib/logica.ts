@@ -1,5 +1,5 @@
 import type {
-  EjercicioEntreno, EstadoEjercicio, Rutina, Record, Unidad, Serie,
+  EjercicioEntreno, EstadoEjercicio, Rutina, Record, Unidad, Serie, Semanas,
 } from './tipos';
 
 const DIA = 86_400_000;
@@ -92,12 +92,37 @@ export function seriesHechas(e: EjercicioEntreno): Serie[] {
   return e.series.filter((s) => s.hecha && s.reps > 0);
 }
 
+/** Series que cuentan para récords: las de calentamiento no */
+export function seriesEfectivas(e: EjercicioEntreno): Serie[] {
+  return seriesHechas(e).filter((s) => s.tipo !== 'calentamiento');
+}
+
+/** 1RM estimado (fórmula de Epley): el peso que podrías levantar una sola vez */
+export function e1rm(peso: number, reps: number): number {
+  if (peso <= 0 || reps <= 0) return 0;
+  if (reps === 1) return peso;
+  return peso * (1 + Math.min(reps, 20) / 30);
+}
+
 export function volumenEjercicio(e: EjercicioEntreno): number {
   return seriesHechas(e).reduce((t, s) => t + s.peso * s.reps, 0);
 }
 
 export function pesoMaximo(e: EjercicioEntreno): number {
-  return seriesHechas(e).reduce((m, s) => Math.max(m, s.peso), 0);
+  return seriesEfectivas(e).reduce((m, s) => Math.max(m, s.peso), 0);
+}
+
+export function mejor1RM(e: EjercicioEntreno): number {
+  return seriesEfectivas(e).reduce((m, s) => Math.max(m, e1rm(s.peso, s.reps)), 0);
+}
+
+export function repsTotales(e: EjercicioEntreno): number {
+  return seriesHechas(e).reduce((t, s) => t + s.reps, 0);
+}
+
+/** La mejor serie (por 1RM estimado), como muestra Hevy en el historial */
+export function mejorSerie(e: EjercicioEntreno): Serie | undefined {
+  return seriesEfectivas(e).reduce<Serie | undefined>((m, s) => (!m || e1rm(s.peso, s.reps) > e1rm(m.peso, m.reps) ? s : m), undefined);
 }
 
 export function volumenTotal(ejs: EjercicioEntreno[]): number {
@@ -119,7 +144,9 @@ export function detectarRecords(
     if (!est || !est.ultima) continue;
     const p = pesoMaximo(e);
     const v = volumenEjercicio(e);
+    const u = mejor1RM(e);
     if (p > 0 && p > est.mejorPeso) r.push({ ejercicioId: e.ejercicioId, tipo: 'peso', valor: p });
+    if (u > 0 && u > (est.mejor1RM ?? 0) + 0.01) r.push({ ejercicioId: e.ejercicioId, tipo: '1rm', valor: redondear(u) });
     if (v > 0 && v > est.mejorVolumen) r.push({ ejercicioId: e.ejercicioId, tipo: 'volumen', valor: v });
   }
   return r;
@@ -136,13 +163,64 @@ export function actualizarEstado(
   if (!hechas.length) return previo;
   const p = pesoMaximo(e);
   const v = volumenEjercicio(e);
-  const puntos = [...(previo?.puntos ?? []), { fecha, pesoMax: p, volumen: v }].slice(-MAX_PUNTOS);
+  const u = redondear(mejor1RM(e));
+  const puntos = [...(previo?.puntos ?? []), { fecha, pesoMax: p, volumen: v, e1rm: u, reps: repsTotales(e) }].slice(-MAX_PUNTOS);
   return {
     ejercicioId: e.ejercicioId,
     ultima: { fecha, series: hechas.map((s) => ({ peso: s.peso, reps: s.reps })) },
     mejorPeso: Math.max(previo?.mejorPeso ?? 0, p),
     mejorVolumen: Math.max(previo?.mejorVolumen ?? 0, v),
+    mejor1RM: Math.max(previo?.mejor1RM ?? 0, u),
     puntos,
+  };
+}
+
+/* ───────── Totales por semana (para los gráficos de Progreso) ───────── */
+export const MAX_SEMANAS = 60;
+
+export function sumarSemana(sem: Semanas | undefined, inicio: number, volumen: number, minutos: number): Semanas {
+  const k = claveDia(inicioSemana(inicio));
+  const x = { ...(sem ?? {}) };
+  const a = x[k] ?? { v: 0, n: 0, m: 0 };
+  x[k] = { v: Math.round(a.v + volumen), n: a.n + 1, m: Math.round(a.m + minutos) };
+  const claves = Object.keys(x).sort();
+  for (const c of claves.slice(0, Math.max(0, claves.length - MAX_SEMANAS))) delete x[c];
+  return x;
+}
+
+/** Serie de semanas para el gráfico, incluyendo las semanas vacías */
+export function semanasEnRango(sem: Semanas | undefined, semanas: number, hoy = Date.now()) {
+  const r: { fecha: number; v: number; n: number; m: number }[] = [];
+  let l = inicioSemana(hoy);
+  for (let i = 0; i < semanas; i++) {
+    const k = claveDia(l);
+    r.unshift({ fecha: l, ...(sem?.[k] ?? { v: 0, n: 0, m: 0 }) });
+    l = inicioSemana(l - DIA);
+  }
+  return r;
+}
+
+/* ───────── Rango y nivel ───────── */
+export const RANGOS = [
+  { nombre: 'Recluta', desde: 0 },
+  { nombre: 'Legionario', desde: 10 },
+  { nombre: 'Decurión', desde: 30 },
+  { nombre: 'Centurión', desde: 60 },
+  { nombre: 'Tribuno', desde: 120 },
+  { nombre: 'Legado', desde: 200 },
+  { nombre: 'César', desde: 365 },
+];
+
+/** Cada 5 entrenamientos sube un nivel; el rango cambia por hitos */
+export function rango(total: number) {
+  const i = RANGOS.reduce((k, r, j) => (total >= r.desde ? j : k), 0);
+  const sig = RANGOS[i + 1];
+  return {
+    nombre: RANGOS[i].nombre,
+    nivel: Math.floor(total / 5) + 1,
+    siguiente: sig?.nombre,
+    faltan: sig ? sig.desde - total : 0,
+    progreso: sig ? (total - RANGOS[i].desde) / (sig.desde - RANGOS[i].desde) : 1,
   };
 }
 

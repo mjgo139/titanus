@@ -1,29 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import espalda from '../assets/espalda.webp';
 import { buscarEjercicio } from '../lib/biblioteca';
 import {
-  aKg, aUnidad, claveDia, contarSeries, duracion, fechaCorta, fechaLarga, formatoNumero, formatoPeso, redondear,
+  aKg, aUnidad, claveDia, contarSeries, duracion, fechaLarga, formatoNumero, formatoPeso, inicioDia, mejorSerie,
+  rachaSemanas, rango, redondear, romano, semanasEnRango,
 } from '../lib/logica';
 import type { Ejercicio, Entrenamiento, EstadoEjercicio, RegistroCuerpo } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
-import { Cargando, Encabezado, GraficoLinea, Hoja, Selector, Vacio } from '../ui/piezas';
+import { Cargando, GraficoBarras, GraficoLinea, Hoja, Selector, Vacio } from '../ui/piezas';
+import { useEmpezar } from './empezar';
+import { Miniatura } from './Miniatura';
 
-type Vista = 'historial' | 'records' | 'cuerpo';
+type Vista = 'resumen' | 'historial' | 'records' | 'medidas';
 const PAGINA = 20;
 
 export default function Progreso() {
   const [params, setParams] = useSearchParams();
-  const vista = (params.get('v') as Vista) || 'historial';
+  const vista = (params.get('v') as Vista) || 'resumen';
   return (
-    <div>
-      <Encabezado etiqueta="Progreso" titulo="Lo que construiste" linea="Historial, récords y tu cuerpo, semana a semana." />
+    <div className="pt-6">
+      <h1 className="titulo mb-5 text-center">Progreso</h1>
       <Selector nombre="Sección" valor={vista} alCambiar={(v) => setParams({ v }, { replace: true })}
-        opciones={[{ v: 'historial', t: 'Historial' }, { v: 'records', t: 'Récords' }, { v: 'cuerpo', t: 'Cuerpo' }]} />
+        opciones={[{ v: 'resumen', t: 'Resumen' }, { v: 'historial', t: 'Historial' }, { v: 'records', t: 'Récords' }, { v: 'medidas', t: 'Medidas' }]} />
       <div className="mt-5">
+        {vista === 'resumen' && <ResumenProgreso />}
         {vista === 'historial' && <Historial />}
         {vista === 'records' && <Records />}
-        {vista === 'cuerpo' && <Cuerpo />}
+        {vista === 'medidas' && <Medidas />}
       </div>
     </div>
   );
@@ -36,8 +41,123 @@ function usePropios() {
   return p;
 }
 
+const RANGOS_TIEMPO = { '1M': 5, '3M': 13, '6M': 26, '1A': 52 } as const;
+
+/** Todo sale del resumen del perfil: 0 lecturas extra */
+function ResumenProgreso() {
+  const { perfil } = useSesion();
+  const [tiempo, setTiempo] = useState<keyof typeof RANGOS_TIEMPO>('3M');
+  const [medida, setMedida] = useState<'v' | 'n' | 'm'>('v');
+  const u = perfil.unidad;
+  const ahora = Date.now();
+  const sem = perfil.resumen.semanas;
+  const ult4 = semanasEnRango(sem, 4, ahora);
+  const prev4 = semanasEnRango(sem, 8, ahora).slice(0, 4);
+  const suma = (l: { v: number; n: number; m: number }[], k: 'v' | 'n' | 'm') => l.reduce((t, x) => t + x[k], 0);
+  const cambio = (k: 'v' | 'n' | 'm') => {
+    const a = suma(ult4, k), b = suma(prev4, k);
+    return b ? Math.round(((a - b) / b) * 100) : null;
+  };
+  const datos = semanasEnRango(sem, RANGOS_TIEMPO[tiempo], ahora).map((x) => ({ fecha: x.fecha, y: medida === 'v' ? aUnidad(x.v, u) : x[medida] }));
+  const r = rango(perfil.resumen.total);
+  const racha = rachaSemanas(perfil.resumen.dias, ahora);
+  const fmt = (n: number) => (medida === 'v' ? `${formatoNumero(redondear(n, 0))} ${u}` : medida === 'n' ? `${n} entrenos` : `${n} min`);
+
+  const filas: [string, string, number | null][] = [
+    ['Entrenamientos', String(suma(ult4, 'n')), cambio('n')],
+    ['Volumen', `${formatoNumero(redondear(aUnidad(suma(ult4, 'v'), u), 0))} ${u}`, cambio('v')],
+    ['Tiempo entrenando', duracion(suma(ult4, 'm') * 60000), cambio('m')],
+  ];
+
+  return (
+    <>
+      <div className="tarjeta relative min-h-[215px] overflow-hidden">
+        <img src={espalda} alt="" className="mascara-izq absolute -right-4 top-0 h-full w-[48%] object-cover" />
+        <div className="relative z-[1]">
+          <h3 className="font-display text-[20px] font-semibold">Tu evolución</h3>
+          <p className="text-[12px] text-mu">Últimas 4 semanas</p>
+          {filas.map(([t, v, c]) => (
+            <p key={t} className="mt-3 text-[13px]">
+              <b className="num text-[18px]">{v}</b>{' '}
+              {c !== null && <span className={c >= 0 ? 'oro' : 'text-miss'}>{c >= 0 ? '↑' : '↓'} {Math.abs(c)} %</span>}
+              <br /><span className="text-mu">{t}</span>
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="tarjeta mt-3 p-[9px]">
+        <Selector nombre="Período" valor={tiempo} alCambiar={setTiempo}
+          opciones={(Object.keys(RANGOS_TIEMPO) as (keyof typeof RANGOS_TIEMPO)[]).map((k) => ({ v: k, t: k }))} />
+        <div className="mt-3 flex gap-3 px-1 text-[13px]">
+          {([['v', 'Volumen'], ['n', 'Entrenos'], ['m', 'Minutos']] as const).map(([k, t]) => (
+            <button key={k} onClick={() => setMedida(k)} className={medida === k ? 'oro font-semibold underline underline-offset-4' : 'text-mu'}>{t}</button>
+          ))}
+        </div>
+        <div className="mt-2 px-1">
+          <GraficoBarras datos={datos} etiqueta={`Gráfico semanal de ${medida === 'v' ? 'volumen' : medida === 'n' ? 'entrenamientos' : 'minutos'}`} formato={fmt} />
+        </div>
+      </div>
+
+      <Calendario dias={perfil.resumen.dias} />
+
+      <div className="mt-5 flex items-center justify-between">
+        <h3 className="font-display text-[20px] font-semibold">Logros</h3>
+        <Link to="/progreso?v=records" className="oro text-[14px]">Ver récords</Link>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        {[
+          { i: 'fuego', v: romano(racha) === '—' ? '0' : romano(racha), t: 'Racha', s: racha === 1 ? 'semana' : 'semanas' },
+          { i: 'corona', v: String(r.nivel), t: r.nombre, s: 'nivel' },
+          { i: 'trofeo', v: String(perfil.resumen.total), t: 'Constancia', s: 'entrenos' },
+        ].map((x) => (
+          <div key={x.t} className="tarjeta min-h-[110px] px-1 text-center">
+            <Icono n={x.i} size={28} className="oro mx-auto" />
+            <div className="num mt-1 text-[22px]">{x.v}</div>
+            <p className="text-[12px] text-mu">{x.t}<br />{x.s}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function Calendario({ dias }: { dias: number[] }) {
+  const [mes, setMes] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).getTime(); });
+  const set = useMemo(() => new Set(dias.map(inicioDia)), [dias]);
+  const d0 = new Date(mes);
+  const offset = (d0.getDay() + 6) % 7;
+  const total = new Date(d0.getFullYear(), d0.getMonth() + 1, 0).getDate();
+  const hoy = inicioDia(Date.now());
+  const celdas = Array.from({ length: offset + total }, (_, i) => (i < offset ? null : new Date(d0.getFullYear(), d0.getMonth(), i - offset + 1).getTime()));
+  const enMes = celdas.filter((c) => c && set.has(c)).length;
+  const mover = (k: number) => setMes(new Date(d0.getFullYear(), d0.getMonth() + k, 1).getTime());
+  return (
+    <div className="tarjeta mt-3" aria-label="Calendario de entrenamientos">
+      <div className="flex items-center justify-between">
+        <button aria-label="Mes anterior" className="toque -ml-3 flex items-center justify-center oro" onClick={() => mover(-1)}><Icono n="atras" /></button>
+        <div className="text-center">
+          <div className="font-display text-[17px] font-semibold first-letter:uppercase">{new Intl.DateTimeFormat('es-PY', { month: 'long', year: 'numeric' }).format(mes)}</div>
+          <div className="text-[12px] text-mu">{enMes} {enMes === 1 ? 'día entrenado' : 'días entrenados'}</div>
+        </div>
+        <button aria-label="Mes siguiente" className="toque -mr-3 flex rotate-180 items-center justify-center oro" onClick={() => mover(1)}><Icono n="atras" /></button>
+      </div>
+      <div className="mt-2 grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-mu2">
+        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((l, i) => <span key={i}>{l}</span>)}
+        {celdas.map((c, i) => (
+          <span key={i} className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-medium ${c && set.has(c) ? '' : c === hoy ? 'border border-gold oro' : 'text-tx2'}`}
+            style={c && set.has(c) ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
+            {c ? new Date(c).getDate() : ''}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Historial() {
   const { repo, usuario, perfil } = useSesion();
+  const empezar = useEmpezar();
   const propios = usePropios();
   const [items, setItems] = useState<Entrenamiento[] | null>(null);
   const [mas, setMas] = useState(false);
@@ -59,19 +179,32 @@ function Historial() {
   if (!items.length) return <Vacio titulo="Sin entrenamientos todavía" linea="Cuando termines tu primer entrenamiento, aparece acá." />;
   return (
     <>
-      <ul className="tarjeta py-1">
+      <ul className="flex flex-col gap-3">
         {items.map((e) => (
-          <li key={e.id}>
-            <button className="fila w-full text-left" onClick={() => setAbierto(e)}>
-              <span className="flex h-10 w-10 flex-col items-center justify-center rounded-xl bg-goldbg text-gold">
-                <span className="num text-[15px] leading-none">{new Date(e.inicio).getDate()}</span>
-                <span className="text-[9px] font-bold uppercase">{fechaCorta(e.inicio).split(' ')[1]?.replace('.', '')}</span>
-              </span>
-              <span className="flex-1">
-                <span className="block font-semibold">{e.nombre}</span>
-                <span className="text-[13px] text-mu">{duracion(e.fin - e.inicio)} · {contarSeries(e.ejercicios)} series · {formatoPeso(e.volumen, u, 0)}</span>
-              </span>
-              {e.records.length > 0 && <Icono n="medalla" size={18} className="text-gold" />}
+          <li key={e.id} className="tarjeta" data-testid="entreno-historial">
+            <button className="w-full text-left" onClick={() => setAbierto(e)}>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h3 className="titulo-tarjeta">{e.nombre}</h3>
+                  <p className="text-[13px] text-mu first-letter:uppercase">{fechaLarga(e.inicio)}</p>
+                </div>
+                {e.records.length > 0 && <span className="chip h-7 gap-1 border-gold2 oro"><Icono n="medalla" size={14} />{e.records.length}</span>}
+              </div>
+              <div className="mt-3 grid grid-cols-3 text-[13px]">
+                <div><div className="text-mu">Duración</div><div className="font-semibold">{duracion(e.fin - e.inicio)}</div></div>
+                <div><div className="text-mu">Volumen</div><div className="font-semibold">{formatoPeso(e.volumen, u, 0)}</div></div>
+                <div><div className="text-mu">Series</div><div className="font-semibold">{contarSeries(e.ejercicios)}</div></div>
+              </div>
+              <div className="divisor my-3 opacity-40" />
+              <ul className="flex flex-col gap-1.5 text-[14px]">
+                {e.ejercicios.slice(0, 3).map((x) => (
+                  <li key={x.ejercicioId} className="flex items-center gap-2">
+                    <Miniatura musculo={buscarEjercicio(x.ejercicioId, propios)?.musculo} tam={26} />
+                    <span className="flex-1 truncate">{x.series.length} series · {buscarEjercicio(x.ejercicioId, propios)?.nombre}</span>
+                  </li>
+                ))}
+                {e.ejercicios.length > 3 && <li className="text-[13px] text-mu">Ver {e.ejercicios.length - 3} {e.ejercicios.length - 3 === 1 ? 'ejercicio' : 'ejercicios'} más</li>}
+              </ul>
             </button>
           </li>
         ))}
@@ -79,14 +212,32 @@ function Historial() {
       {mas && <button className="btn-sec w-full mt-4" onClick={cargarMas}>Ver más</button>}
 
       <Hoja abierta={!!abierto} alCerrar={() => setAbierto(null)} etiqueta={abierto ? fechaLarga(abierto.inicio) : ''} titulo={abierto?.nombre ?? ''}>
-        {abierto && abierto.ejercicios.map((x) => (
-          <div key={x.ejercicioId} className="py-3 border-b border-ln2 last:border-0">
-            <div className="font-semibold">{buscarEjercicio(x.ejercicioId, propios)?.nombre}</div>
-            <div className="mt-1 text-[14px] text-mu num">
-              {x.series.map((s) => `${formatoNumero(redondear(aUnidad(s.peso, u)))}×${s.reps}`).join('  ·  ')} {u}
-            </div>
-          </div>
-        ))}
+        {abierto && (
+          <>
+            {abierto.nota && <p className="mb-3 italic text-tx2">“{abierto.nota}”</p>}
+            {abierto.ejercicios.map((x) => {
+              const m = mejorSerie(x);
+              return (
+                <div key={x.ejercicioId} className="border-b border-ln2 py-3 last:border-0">
+                  <div className="font-semibold oro">{buscarEjercicio(x.ejercicioId, propios)?.nombre}</div>
+                  {x.nota && <p className="text-[13px] italic text-mu">{x.nota}</p>}
+                  <ol className="mt-1 text-[14px] num">
+                    {x.series.map((s, j) => (
+                      <li key={j} className="flex gap-3">
+                        <span className="w-5 text-mu">{s.tipo === 'calentamiento' ? 'C' : s.tipo === 'fallo' ? 'F' : s.tipo === 'drop' ? 'D' : j + 1}</span>
+                        <span>{formatoNumero(redondear(aUnidad(s.peso, u)))} {u} × {s.reps}</span>
+                        {m === s && <span className="oro text-[12px]">mejor</span>}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              );
+            })}
+            <button className="btn mt-5 w-full" onClick={() => { const e = abierto; setAbierto(null); empezar.repetir(e); }}>
+              <Icono n="repetir" size={18} />Repetir entrenamiento
+            </button>
+          </>
+        )}
       </Hoja>
     </>
   );
@@ -97,26 +248,24 @@ function Records() {
   const propios = usePropios();
   const [estados, setEstados] = useState<EstadoEjercicio[] | null>(null);
   useEffect(() => {
-    repo.leerEstados(usuario.uid).then((m) => setEstados([...m.values()].sort((a, b) => (b.ultima?.fecha ?? 0) - (a.ultima?.fecha ?? 0))));
+    repo.leerEstados(usuario.uid).then((m) => setEstados([...m.values()].sort((a, b) => (b.mejor1RM ?? b.mejorPeso) - (a.mejor1RM ?? a.mejorPeso))));
   }, [repo, usuario.uid]);
   if (!estados) return <Cargando />;
   if (!estados.length) return <Vacio titulo="Sin récords todavía" linea="Tus mejores marcas por ejercicio aparecen después de entrenar." />;
+  const u = perfil.unidad;
   return (
     <ul className="flex flex-col gap-3">
       {estados.map((s) => {
         const ej = buscarEjercicio(s.ejercicioId, propios);
         return (
           <li key={s.ejercicioId}>
-            <Link to={`/progreso/ejercicio/${s.ejercicioId}`} className="tarjeta flex items-center gap-4">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-goldbg text-gold"><Icono n="medalla" /></span>
+            <Link to={`/progreso/ejercicio/${s.ejercicioId}`} className="tarjeta flex items-center gap-3">
+              <Miniatura musculo={ej?.musculo} />
               <span className="flex-1">
-                <span className="etiqueta">{ej?.musculo}</span>
-                <span className="block font-semibold mt-0.5">{ej?.nombre ?? s.ejercicioId}</span>
+                <span className="block font-semibold">{ej?.nombre ?? s.ejercicioId}</span>
+                <span className="text-[12px] text-mu">{s.puntos.length} sesiones{s.mejor1RM ? ` · 1RM ${formatoPeso(s.mejor1RM, u)}` : ''}</span>
               </span>
-              <span className="text-right">
-                <span className="num block text-[20px] text-gold">{formatoPeso(s.mejorPeso, perfil.unidad)}</span>
-                <span className="text-[12px] text-mu">{s.puntos.length} sesiones</span>
-              </span>
+              <span className="num oro text-[20px]">{formatoPeso(s.mejorPeso, u)}</span>
             </Link>
           </li>
         );
@@ -133,7 +282,7 @@ const MEDIDAS: { k: keyof RegistroCuerpo; t: string; unidad: 'peso' | 'cm' }[] =
   { k: 'muslo', t: 'Muslo', unidad: 'cm' },
 ];
 
-function Cuerpo() {
+function Medidas() {
   const { repo, usuario, perfil, aviso } = useSesion();
   const u = perfil.unidad;
   const [regs, setRegs] = useState<RegistroCuerpo[] | null>(null);
@@ -165,8 +314,8 @@ function Cuerpo() {
     <>
       <div className="tarjeta">
         <div className="etiqueta">Peso corporal</div>
-        <div className="num text-[40px] mt-1">{val('peso') ? formatoPeso(val('peso')!, u) : '—'}</div>
-        <div className="mt-3">
+        <div className="num oro mt-1 text-[38px]">{val('peso') ? formatoPeso(val('peso')!, u) : '—'}</div>
+        <div className="mt-2">
           <GraficoLinea puntos={pesos} etiqueta="Peso corporal en el tiempo" formato={(n) => `${formatoNumero(redondear(n))} ${u}`} />
         </div>
       </div>
@@ -174,13 +323,14 @@ function Cuerpo() {
         {MEDIDAS.slice(1).map((m) => (
           <div key={m.k} className="tarjeta">
             <div className="etiqueta">{m.t}</div>
-            <div className="num text-[24px] mt-1">{val(m.k) ? `${formatoNumero(redondear(val(m.k)!))} cm` : '—'}</div>
+            <div className="num mt-1 text-[24px]">{val(m.k) ? `${formatoNumero(redondear(val(m.k)!))} cm` : '—'}</div>
           </div>
         ))}
       </div>
       <button className="btn w-full mt-5" onClick={() => setForm(true)}>Registrar medidas de hoy</button>
 
-      <Hoja abierta={form} alCerrar={() => setForm(false)} etiqueta="Cuerpo" titulo="Medidas de hoy">
+      <Hoja abierta={form} alCerrar={() => setForm(false)} etiqueta="Medidas" titulo="Registro de hoy">
+        <p className="mb-3 text-[13px] text-mu">Un registro personal, sin objetivos obligatorios.</p>
         <div className="grid grid-cols-2 gap-4">
           {MEDIDAS.map((m) => (
             <label key={m.k}>

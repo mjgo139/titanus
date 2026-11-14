@@ -32,16 +32,21 @@ export interface Rutina {
   creado: number;
 }
 
+export type TipoSerie = 'normal' | 'calentamiento' | 'fallo' | 'drop';
+
 export interface Serie {
   peso: number; // siempre guardado en kg
   reps: number;
   sensacion?: Sensacion;
+  tipo?: TipoSerie;
   hecha: boolean;
 }
 
 export interface EjercicioEntreno {
   ejercicioId: string;
   series: Serie[];
+  nota?: string;
+  descanso?: number; // segundos
 }
 
 export interface Entrenamiento {
@@ -53,11 +58,13 @@ export interface Entrenamiento {
   ejercicios: EjercicioEntreno[];
   volumen: number; // kg·reps
   records: Record[];
+  nota?: string;
+  numero?: number; // entrenamiento N° del usuario
 }
 
 export interface Record {
   ejercicioId: string;
-  tipo: 'peso' | 'volumen';
+  tipo: 'peso' | 'volumen' | '1rm';
   valor: number;
 }
 
@@ -65,6 +72,8 @@ export interface PuntoGrafico {
   fecha: number;
   pesoMax: number;
   volumen: number;
+  e1rm?: number;
+  reps?: number;
 }
 
 /** Resumen por ejercicio: evita recorrer todo el historial (ahorra lecturas) */
@@ -73,6 +82,7 @@ export interface EstadoEjercicio {
   ultima?: { fecha: number; series: { peso: number; reps: number }[] };
   mejorPeso: number;
   mejorVolumen: number;
+  mejor1RM?: number;
   puntos: PuntoGrafico[];
 }
 
@@ -101,5 +111,15 @@ export interface Perfil {
   recordatorio: Recordatorio;
   creado: number;
   /** Fechas (ms) de los entrenamientos de las últimas semanas, para Hoy con 1 sola lectura */
-  resumen: { dias: number[]; total: number };
+  resumen: Resumen;
+}
+
+/** Totales por semana (clave: lunes AAAA-MM-DD): volumen, entrenamientos y minutos */
+export type Semanas = { [lunes: string]: { v: number; n: number; m: number } };
+
+/** Resumen guardado en el perfil para que Inicio y Progreso carguen con 1 sola lectura */
+export interface Resumen {
+  dias: number[];
+  total: number;
+  semanas?: Semanas;
 }

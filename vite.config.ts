@@ -30,10 +30,10 @@ export default defineConfig({
       manifest: {
         name: 'TITANUS',
         short_name: 'TITANUS',
-        description: 'Entrená con disciplina. Rutinas, series, récords y rachas.',
+        description: 'Entrenamiento · Disciplina · Fuerza. Registrá cada serie como un legionario.',
         lang: 'es',
-        theme_color: '#14120E',
-        background_color: '#ECE6DB',
+        theme_color: '#090909',
+        background_color: '#090909',
         display: 'standalone',
         start_url: '/',
         icons: [
@@ -47,7 +47,7 @@ export default defineConfig({
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,mp3}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,mp3}'],
       },
     }),
   ],

@@ -1,131 +1,129 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { buscarEjercicio } from '../lib/biblioteca';
+import avatar from '../assets/avatar.webp';
+import espalda from '../assets/espalda.webp';
 import { leerBorrador } from '../lib/borrador';
 import { fraseDelDia } from '../lib/frases';
-import { NOMBRES_DIA, fechaLarga, rachaSemanas, romano, rutinaDeHoy, saludo, semanaActual } from '../lib/logica';
-import type { Ejercicio, Rutina } from '../lib/tipos';
+import { rachaSemanas, rango, romano, rutinaDeHoy, semanaActual } from '../lib/logica';
+import type { Rutina } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
-import { Cargando, Seccion, Vacio } from '../ui/piezas';
+import { Cargando } from '../ui/piezas';
+import { useEmpezar } from './empezar';
+
+export function minutosEstimados(r: Rutina): number {
+  return Math.max(10, Math.round(r.ejercicios.reduce((t, e) => t + e.series * (e.descanso + 40), 0) / 60 / 5) * 5);
+}
 
 export default function Hoy() {
   const { repo, usuario, perfil } = useSesion();
   const nav = useNavigate();
+  const empezar = useEmpezar();
   const [rutinas, setRutinas] = useState<Rutina[] | null>(null);
-  const [propios, setPropios] = useState<Ejercicio[]>([]);
   const ahora = Date.now();
   const frase = fraseDelDia(ahora);
-  const borrador = leerBorrador(usuario.uid);
+  const enCurso = !!leerBorrador(usuario.uid);
 
-  useEffect(() => {
-    repo.leerRutinas(usuario.uid).then(setRutinas);
-    repo.leerPropios(usuario.uid).then(setPropios);
-  }, [repo, usuario.uid]);
+  useEffect(() => { repo.leerRutinas(usuario.uid).then(setRutinas); }, [repo, usuario.uid]);
 
   const dias = perfil.resumen.dias;
   const racha = rachaSemanas(dias, ahora);
   const semana = semanaActual(dias, ahora);
-  const hechosSemana = semana.filter((d) => d.hecho).length;
+  const r = rango(perfil.resumen.total);
   const deHoy = rutinas ? rutinaDeHoy(rutinas, ahora) : undefined;
-  const entrenoHoy = semana.find((d) => d.hoy)?.hecho;
-  const proxima = rutinas && !deHoy
-    ? [1, 2, 3, 4, 5, 6].map((i) => ({ i, r: rutinaDeHoy(rutinas, ahora + i * 86_400_000) })).find((x) => x.r)
-    : undefined;
+  const idx = deHoy && rutinas ? [...rutinas].sort((a, b) => a.orden - b.orden).indexOf(deHoy) + 1 : 0;
+  const fecha = new Intl.DateTimeFormat('es-PY', { day: 'numeric', month: 'short' }).format(ahora).replace('.', '');
 
   return (
-    <div>
-      <header className="entrar pt-6 pb-5">
-        <div className="etiqueta">Panel del día · {fechaLarga(ahora)}</div>
-        <h1 className="titulo mt-2">{saludo(new Date(ahora).getHours())}, {perfil.nombre.split(' ')[0]}</h1>
-        <p className="mt-2 text-mu font-medium">Una serie por vez, con toda la atención.</p>
-      </header>
-
-      <figure className="hero entrar">
-        <Icono n="laurel" size={140} className="absolute -right-6 -bottom-6 text-gold opacity-[.13]" />
-        <div className="etiqueta">Frase del día</div>
-        <blockquote className="mt-3 font-display font-semibold text-[18px] leading-snug text-tx2">“{frase.texto}”</blockquote>
-        <figcaption className="etiqueta mt-3">{frase.autor}</figcaption>
-      </figure>
-
-      {borrador && (
-        <button onClick={() => nav('/entrenar/continuar')} className="tarjeta mt-4 w-full text-left flex items-center gap-4 border-gold">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold text-on"><Icono n="play" size={18} /></span>
-          <span className="flex-1">
-            <span className="etiqueta text-gold">En curso</span>
-            <span className="block titulo-tarjeta">{borrador.nombre}</span>
-          </span>
-          <span className="text-gold font-bold text-[13px] uppercase tracking-[.1em]">Seguir</span>
-        </button>
-      )}
-
-      <Seccion titulo="Entrenamiento de hoy">
-        {!rutinas ? <Cargando /> : deHoy ? (
-          <div className="tarjeta">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="etiqueta">{deHoy.dias.map((d) => NOMBRES_DIA[d]).join(' · ')}</div>
-                <h3 className="titulo-tarjeta mt-1">{deHoy.nombre}</h3>
-              </div>
-              {entrenoHoy && <span className="chip border-ok text-ok bg-okbg">Hecho</span>}
-            </div>
-            <ul className="mt-3 text-[14px] text-mu">
-              {deHoy.ejercicios.slice(0, 5).map((e) => (
-                <li key={e.ejercicioId} className="flex justify-between py-1">
-                  <span>{buscarEjercicio(e.ejercicioId, propios)?.nombre ?? 'Ejercicio'}</span>
-                  <span className="num text-tx2">{e.series}×{e.reps}</span>
-                </li>
-              ))}
-            </ul>
-            {!borrador && (
-              <button className="btn w-full mt-4" onClick={() => nav(`/entrenar/${deHoy.id}`)}>
-                {entrenoHoy ? 'Entrenar de nuevo' : 'Empezar entrenamiento'}
-              </button>
-            )}
+    <div className="pt-6">
+      <div className="entrar flex items-center justify-between">
+        <div className="flex items-center gap-[15px]">
+          <img src={avatar} alt="" className="h-[65px] w-[65px] rounded-full border-2 border-gold object-cover" />
+          <div>
+            <h1 className="font-display text-[20px] font-semibold">Hola, {perfil.nombre.split(' ')[0]}</h1>
+            <p className="oro mt-1 text-[14px]" data-testid="rango">{r.nombre} · Nivel {r.nivel}</p>
           </div>
-        ) : rutinas.length === 0 ? (
-          <Vacio titulo="Todavía no tenés rutinas" linea="Armá tu primera rutina y asignala a los días que vas al gimnasio.">
-            <Link to="/rutinas/nueva" className="btn">Crear rutina</Link>
-          </Vacio>
-        ) : (
-          <div className="tarjeta">
-            <h3 className="titulo-tarjeta">Día de descanso</h3>
-            <p className="mt-2 text-mu">
-              {proxima?.r ? <>Lo próximo: <b className="text-tx2">{proxima.r.nombre}</b> {proxima.i === 1 ? 'mañana' : `en ${proxima.i} días`}.</> : 'El descanso también es parte del entrenamiento.'}
-            </p>
-            {!borrador && (
-              <button className="btn-sec mt-4" onClick={() => nav('/rutinas')}>Entrenar igual</button>
-            )}
-          </div>
-        )}
-      </Seccion>
-
-      <div className="mt-7 grid grid-cols-2 gap-3">
-        <div className="tarjeta">
-          <div className="etiqueta">Racha</div>
-          <div className="num text-[44px] leading-none mt-2 text-gold" data-testid="racha">{racha ? romano(racha) : '—'}</div>
-          <div className="mt-2 text-[13px] text-mu">{racha === 1 ? 'semana entrenada' : `${racha} semanas seguidas`}</div>
         </div>
-        <div className="tarjeta">
-          <div className="etiqueta">Esta semana</div>
-          <div className="num text-[44px] leading-none mt-2">{hechosSemana}</div>
-          <div className="mt-2 text-[13px] text-mu">{hechosSemana === 1 ? 'entrenamiento' : 'entrenamientos'}</div>
+        <Link to="/perfil" aria-label="Ir a mi perfil" className="toque flex items-center justify-center oro"><Icono n="corona" size={24} /></Link>
+      </div>
+
+      <div className="divisor my-[17px]" />
+
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-display text-[19px] font-semibold"><Icono n="calendario" size={20} className="oro" />Hoy, {fecha}</h2>
+        <div className="text-right">
+          <div className="text-[12px] text-mu flex items-center gap-1 justify-end"><Icono n="fuego" size={14} className="oro" />Racha</div>
+          <strong className="num oro text-[20px]" data-testid="racha">{racha ? romano(racha) : '—'}</strong>
+          <span className="text-[12px] text-mu"> {racha === 1 ? 'semana' : 'semanas'}</span>
         </div>
       </div>
 
-      <Seccion titulo="Semana">
-        <div className="tarjeta flex justify-between px-3">
-          {semana.map((d) => (
-            <div key={d.fecha} className="flex flex-col items-center gap-2">
-              <span className={`text-[11px] font-bold ${d.hoy ? 'text-gold' : 'text-mu2'}`}>{d.letra}</span>
-              <span aria-label={d.hecho ? 'Entrenado' : d.futuro ? 'Próximo' : 'Sin entrenar'}
-                className={`flex h-9 w-9 items-center justify-center rounded-full border ${d.hecho ? 'bg-ok border-ok text-on' : d.hoy ? 'border-gold text-gold' : 'border-ln text-mu2'}`}>
-                {d.hecho ? <Icono n="check" size={16} /> : <span className="num text-[13px]">{new Date(d.fecha).getDate()}</span>}
-              </span>
-            </div>
-          ))}
+      <figure className="hero mt-4">
+        <blockquote className="font-display text-[18px] italic leading-snug text-tx">“{frase.texto}”</blockquote>
+        <figcaption className="oro mt-2 text-[14px]">— {frase.autor}</figcaption>
+      </figure>
+
+      <h2 className="mt-6 mb-3 font-display text-[23px] font-semibold">Entrenamiento de hoy</h2>
+      {!rutinas ? <Cargando /> : (
+        <div className="tarjeta flex min-h-[165px] items-center gap-3 overflow-hidden p-0">
+          <img src={espalda} alt="" className="h-[165px] w-[40%] object-cover" />
+          <div className="flex-1 py-3 pr-4">
+            {deHoy ? <>
+              <div className="etiqueta oro">Día {romano(idx)} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : "Primera sesión"}</div>
+              <h3 className="mt-1 font-display text-[21px] font-semibold leading-tight">{deHoy.nombre}</h3>
+              <p className="mt-1 text-[14px] text-mu">{deHoy.ejercicios.length} ejercicios</p>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-[14px]"><span className="oro">◷</span> {minutosEstimados(deHoy)} min</span>
+                <button className="btn-redondo" aria-label={`Empezar ${deHoy.nombre}`} disabled={enCurso}
+                  onClick={() => empezar.rutina(deHoy)}><Icono n="play" size={20} /></button>
+              </div>
+            </> : <>
+              <div className="etiqueta oro">{rutinas.length ? 'Día libre' : 'Primer paso'}</div>
+              <h3 className="mt-1 font-display text-[21px] font-semibold leading-tight">{rutinas.length ? 'Descanso o libre' : 'Armá tu rutina'}</h3>
+              <p className="mt-1 text-[14px] text-mu">{rutinas.length ? 'Hoy no hay rutina asignada.' : 'Elegí ejercicios y días.'}</p>
+              <div className="mt-3 flex items-center justify-between">
+                <Link to={rutinas.length ? '/entreno' : '/rutinas/nueva'} className="text-[14px] oro font-semibold">{rutinas.length ? 'Ver rutinas' : 'Crear rutina'}</Link>
+                <button className="btn-redondo" aria-label="Empezar entrenamiento libre" disabled={enCurso}
+                  onClick={() => empezar.libre()}><Icono n="play" size={20} /></button>
+              </div>
+            </>}
+          </div>
         </div>
-      </Seccion>
+      )}
+
+      <div className="tarjeta mt-3 flex justify-between px-3 py-3">
+        {semana.map((d) => (
+          <div key={d.fecha} className="flex flex-col items-center gap-1.5">
+            <span className={`text-[11px] font-bold ${d.hoy ? 'oro' : 'text-mu2'}`}>{d.letra}</span>
+            <span aria-label={d.hecho ? 'Entrenado' : 'Sin entrenar'}
+              className={`flex h-8 w-8 items-center justify-center rounded-full border text-[12px] ${d.hecho ? 'border-goldh' : d.hoy ? 'border-gold oro' : 'border-ln2 text-mu2'}`}
+              style={d.hecho ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
+              {d.hecho ? <Icono n="check" size={15} /> : new Date(d.fecha).getDate()}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-[9px]">
+        {[
+          { a: '/entreno', i: 'entreno', t: 'Rutinas', s: `${rutinas?.length ?? 0} planificadas` },
+          { a: '/progreso', i: 'progreso', t: 'Progreso', s: 'Tu evolución' },
+          { a: '/progreso?v=records', i: 'trofeo', t: 'Récords', s: 'Tus mejores marcas' },
+          { a: '/progreso?v=medidas', i: 'cuerpo', t: 'Medidas', s: 'Peso y cuerpo' },
+        ].map((x) => (
+          <button key={x.t} onClick={() => nav(x.a)} className="tarjeta flex min-h-[86px] items-center gap-3 text-left">
+            <Icono n={x.i} size={28} className="oro" />
+            <span><strong className="block text-[17px] font-display">{x.t}</strong><span className="text-[13px] text-mu">{x.s}</span></span>
+          </button>
+        ))}
+      </div>
+
+      {usuario.invitado && (
+        <Link to="/perfil" className="tarjeta mt-4 flex items-center gap-3 border-gold2">
+          <Icono n="info" className="oro" />
+          <span className="flex-1 text-[14px]">Estás como invitado. <b className="oro">Creá tu cuenta</b> para no perder tu progreso.</span>
+        </Link>
+      )}
     </div>
   );
 }
