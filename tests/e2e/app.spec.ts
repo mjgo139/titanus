@@ -149,12 +149,28 @@ test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ pa
   await entrar(page);
   await ir(page, 'Entreno');
   await page.getByRole('button', { name: 'Empezar entrenamiento libre' }).click();
-  await expect(page.getByText('Empezá agregando un ejercicio')).toBeVisible();
-  await sinSobrecarga(page);
-  await page.getByRole('button', { name: 'Ver todo' }).click();
-  await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
+  // primero se arma: la biblioteca se abre sola y el reloj no corre
   await page.getByLabel('Buscar ejercicio').fill('dominadas');
   await page.getByRole('button', { name: /Dominadas/ }).first().click();
+  await expect(page.getByTestId('armado')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Terminar', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
+  await page.getByLabel('Buscar ejercicio').fill('press de banca');
+  await page.getByRole('button', { name: /Press de banca/ }).first().click();
+  await page.getByRole('button', { name: /Más series de Press de banca/ }).click();
+  await page.getByRole('button', { name: /Subir Press de banca/ }).click();
+  await expect(page.getByTestId('ejercicio-armado').first()).toContainText('Press de banca');
+  await captura(page, '12b-armar-libre');
+  await page.getByRole('button', { name: 'Empezar entrenamiento', exact: true }).click();
+  await page.getByRole('button', { name: 'Ver todo' }).click();
+  await expect(page.getByTestId('ejercicio')).toHaveCount(2);
+  // borrar una serie y quitar un ejercicio, a la vista
+  const antes = await page.getByTestId('serie').count();
+  await page.getByRole('button', { name: /Eliminar serie 1 de Press de banca/ }).click();
+  await expect(page.getByTestId('serie')).toHaveCount(antes - 1);
+  await page.getByRole('button', { name: /Quitar Press de banca/ }).click();
+  await page.getByRole('button', { name: 'Sí, quitar' }).click();
+  await expect(page.getByTestId('ejercicio')).toHaveCount(1);
   await page.getByRole('button', { name: 'Marcar serie 1 como hecha' }).click();
   await page.getByRole('button', { name: 'Minimizar' }).click();
   await expect(page.getByTestId('en-curso')).toBeVisible();

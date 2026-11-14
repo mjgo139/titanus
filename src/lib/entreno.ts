@@ -90,7 +90,7 @@ export function nombreLibre(ahora = Date.now()): string {
 }
 
 export function iniciarLibre(ahora = Date.now()): Borrador {
-  return { nombre: nombreLibre(ahora), inicio: ahora, ejercicios: [] };
+  return { nombre: nombreLibre(ahora), inicio: ahora, ejercicios: [], preparando: true };
 }
 
 /** Repetir un entrenamiento del historial con los mismos ejercicios y series */

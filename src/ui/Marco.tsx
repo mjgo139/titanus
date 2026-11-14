@@ -38,10 +38,10 @@ function EnCurso() {
       style={{ background: 'var(--oro-grad)', color: 'var(--on)', boxShadow: 'var(--sombra)' }}>
       <Icono n="entreno" />
       <span className="flex-1">
-        <span className="block text-[11px] font-bold uppercase tracking-[.12em]">Entrenamiento en curso</span>
+        <span className="block text-[11px] font-bold uppercase tracking-[.12em]">{b.preparando ? 'Armando entrenamiento' : 'Entrenamiento en curso'}</span>
         <span className="block font-semibold">{b.nombre}</span>
       </span>
-      <span className="num text-[18px]">{reloj((ahora - b.inicio) / 1000)}</span>
+      <span className="num text-[18px]">{b.preparando ? 'Seguir' : reloj((ahora - b.inicio) / 1000)}</span>
     </button>
   );
 }

@@ -9,6 +9,8 @@ export interface Borrador {
   nota?: string;
   /** Ya se preguntó qué sobrecargas aplicar al empezar */
   sobrecargaRevisada?: boolean;
+  /** Entrenamiento libre que todavía se está armando: el reloj no corre */
+  preparando?: boolean;
 }
 
 const clave = (uid: string) => `titanus-borrador-${uid}`;

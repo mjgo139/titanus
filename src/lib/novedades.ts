@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.6.0',
+    fecha: '2026-11-14',
+    cambios: [
+      'Entrenamiento libre: primero lo armás (ejercicios, series y orden) y el reloj arranca recién al tocar "Empezar".',
+      'Subir, bajar y quitar ejercicios con botones a la vista en cada tarjeta.',
+      'Cada serie tiene su botón de papelera para eliminarla.',
+    ],
+  },
+  {
     version: '1.5.1',
     fecha: '2026-11-14',
     cambios: [
