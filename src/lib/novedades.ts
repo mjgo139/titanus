@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.6.1',
+    fecha: '2026-11-14',
+    cambios: [
+      'Al armar el entrenamiento libre ya podés poner peso y reps de cada serie, agregar o borrar series.',
+      'Transiciones suaves al cambiar de pantalla y al abrir o cerrar las hojas.',
+    ],
+  },
+  {
     version: '1.6.0',
     fecha: '2026-11-14',
     cambios: [

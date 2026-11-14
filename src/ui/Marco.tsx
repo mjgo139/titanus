@@ -75,7 +75,7 @@ export function Marco() {
             Modo prueba · datos inventados
           </div>
         )}
-        <Outlet />
+        <div key={loc.pathname} className="pagina"><Outlet /></div>
       </main>
 
       <EnCurso />

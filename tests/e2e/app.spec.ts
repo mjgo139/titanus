@@ -158,12 +158,15 @@ test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ pa
   await page.getByLabel('Buscar ejercicio').fill('press de banca');
   await page.getByRole('button', { name: /Press de banca/ }).first().click();
   await page.getByRole('button', { name: /Más series de Press de banca/ }).click();
+  await page.getByLabel('Peso serie 1 de Press de banca').fill('42.5');
+  await page.getByLabel('Repeticiones serie 1 de Press de banca').fill('8');
   await page.getByRole('button', { name: /Subir Press de banca/ }).click();
   await expect(page.getByTestId('ejercicio-armado').first()).toContainText('Press de banca');
   await captura(page, '12b-armar-libre');
   await page.getByRole('button', { name: 'Empezar entrenamiento', exact: true }).click();
   await page.getByRole('button', { name: 'Ver todo' }).click();
   await expect(page.getByTestId('ejercicio')).toHaveCount(2);
+  await expect(page.getByLabel('Peso serie 1').first()).toHaveValue('42.5');
   // borrar una serie y quitar un ejercicio, a la vista
   const antes = await page.getByTestId('serie').count();
   await page.getByRole('button', { name: /Eliminar serie 1 de Press de banca/ }).click();

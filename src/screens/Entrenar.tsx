@@ -225,12 +225,11 @@ export default function Entrenar() {
           <input aria-label="Nombre del entrenamiento" value={b.nombre}
             onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
             className="mt-1 w-full bg-transparent font-display text-[26px] font-semibold outline-none" />
-          <p className="text-[14px] text-mu">Elegí los ejercicios y cuántas series. El reloj arranca recién cuando tocás <b className="oro">Empezar</b>.</p>
+          <p className="text-[14px] text-mu">Elegí los ejercicios, las series, el peso y las reps. El reloj arranca recién cuando tocás <b className="oro">Empezar</b>.</p>
 
           <ol className="mt-4 flex flex-col gap-3">
             {b.ejercicios.map((e, i) => {
               const ej = buscarEjercicio(e.ejercicioId, propios);
-              const btn = 'flex h-9 w-9 items-center justify-center rounded-full border border-ln3 text-[18px] oro disabled:opacity-30';
               return (
                 <li key={e.ejercicioId + i} className="tarjeta px-3" data-testid="ejercicio-armado">
                   <div className="flex items-center gap-3">
@@ -238,16 +237,34 @@ export default function Entrenar() {
                     <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={44} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold oro">{ej?.nombre}</span>
-                      <span className="text-[12px] text-mu">{ej?.musculo}</span>
+                      <span className="text-[12px] text-mu">{ej?.musculo} · {e.series.length} {e.series.length === 1 ? 'serie' : 'series'}</span>
                     </span>
-                    <div className="flex shrink-0 items-center gap-1.5" aria-label={`Series de ${ej?.nombre}`}>
-                      <button className={btn} aria-label={`Menos series de ${ej?.nombre}`} disabled={e.series.length <= 1}
-                        onClick={() => cambiar((x) => { x.ejercicios[i].series.pop(); })}>−</button>
-                      <span className="w-12 text-center leading-tight"><b className="num block text-[18px]">{e.series.length}</b><span className="text-[11px] text-mu">series</span></span>
-                      <button className={btn} aria-label={`Más series de ${ej?.nombre}`} disabled={e.series.length >= 10}
-                        onClick={() => cambiar((x) => { const ss = x.ejercicios[i].series; const ul = ss[ss.length - 1]; ss.push({ peso: ul?.peso ?? 0, reps: ul?.reps ?? 10, tipo: 'normal', hecha: false }); })}>+</button>
-                    </div>
                   </div>
+                  <div className="mt-3 grid grid-cols-[34px_minmax(0,1fr)_minmax(0,1fr)_32px] gap-2 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
+                    <span className="text-center">Serie</span><span className="text-center">{u}</span><span className="text-center">Reps</span><span />
+                  </div>
+                  {e.series.map((s, j) => (
+                    <div key={j} data-testid="serie-armado" className="mt-1.5 grid grid-cols-[34px_minmax(0,1fr)_minmax(0,1fr)_32px] items-center gap-2">
+                      <span className="num text-center text-[15px] font-bold oro">{j + 1}</span>
+                      <input aria-label={`Peso serie ${j + 1} de ${ej?.nombre}`} type="number" inputMode="decimal" step="0.5" min={0} placeholder="0"
+                        className="h-10 w-full rounded-[8px] border border-ln2 bg-transparent text-center num text-[16px] outline-none focus:border-gold"
+                        value={s.peso ? redondear(aUnidad(s.peso, u)) : ''}
+                        onChange={(ev) => { const v = aKg(Number(ev.target.value) || 0, u); cambiar((x) => { x.ejercicios[i].series[j].peso = v; }); }} />
+                      <input aria-label={`Repeticiones serie ${j + 1} de ${ej?.nombre}`} type="number" inputMode="numeric" min={0} placeholder="0"
+                        className="h-10 w-full rounded-[8px] border border-ln2 bg-transparent text-center num text-[16px] outline-none focus:border-gold"
+                        value={s.reps || ''}
+                        onChange={(ev) => { const v = Math.max(0, Math.round(Number(ev.target.value) || 0)); cambiar((x) => { x.ejercicios[i].series[j].reps = v; }); }} />
+                      <button aria-label={`Eliminar serie ${j + 1} de ${ej?.nombre}`} title="Eliminar serie" disabled={e.series.length <= 1}
+                        onClick={() => cambiar((x) => { x.ejercicios[i].series.splice(j, 1); })}
+                        className="flex h-8 w-8 items-center justify-center rounded-[8px] text-mu2 hover:text-miss disabled:opacity-30">
+                        <Icono n="basura" size={15} />
+                      </button>
+                    </div>
+                  ))}
+                  <button className="btn-sec mt-2 h-9 w-full text-[13px]" aria-label={`Más series de ${ej?.nombre}`} disabled={e.series.length >= 10}
+                    onClick={() => cambiar((x) => { const ss = x.ejercicios[i].series; const ul = ss[ss.length - 1]; ss.push({ peso: ul?.peso ?? 0, reps: ul?.reps ?? 10, tipo: 'normal', hecha: false }); })}>
+                    <Icono n="mas" size={15} />Agregar serie
+                  </button>
                   <AccionesEjercicio i={i} total={b.ejercicios.length} nombre={ej?.nombre ?? 'ejercicio'}
                     descanso={textoDescanso(e.descanso ?? DESCANSO_POR_DEFECTO)} alDescanso={() => setMenuEj(i)}
                     alMover={(d) => moverEjercicio(i, d)} alEliminar={() => cambiar((x) => { x.ejercicios.splice(i, 1); })} />

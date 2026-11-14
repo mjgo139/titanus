@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icono } from './Icono';
 
@@ -43,29 +43,41 @@ export function Seccion({ titulo, children, accion }: { titulo: string; children
 export function Hoja({ abierta, alCerrar, titulo, etiqueta, children }: {
   abierta: boolean; alCerrar: () => void; titulo: string; etiqueta?: string; children: ReactNode;
 }) {
+  const [montada, setMontada] = useState(abierta);
+  // al cerrar se sigue mostrando lo último mientras baja, para que no salte
+  const ultimo = useRef({ titulo, etiqueta, children });
+  if (abierta) ultimo.current = { titulo, etiqueta, children };
+  useEffect(() => {
+    if (abierta) { setMontada(true); return; }
+    const t = setTimeout(() => setMontada(false), 220);
+    return () => clearTimeout(t);
+  }, [abierta]);
   useEffect(() => {
     if (!abierta) return;
     const f = (e: KeyboardEvent) => e.key === 'Escape' && alCerrar();
     window.addEventListener('keydown', f);
     return () => window.removeEventListener('keydown', f);
   }, [abierta, alCerrar]);
-  if (!abierta) return null;
+  if (!abierta && !montada) return null;
+  const sale = !abierta;
+  const v = ultimo.current;
   return (
-    <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center" role="dialog" aria-modal aria-label={titulo}>
-      <button aria-label="Cerrar" className="absolute inset-0 bg-black/40" onClick={alCerrar} />
-      <div className="subir relative w-full max-w-[480px] max-h-[88vh] overflow-y-auto bg-sf rounded-t-[18px] lg:rounded-[18px] border border-ln2 px-5 pb-8 pt-3"
+    <div className={`fixed inset-0 z-50 flex items-end lg:items-center justify-center ${sale ? 'pointer-events-none' : ''}`}
+      role={sale ? undefined : 'dialog'} aria-modal={sale ? undefined : true} aria-label={sale ? undefined : v.titulo} aria-hidden={sale || undefined}>
+      <button aria-label="Cerrar" tabIndex={sale ? -1 : 0} className={`absolute inset-0 bg-black/45 ${sale ? 'velo-sale' : 'velo-entra'}`} onClick={alCerrar} />
+      <div className={`relative w-full max-w-[480px] max-h-[88vh] overflow-y-auto bg-sf rounded-t-[18px] lg:rounded-[18px] border border-ln2 px-5 pb-8 pt-3 ${sale ? 'hoja-sale' : 'hoja-entra'}`}
         style={{ boxShadow: 'var(--sombra)' }}>
         <div className="mx-auto mb-3 h-[3px] w-9 rounded-full bg-ln3 lg:hidden" />
         <div className="flex items-start justify-between">
           <div>
-            {etiqueta && <div className="etiqueta">{etiqueta}</div>}
-            <h2 className="titulo-tarjeta mt-1">{titulo}</h2>
+            {v.etiqueta && <div className="etiqueta">{v.etiqueta}</div>}
+            <h2 className="titulo-tarjeta mt-1">{v.titulo}</h2>
           </div>
           <button aria-label="Cerrar" onClick={alCerrar} className="toque -mr-2 flex items-center justify-center text-mu">
             <Icono n="cerrar" />
           </button>
         </div>
-        <div className="mt-4">{children}</div>
+        <div className="mt-4">{v.children}</div>
       </div>
     </div>
   );
