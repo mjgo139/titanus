@@ -82,17 +82,14 @@ jobs:
     name: 4 · Deploy a Firebase
     needs: apk
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: npm }
       - run: npm ci
       - run: npm run build
-      - name: Sumar la APK a la web (descarga en /titanus.apk)
-        uses: actions/download-artifact@v4
-        with:
-          name: titanus-apk
-          path: dist
       - name: Revisar credencial
         env:
           SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -109,3 +106,22 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           npx firebase deploy --only hosting,firestore --project "$PROYECTO" --non-interactive --force
           rm -f "$RUNNER_TEMP/sa.json"
+
+      # El plan gratis de Firebase no permite archivos .apk en Hosting: la APK se publica como Release de GitHub
+      - name: Bajar la APK armada
+        uses: actions/download-artifact@v4
+        with:
+          name: titanus-apk
+          path: apk
+      - name: Publicar la APK en GitHub (Release "apk-ultima")
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          NOTAS="TITANUS v$VERSION · commit ${GITHUB_SHA::7} · $(date -u +%Y-%m-%d)"
+          if gh release view apk-ultima >/dev/null 2>&1; then
+            gh release upload apk-ultima apk/titanus.apk --clobber
+            gh release edit apk-ultima --title "TITANUS v$VERSION (APK)" --notes "$NOTAS"
+          else
+            gh release create apk-ultima apk/titanus.apk --title "TITANUS v$VERSION (APK)" --notes "$NOTAS" --target "$GITHUB_SHA"
+          fi
