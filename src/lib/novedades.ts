@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.2.0',
+    fecha: '2026-11-14',
+    cambios: [
+      'PC: pantallas a dos columnas que aprovechan el ancho (portada, inicio, entreno, progreso, perfil).',
+      'Plantilla "Full body principiante" (A lunes, B miércoles, C viernes) lista para cargar.',
+      'Rutinas con rango de repeticiones (8–12), series al fallo (1×Máx) y alternativas ("o Jalón").',
+      'Ejercicios nuevos: Remo Pendlay, Press declinado, Dominadas neutras y supinas, Extensión de tríceps con mancuernas.',
+    ],
+  },
+  {
     version: '1.1.0',
     fecha: '2026-11-14',
     cambios: [

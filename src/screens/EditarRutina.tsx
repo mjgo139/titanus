@@ -8,6 +8,7 @@ import { Icono } from '../ui/Icono';
 import { Cargando, Encabezado, Hoja, Seccion } from '../ui/piezas';
 import { Biblioteca } from './Biblioteca';
 import { Miniatura } from './Miniatura';
+import { textoObjetivo } from '../lib/plantillas';
 
 function Paso({ etiqueta, valor, alCambiar, min, max, paso = 1, sufijo = '' }: {
   etiqueta: string; valor: number; alCambiar: (n: number) => void; min: number; max: number; paso?: number; sufijo?: string;
@@ -17,7 +18,7 @@ function Paso({ etiqueta, valor, alCambiar, min, max, paso = 1, sufijo = '' }: {
       <span className="text-[11px] font-bold uppercase tracking-[.1em] text-mu2">{etiqueta}</span>
       <div className="mt-1 flex items-center gap-1">
         <button aria-label={`Menos ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln oro" onClick={() => alCambiar(Math.max(min, valor - paso))}>−</button>
-        <span className="num w-12 text-center text-[16px]">{valor}{sufijo}</span>
+        <span className="num w-12 text-center text-[16px]">{valor || (etiqueta === 'Hasta' || etiqueta === 'Al fallo' ? '—' : valor)}{valor ? sufijo : ''}</span>
         <button aria-label={`Más ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln oro" onClick={() => alCambiar(Math.min(max, valor + paso))}>+</button>
       </div>
     </div>
@@ -70,7 +71,7 @@ export default function EditarRutina() {
   }
 
   return (
-    <div>
+    <div className="lg:mx-auto lg:max-w-[760px]">
       <Encabezado atras="/entreno" etiqueta={nueva ? 'Rutina nueva' : 'Editar rutina'} titulo={r.nombre || 'Sin nombre'}
         linea="Nombre, días y ejercicios con sus series." />
 
@@ -106,10 +107,21 @@ export default function EditarRutina() {
                 <button aria-label="Quitar" className="h-8 w-8 flex items-center justify-center text-miss"
                   onClick={() => setR({ ...r, ejercicios: r.ejercicios.filter((_, j) => j !== i) })}><Icono n="basura" size={18} /></button>
               </div>
-              <div className="mt-3 flex justify-between">
+              <div className="mt-3 grid grid-cols-3 gap-y-3">
                 <Paso etiqueta="Series" valor={e.series} min={1} max={10} alCambiar={(n) => cambiarEj(i, { series: n })} />
-                <Paso etiqueta="Reps" valor={e.reps} min={1} max={50} alCambiar={(n) => cambiarEj(i, { reps: n })} />
+                <Paso etiqueta="Reps" valor={e.reps} min={1} max={50} alCambiar={(n) => cambiarEj(i, { reps: n, ...(e.repsMax && e.repsMax <= n ? { repsMax: 0 } : {}) })} />
+                <Paso etiqueta="Hasta" valor={e.repsMax ?? 0} min={0} max={50} alCambiar={(n) => {
+                  const actual = e.repsMax ?? 0;
+                  const sube = n > actual;
+                  cambiarEj(i, { repsMax: sube ? Math.max(n, e.reps + 1) : n > e.reps ? n : 0 });
+                }} />
+                <Paso etiqueta="Al fallo" valor={e.alFallo ?? 0} min={0} max={3} alCambiar={(n) => cambiarEj(i, { alFallo: n })} />
                 <Paso etiqueta="Descanso" valor={e.descanso} min={15} max={300} paso={15} sufijo="s" alCambiar={(n) => cambiarEj(i, { descanso: n })} />
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-2 text-[13px]">
+                <span className="oro font-semibold">{textoObjetivo(e)}</span>
+                <input className="h-8 flex-1 rounded-[8px] border border-ln2 bg-transparent px-2 text-right outline-none" placeholder="Alternativa (opcional)"
+                  aria-label="Alternativa" value={e.nota ?? ''} onChange={(ev) => cambiarEj(i, { nota: ev.target.value })} />
               </div>
             </li>
           ))}

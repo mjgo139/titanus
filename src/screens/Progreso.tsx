@@ -21,9 +21,11 @@ export default function Progreso() {
   const vista = (params.get('v') as Vista) || 'resumen';
   return (
     <div className="pt-6">
-      <h1 className="titulo mb-5 text-center">Progreso</h1>
+      <h1 className="titulo mb-5 text-center lg:text-left">Progreso</h1>
+      <div className="lg:max-w-[560px]">
       <Selector nombre="Sección" valor={vista} alCambiar={(v) => setParams({ v }, { replace: true })}
         opciones={[{ v: 'resumen', t: 'Resumen' }, { v: 'historial', t: 'Historial' }, { v: 'records', t: 'Récords' }, { v: 'medidas', t: 'Medidas' }]} />
+      </div>
       <div className="mt-5">
         {vista === 'resumen' && <ResumenProgreso />}
         {vista === 'historial' && <Historial />}
@@ -70,7 +72,8 @@ function ResumenProgreso() {
   ];
 
   return (
-    <>
+    <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+      <div>
       <div className="tarjeta relative min-h-[215px] overflow-hidden">
         <img src={espalda} alt="" className="mascara-izq absolute -right-4 top-0 h-full w-[48%] object-cover" />
         <div className="relative z-[1]">
@@ -99,6 +102,8 @@ function ResumenProgreso() {
         </div>
       </div>
 
+      </div>
+      <div>
       <Calendario dias={perfil.resumen.dias} />
 
       <div className="mt-5 flex items-center justify-between">
@@ -118,7 +123,8 @@ function ResumenProgreso() {
           </div>
         ))}
       </div>
-    </>
+      </div>
+    </div>
   );
 }
 
@@ -133,7 +139,7 @@ function Calendario({ dias }: { dias: number[] }) {
   const enMes = celdas.filter((c) => c && set.has(c)).length;
   const mover = (k: number) => setMes(new Date(d0.getFullYear(), d0.getMonth() + k, 1).getTime());
   return (
-    <div className="tarjeta mt-3" aria-label="Calendario de entrenamientos">
+    <div className="tarjeta mt-3 lg:mt-0" aria-label="Calendario de entrenamientos">
       <div className="flex items-center justify-between">
         <button aria-label="Mes anterior" className="toque -ml-3 flex items-center justify-center oro" onClick={() => mover(-1)}><Icono n="atras" /></button>
         <div className="text-center">
@@ -179,7 +185,7 @@ function Historial() {
   if (!items.length) return <Vacio titulo="Sin entrenamientos todavía" linea="Cuando termines tu primer entrenamiento, aparece acá." />;
   return (
     <>
-      <ul className="flex flex-col gap-3">
+      <ul className="grid gap-3 lg:grid-cols-2 lg:items-start">
         {items.map((e) => (
           <li key={e.id} className="tarjeta" data-testid="entreno-historial">
             <button className="w-full text-left" onClick={() => setAbierto(e)}>
@@ -254,7 +260,7 @@ function Records() {
   if (!estados.length) return <Vacio titulo="Sin récords todavía" linea="Tus mejores marcas por ejercicio aparecen después de entrenar." />;
   const u = perfil.unidad;
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="grid gap-3 lg:grid-cols-2">
       {estados.map((s) => {
         const ej = buscarEjercicio(s.ejercicioId, propios);
         return (
@@ -311,7 +317,7 @@ function Medidas() {
   const pesos = regs.filter((r) => r.peso).map((r) => ({ x: r.fecha, y: aUnidad(r.peso!, u) }));
 
   return (
-    <>
+    <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
       <div className="tarjeta">
         <div className="etiqueta">Peso corporal</div>
         <div className="num oro mt-1 text-[38px]">{val('peso') ? formatoPeso(val('peso')!, u) : '—'}</div>
@@ -319,7 +325,8 @@ function Medidas() {
           <GraficoLinea puntos={pesos} etiqueta="Peso corporal en el tiempo" formato={(n) => `${formatoNumero(redondear(n))} ${u}`} />
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div>
+      <div className="mt-3 grid grid-cols-2 gap-3 lg:mt-0">
         {MEDIDAS.slice(1).map((m) => (
           <div key={m.k} className="tarjeta">
             <div className="etiqueta">{m.t}</div>
@@ -328,6 +335,7 @@ function Medidas() {
         ))}
       </div>
       <button className="btn w-full mt-5" onClick={() => setForm(true)}>Registrar medidas de hoy</button>
+      </div>
 
       <Hoja abierta={form} alCerrar={() => setForm(false)} etiqueta="Medidas" titulo="Registro de hoy">
         <p className="mb-3 text-[13px] text-mu">Un registro personal, sin objetivos obligatorios.</p>
@@ -342,6 +350,6 @@ function Medidas() {
         </div>
         <button className="btn w-full mt-6" onClick={guardar}>Guardar</button>
       </Hoja>
-    </>
+    </div>
   );
 }

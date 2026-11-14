@@ -6,7 +6,7 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 
 | Dato | Valor |
 |---|---|
-| Fase | 1 (lo esencial) publicada; v1.1.0 = rediseño romano + seguimiento estilo Hevy |
+| Fase | 1 (lo esencial) publicada; v1.1.0 = rediseño romano + Hevy; v1.2.0 = PC a dos columnas + plantillas |
 | Proyecto Firebase | `titanus-10398` (plan Spark, gratis) |
 | Firestore | modo nativo, edición Standard, región `southamerica-east1` (São Paulo) |
 | Auth | correo/contraseña, Google y anónimo ("Continuar como invitado") habilitados. Limpieza automática de anónimos: apagada |
@@ -41,6 +41,9 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 - **Hermana de Stoica, no copia:** se mantienen Playfair para números, números romanos, frases estoicas y celebraciones breves. El modo claro se llama **"Mármol"** y usa la piedra/bronce de Stoica. El oscuro **"Noche romana"** es el predeterminado.
 - **Sin** Mente ni Hábitos. Pestañas: Inicio · Entreno · Progreso · Perfil.
 - **Seguimiento estilo Hevy:** duración/volumen/series en vivo, tabla SERIE · ANTERIOR · KG · REPS · ✓, tipos de serie (calentamiento C, fallo F, drop D), descanso por ejercicio, notas, 1RM (Epley), libre, minimizar, repetir y guardar como rutina.
+- **PC (≥1024px):** contenido hasta 1180px en dos columnas; celular sigue con máximo 480px.
+- **Plantillas** en `src/lib/plantillas.ts` (Full body principiante A/B/C). Las rutinas admiten `repsMax` (rango), `alFallo` (series 1×Máx) y `nota` (alternativa).
+- **GIFs de ejercicios (pendiente de decisión del dueño):** free-exercise-db (dominio público, 2 fotos por ejercicio, se pueden animar), RepDB gratis (atribución), ExerciseDB/AscendAPI (GIFs reales, pago, prohíbe guardarlos). No usar datasets con GIFs de Gymvisual sin licencia propia.
 - Rangos por entrenamientos: Recluta 0, Legionario 10, Decurión 30, Centurión 60, Tribuno 120, Legado 200, César 365. Nivel = total/5 + 1.
 
 ## Reglas de trabajo

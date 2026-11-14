@@ -2,6 +2,7 @@ import type { Borrador } from './borrador';
 import {
   actualizarEstado, agregarDia, detectarRecords, nuevoId, seriesHechas, sumarSemana, volumenTotal,
 } from './logica';
+import { textoObjetivo } from './plantillas';
 import type { EjercicioEntreno, Entrenamiento, EstadoEjercicio, Resumen, Rutina } from './tipos';
 
 export const DESCANSO_POR_DEFECTO = 90;
@@ -29,9 +30,11 @@ export function iniciarDesdeRutina(r: Rutina, estados: Map<string, EstadoEjercic
     nombre: r.nombre,
     inicio: ahora,
     ejercicios: r.ejercicios.map((er) => {
-      const e = ejercicioNuevo(er.ejercicioId, estados.get(er.ejercicioId), er.series, er.reps, er.descanso);
-      // En una rutina mandan las repeticiones planificadas
-      e.series = e.series.map((s) => ({ ...s, reps: er.reps }));
+      const fallo = er.alFallo ?? 0;
+      const e = ejercicioNuevo(er.ejercicioId, estados.get(er.ejercicioId), er.series + fallo, er.reps, er.descanso);
+      // En una rutina mandan las repeticiones planificadas; las últimas son al fallo (1×Máx)
+      e.series = e.series.map((s, i) => (i < er.series ? { ...s, reps: er.reps } : { ...s, reps: 0, tipo: 'fallo' as const }));
+      e.objetivo = textoObjetivo(er) + (er.nota ? ` · ${er.nota}` : '');
       return e;
     }),
   };

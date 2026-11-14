@@ -19,7 +19,13 @@ export interface EjercicioRutina {
   ejercicioId: string;
   series: number;
   reps: number;
+  /** Si hay rango (por ejemplo 8–12), el máximo */
+  repsMax?: number;
+  /** Series extra al fallo (el "1×Máx" de la pizarra) */
+  alFallo?: number;
   descanso: number; // segundos
+  /** Alternativa o indicación, por ejemplo "o Jalón al pecho" */
+  nota?: string;
 }
 
 export interface Rutina {
@@ -47,6 +53,8 @@ export interface EjercicioEntreno {
   series: Serie[];
   nota?: string;
   descanso?: number; // segundos
+  /** Solo mientras se entrena: lo que pide la rutina ("3×6 + 1 al fallo") */
+  objetivo?: string;
 }
 
 export interface Entrenamiento {

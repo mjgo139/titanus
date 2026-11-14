@@ -50,7 +50,9 @@ export default function Perfil() {
 
   return (
     <div>
-      <h1 className="titulo mt-6 mb-5 text-center">Perfil</h1>
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-10">
+      <div className="lg:sticky lg:top-6">
+      <h1 className="titulo mt-6 mb-5 text-center lg:text-left">Perfil</h1>
       <div className="text-center">
         <img src={avatar} alt="" className="mx-auto h-[100px] w-[100px] rounded-full border-2 border-gold object-cover" />
         <h2 className="mt-3 font-display text-[25px] font-semibold">{perfil.nombre}</h2>
@@ -78,6 +80,8 @@ export default function Perfil() {
         </div>
       )}
 
+      </div>
+      <div className="lg:pt-16">
       <Seccion titulo="Nombre">
         <div className="flex gap-2">
           <input className="campo" value={nombre} onChange={(e) => setNombre(e.target.value)} aria-label="Nombre" />
@@ -157,6 +161,8 @@ export default function Perfil() {
         </Seccion>
       )}
 
+      </div>
+      </div>
       <Hoja abierta={crear} alCerrar={() => setCrear(false)} titulo="Crear cuenta">
         <FormAcceso inicial="registrar" alTerminar={() => { setCrear(false); aviso('¡Cuenta creada! Tu progreso quedó guardado'); }} />
       </Hoja>

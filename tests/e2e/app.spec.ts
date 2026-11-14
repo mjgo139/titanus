@@ -130,7 +130,7 @@ test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ pa
   await expect(page.getByText('Empezá agregando un ejercicio')).toBeVisible();
   await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
   await page.getByLabel('Buscar ejercicio').fill('dominadas');
-  await page.getByRole('button', { name: /Dominadas/ }).click();
+  await page.getByRole('button', { name: /Dominadas/ }).first().click();
   await page.getByRole('button', { name: 'Marcar serie 1 como hecha' }).click();
   await page.getByRole('button', { name: 'Minimizar' }).click();
   await expect(page.getByTestId('en-curso')).toBeVisible();
@@ -192,4 +192,20 @@ test('perfil: rango, apariencia, unidades, versión de admin y salir', async ({ 
   await page.getByRole('button', { name: 'Cancelar' }).click();
   await page.getByRole('button', { name: 'Cerrar sesión' }).click();
   await expect(page.getByRole('button', { name: 'Continuar como invitado' })).toBeVisible();
+});
+
+test('plantilla Full body principiante: ver, cargar y entrenar el día A', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Entreno');
+  await page.getByRole('button', { name: 'Ver y cargar' }).first().click();
+  await expect(page.getByRole('dialog').getByText('Remo Pendlay')).toBeVisible();
+  await captura(page, '22-plantilla');
+  await page.getByRole('button', { name: 'Cargar las 3 rutinas' }).click();
+  await expect(page.getByRole('status')).toContainText('3 rutinas cargadas');
+  await expect(page.getByRole('heading', { name: 'A · Full body' })).toBeVisible();
+  await captura(page, '23-rutinas-cargadas');
+  await page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'A · Full body' }) }).getByRole('button', { name: 'Empezar rutina' }).click();
+  await expect(page.getByTestId('objetivo').first()).toContainText('3×6 + 1 al fallo');
+  await expect(page.getByRole('button', { name: 'Tipo de la serie 4' }).first()).toHaveText('F');
+  await captura(page, '24-entrenar-full-body');
 });

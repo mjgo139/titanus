@@ -18,8 +18,12 @@ export const BIBLIOTECA: Ejercicio[] = [
   L('fondos-pecho', 'Fondos en paralelas', 'Pecho', 'Peso corporal'),
   L('flexiones', 'Flexiones de brazos', 'Pecho', 'Peso corporal'),
   L('press-maquina', 'Press en máquina', 'Pecho', 'Máquina'),
+  L('press-declinado', 'Press declinado', 'Pecho', 'Barra'),
   // Espalda
   L('dominadas', 'Dominadas', 'Espalda', 'Peso corporal'),
+  L('dominadas-neutras', 'Dominadas agarre neutro', 'Espalda', 'Peso corporal'),
+  L('dominadas-supinas', 'Dominadas supinas', 'Espalda', 'Peso corporal'),
+  L('remo-pendlay', 'Remo Pendlay', 'Espalda', 'Barra'),
   L('jalon-pecho', 'Jalón al pecho', 'Espalda', 'Polea'),
   L('remo-barra', 'Remo con barra', 'Espalda', 'Barra'),
   L('remo-mancuerna', 'Remo con mancuerna', 'Espalda', 'Mancuernas'),
@@ -47,6 +51,7 @@ export const BIBLIOTECA: Ejercicio[] = [
   L('press-frances', 'Press francés', 'Tríceps', 'Barra'),
   L('fondos-banco', 'Fondos en banco', 'Tríceps', 'Peso corporal'),
   L('extension-nuca', 'Extensión por encima de la cabeza', 'Tríceps', 'Mancuernas'),
+  L('extension-triceps-mancuerna', 'Extensión de tríceps con mancuernas', 'Tríceps', 'Mancuernas'),
   L('patada-triceps', 'Patada de tríceps', 'Tríceps', 'Mancuernas'),
   L('press-cerrado', 'Press de banca agarre cerrado', 'Tríceps', 'Barra'),
   // Piernas

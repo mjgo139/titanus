@@ -49,6 +49,8 @@ export default function Hoy() {
 
       <div className="divisor my-[17px]" />
 
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+      <div>
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-display text-[19px] font-semibold"><Icono n="calendario" size={20} className="oro" />Hoy, {fecha}</h2>
         <div className="text-right">
@@ -58,15 +60,15 @@ export default function Hoy() {
         </div>
       </div>
 
-      <figure className="hero mt-4">
-        <blockquote className="font-display text-[18px] italic leading-snug text-tx">“{frase.texto}”</blockquote>
+      <figure className="hero mt-4 lg:py-7">
+        <blockquote className="font-display text-[18px] italic leading-snug text-tx lg:text-[21px]">“{frase.texto}”</blockquote>
         <figcaption className="oro mt-2 text-[14px]">— {frase.autor}</figcaption>
       </figure>
 
       <h2 className="mt-6 mb-3 font-display text-[23px] font-semibold">Entrenamiento de hoy</h2>
       {!rutinas ? <Cargando /> : (
-        <div className="tarjeta flex min-h-[165px] items-center gap-3 overflow-hidden p-0">
-          <img src={espalda} alt="" className="h-[165px] w-[40%] object-cover" />
+        <div className="tarjeta flex min-h-[165px] items-center gap-3 overflow-hidden p-0 lg:min-h-[240px]">
+          <img src={espalda} alt="" className="h-[165px] w-[40%] object-cover lg:h-[240px]" />
           <div className="flex-1 py-3 pr-4">
             {deHoy ? <>
               <div className="etiqueta oro">Día {romano(idx)} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : "Primera sesión"}</div>
@@ -91,7 +93,10 @@ export default function Hoy() {
         </div>
       )}
 
-      <div className="tarjeta mt-3 flex justify-between px-3 py-3">
+      </div>
+      <div className="lg:pt-1">
+      <h2 className="mb-3 hidden font-display text-[23px] font-semibold lg:block">Tu semana</h2>
+      <div className="tarjeta mt-3 flex justify-between px-3 py-3 lg:mt-0 lg:px-5 lg:py-4">
         {semana.map((d) => (
           <div key={d.fecha} className="flex flex-col items-center gap-1.5">
             <span className={`text-[11px] font-bold ${d.hoy ? 'oro' : 'text-mu2'}`}>{d.letra}</span>
@@ -111,7 +116,7 @@ export default function Hoy() {
           { a: '/progreso?v=records', i: 'trofeo', t: 'Récords', s: 'Tus mejores marcas' },
           { a: '/progreso?v=medidas', i: 'cuerpo', t: 'Medidas', s: 'Peso y cuerpo' },
         ].map((x) => (
-          <button key={x.t} onClick={() => nav(x.a)} className="tarjeta flex min-h-[86px] items-center gap-3 text-left">
+          <button key={x.t} onClick={() => nav(x.a)} className="tarjeta flex min-h-[86px] items-center gap-3 text-left transition-colors hover:border-gold lg:min-h-[104px]">
             <Icono n={x.i} size={28} className="oro" />
             <span><strong className="block text-[17px] font-display">{x.t}</strong><span className="text-[13px] text-mu">{x.s}</span></span>
           </button>
@@ -124,6 +129,8 @@ export default function Hoy() {
           <span className="flex-1 text-[14px]">Estás como invitado. <b className="oro">Creá tu cuenta</b> para no perder tu progreso.</span>
         </Link>
       )}
+      </div>
+      </div>
     </div>
   );
 }

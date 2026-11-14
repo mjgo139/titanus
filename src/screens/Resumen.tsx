@@ -40,8 +40,8 @@ export default function Resumen() {
 
   return (
     <div className="pt-4">
-      <div className="relative -mx-[17px] h-[190px] overflow-hidden">
-        <img src={capa} alt="" className="mascara-izq absolute right-0 top-0 h-full w-[52%] object-cover" />
+      <div className="relative -mx-[17px] h-[190px] overflow-hidden lg:mx-0 lg:h-[240px] lg:rounded-[14px] lg:border lg:border-ln">
+        <img src={capa} alt="" className="mascara-izq absolute right-0 top-0 h-full w-[52%] object-cover lg:w-[40%]" />
         <div className="absolute bottom-3 left-[18px] max-w-[62%]" style={{ textShadow: '0 2px 6px #000' }}>
           <Icono n="corona" size={34} className="oro rebote" />
           <div className="etiqueta oro mt-1">Entrenamiento N.º {romano(e.numero ?? perfil.resumen.total)}</div>
@@ -50,6 +50,8 @@ export default function Resumen() {
       </div>
       <p className="mt-2 text-mu">{e.nombre} · Hoy elegiste el esfuerzo.</p>
 
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
+      <div>
       <div className="tarjeta mt-4 grid grid-cols-3 py-3 text-center">
         <div><div className="etiqueta">Duración</div><div className="num mt-1 text-[18px]">{duracion(e.fin - e.inicio)}</div></div>
         <div><div className="etiqueta">Volumen</div><div className="num mt-1 text-[18px]">{formatoPeso(e.volumen, u, 0)}</div></div>
@@ -81,7 +83,9 @@ export default function Resumen() {
         </section>
       )}
 
-      <section className="mt-6">
+      </div>
+      <div>
+      <section className="mt-6 lg:mt-4">
         <h2 className="mb-3 font-display text-[20px] font-semibold">Ejercicios</h2>
         <ul className="tarjeta py-1">
           {e.ejercicios.map((x) => {
@@ -103,6 +107,8 @@ export default function Resumen() {
           <button className="btn-sec h-[52px]" onClick={guardarRutina}><Icono n="guardar" size={18} />Guardar como rutina</button>
         )}
         <button className="btn w-full" onClick={() => nav('/', { replace: true })}>Volver al inicio</button>
+      </div>
+      </div>
       </div>
 
       <Celebracion visible={festejo} alCerrar={cerrar} icono="medalla"

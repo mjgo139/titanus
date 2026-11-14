@@ -5,7 +5,8 @@ import {
   volumenTotal, MAX_PUNTOS, MAX_SEMANAS,
 } from './logica';
 import { cerrarEntrenamiento, ejercicioNuevo, iniciarDesdeRutina, iniciarLibre, iniciarRepeticion, rutinaDesdeEntreno } from './entreno';
-import { BIBLIOTECA, MUSCULOS } from './biblioteca';
+import { BIBLIOTECA, MUSCULOS, buscarEjercicio } from './biblioteca';
+import { PLANTILLAS, rutinasDePlantilla, textoObjetivo } from './plantillas';
 import { FRASES, fraseDelDia } from './frases';
 import type { EjercicioEntreno, EstadoEjercicio, Rutina } from './tipos';
 
@@ -207,5 +208,30 @@ describe('semanas, rango y nivel', () => {
     expect(rango(0)).toMatchObject({ nombre: 'Recluta', nivel: 1, siguiente: 'Legionario', faltan: 10 });
     expect(rango(23)).toMatchObject({ nombre: 'Legionario', nivel: 5 });
     expect(rango(400)).toMatchObject({ nombre: 'César', progreso: 1 });
+  });
+});
+
+describe('plantilla Full body principiante', () => {
+  const p = PLANTILLAS.find((x) => x.id === 'fullbody-principiante')!;
+  it('tiene A (lunes), B (miércoles) y C (viernes) con ejercicios de la biblioteca', () => {
+    expect(p.rutinas.map((r) => r.dias[0])).toEqual([1, 3, 5]);
+    expect(p.rutinas.map((r) => r.ejercicios.length)).toEqual([7, 8, 7]);
+    for (const r of p.rutinas) for (const e of r.ejercicios) expect(buscarEjercicio(e.ejercicioId), e.ejercicioId).toBeTruthy();
+  });
+  it('respeta la pizarra: 3×6 + 1 al fallo, rangos y alternativas', () => {
+    const [a, b] = p.rutinas;
+    expect(textoObjetivo(a.ejercicios[0])).toBe('3×6 + 1 al fallo');
+    expect(textoObjetivo(a.ejercicios[5])).toBe('3×8–12');
+    expect(textoObjetivo(b.ejercicios[6])).toBe('5×10–15');
+    expect(a.ejercicios[3].nota).toBe('o Jalón al pecho');
+  });
+  it('al entrenar, la serie al fallo queda marcada como tal', () => {
+    const [r] = rutinasDePlantilla(p, 0);
+    const bor = iniciarDesdeRutina(r, new Map());
+    expect(bor.ejercicios[0].series.map((s) => s.tipo)).toEqual(['normal', 'normal', 'normal', 'fallo']);
+    expect(bor.ejercicios[0].objetivo).toBe('3×6 + 1 al fallo');
+    expect(bor.ejercicios[3].objetivo).toBe('3×8 · o Jalón al pecho');
+    const c = cerrarEntrenamiento({ ...bor, ejercicios: [{ ...bor.ejercicios[0], series: bor.ejercicios[0].series.map((s) => ({ ...s, peso: 60, reps: 6, hecha: true })) }] }, new Map(), { dias: [], total: 0 });
+    expect(c.entreno.ejercicios[0]).not.toHaveProperty('objetivo');
   });
 });

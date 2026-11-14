@@ -141,14 +141,16 @@ export default function Entrenar() {
         <button className="btn h-9 px-4 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
       </header>
 
+      <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
       <input aria-label="Nombre del entrenamiento" value={b.nombre}
         onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
-        className="mt-4 w-full bg-transparent font-display text-[26px] font-semibold outline-none" />
+        className="mt-4 w-full bg-transparent font-display text-[26px] font-semibold outline-none lg:mt-0 lg:text-[32px]" />
 
-      <div className="tarjeta mt-3 grid grid-cols-3 py-3 text-center" data-testid="metricas">
+      <div className="tarjeta mt-3 grid grid-cols-3 py-3 text-center lg:mt-0" data-testid="metricas">
         <div><div className="etiqueta">Duración</div><div className="num oro mt-1 text-[18px]">{reloj((ahora - b.inicio) / 1000)}</div></div>
         <div><div className="etiqueta">Volumen</div><div className="num mt-1 text-[18px]">{formatoNumero(redondear(aUnidad(volumen, u), 0))} {u}</div></div>
         <div><div className="etiqueta">Series</div><div className="num mt-1 text-[18px]">{hechas.length}</div></div>
+      </div>
       </div>
 
       {b.ejercicios.length === 0 && (
@@ -159,7 +161,7 @@ export default function Entrenar() {
         </div>
       )}
 
-      <ol className="mt-4 flex flex-col gap-4">
+      <ol className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start">
         {b.ejercicios.map((e, i) => {
           const ej = buscarEjercicio(e.ejercicioId, propios);
           const ant = estados.get(e.ejercicioId)?.ultima?.series ?? [];
@@ -173,6 +175,7 @@ export default function Entrenar() {
                   <Icono n="puntos" />
                 </button>
               </div>
+              {e.objetivo && <p className="mt-1 text-[13px] text-mu" data-testid="objetivo">Objetivo: <span className="text-tx2">{e.objetivo}</span></p>}
               <input aria-label={`Notas de ${ej?.nombre}`} placeholder="Agregar notas aquí…" value={e.nota ?? ''}
                 onChange={(ev) => { const v = ev.target.value; cambiar((x) => { x.ejercicios[i].nota = v; }); }}
                 className="mt-2 w-full bg-transparent text-[14px] text-tx2 outline-none placeholder:text-mu2" />
@@ -228,8 +231,10 @@ export default function Entrenar() {
         })}
       </ol>
 
-      <button className="btn mt-5 w-full" onClick={() => setBiblio(true)}><Icono n="mas" size={18} />Agregar ejercicio</button>
-      <button className="mt-4 w-full p-2 text-[14px] font-semibold text-miss" onClick={() => setDescartar(true)}>Descartar entrenamiento</button>
+      <div className="lg:mx-auto lg:mt-2 lg:flex lg:max-w-[640px] lg:items-center lg:gap-4">
+        <button className="btn mt-5 w-full lg:flex-1" onClick={() => setBiblio(true)}><Icono n="mas" size={18} />Agregar ejercicio</button>
+        <button className="mt-4 w-full p-2 text-[14px] font-semibold text-miss lg:mt-5 lg:w-auto" onClick={() => setDescartar(true)}>Descartar entrenamiento</button>
+      </div>
 
       {descanso && (
         <div className="fixed inset-x-0 bottom-0 z-40 lg:pl-[248px]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>

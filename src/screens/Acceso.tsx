@@ -96,19 +96,22 @@ export default function Acceso() {
   const titulos: Record<VistaAcceso, string> = { ingresar: 'Iniciar sesión', registrar: 'Crear cuenta', recuperar: 'Recuperá el acceso' };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[440px] flex-col justify-between px-[26px] pb-12 pt-8 text-center">
-      <div className="entrar">
-        <Logo grande />
-        <div className="mt-2 text-[12px] tracking-[.14em] text-tx2">ENTRENAMIENTO · DISCIPLINA · FUERZA</div>
-      </div>
-      <div className="mascara-vert -mx-[26px] my-[-10px] h-[43vh] min-h-[260px] max-h-[480px] bg-cover bg-no-repeat"
+    <div className="mx-auto flex min-h-screen max-w-[440px] flex-col justify-between px-[26px] pb-12 pt-8 text-center lg:max-w-[1200px] lg:flex-row lg:items-center lg:gap-14 lg:py-10">
+      <div className="mascara-vert order-2 -mx-[26px] my-[-10px] h-[43vh] min-h-[260px] max-h-[480px] bg-cover bg-no-repeat lg:order-1 lg:m-0 lg:h-[84vh] lg:max-h-[820px] lg:w-[55%] lg:rounded-[20px]"
         role="img" aria-label="Estatua romana" style={{ backgroundImage: `url(${busto})`, backgroundPosition: 'center 30%' }} />
-      <div className="grid gap-3">
-        <button className="btn w-full" onClick={() => setModal('ingresar')}><Icono n="corona" size={18} />Iniciar sesión</button>
-        <button className="btn-sec w-full h-[52px] text-[16px]" onClick={() => setModal('registrar')}>Crear cuenta</button>
-        <button className="p-2 text-[15px] text-tx2" onClick={invitado}>Continuar como invitado</button>
-        {error && <p role="alert" className="text-miss text-[14px]">{error}</p>}
-        {repo.modo === 'prueba' && <p className="text-[12px] text-mu2">Modo prueba: la cuenta de ejemplo ya está cargada en "Iniciar sesión".</p>}
+      <div className="contents lg:order-2 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:gap-12">
+        <div className="entrar order-1">
+          <Logo grande />
+          <div className="mt-2 text-[12px] tracking-[.14em] text-tx2">ENTRENAMIENTO · DISCIPLINA · FUERZA</div>
+          <p className="mx-auto mt-6 hidden max-w-[380px] font-display text-[18px] italic text-tx2 lg:block">Registrá cada serie, superá tus marcas y forjá la disciplina de un legionario.</p>
+        </div>
+        <div className="order-3 grid gap-3 lg:mx-auto lg:w-full lg:max-w-[380px]">
+          <button className="btn w-full" onClick={() => setModal('ingresar')}><Icono n="corona" size={18} />Iniciar sesión</button>
+          <button className="btn-sec w-full h-[52px] text-[16px]" onClick={() => setModal('registrar')}>Crear cuenta</button>
+          <button className="p-2 text-[15px] text-tx2" onClick={invitado}>Continuar como invitado</button>
+          {error && <p role="alert" className="text-miss text-[14px]">{error}</p>}
+          {repo.modo === 'prueba' && <p className="text-[12px] text-mu2">Modo prueba: la cuenta de ejemplo ya está cargada en "Iniciar sesión".</p>}
+        </div>
       </div>
 
       <Hoja abierta={!!modal} alCerrar={() => setModal(null)} titulo={modal ? titulos[modal] : ''}>

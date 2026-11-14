@@ -7,12 +7,25 @@ import { NOMBRES_DIA } from '../lib/logica';
 import type { Ejercicio, Rutina } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
-import { Cargando, Vacio } from '../ui/piezas';
+import { Cargando, Hoja, Vacio } from '../ui/piezas';
+import { PLANTILLAS, rutinasDePlantilla, textoObjetivo, type Plantilla } from '../lib/plantillas';
 import { useEmpezar } from './empezar';
 import { minutosEstimados } from './Hoy';
 
 export default function Entreno() {
-  const { repo, usuario } = useSesion();
+  const { repo, usuario, aviso } = useSesion();
+  const [plantilla, setPlantilla] = useState<Plantilla | null>(null);
+  const [cargando, setCargando] = useState(false);
+
+  async function cargarPlantilla(p: Plantilla) {
+    setCargando(true);
+    const nuevas = rutinasDePlantilla(p, rutinas?.length ?? 0);
+    for (const r of nuevas) await repo.guardarRutina(usuario.uid, r);
+    setRutinas((l) => [...(l ?? []), ...nuevas]);
+    setCargando(false);
+    setPlantilla(null);
+    aviso(`${p.nombre}: ${nuevas.length} rutinas cargadas`);
+  }
   const nav = useNavigate();
   const empezar = useEmpezar();
   const [rutinas, setRutinas] = useState<Rutina[] | null>(null);
@@ -26,21 +39,30 @@ export default function Entreno() {
 
   return (
     <div className="pt-6">
-      <h1 className="titulo text-center">Entrenamiento</h1>
+      <h1 className="titulo text-center lg:text-left">Entrenamiento</h1>
 
-      <div className="relative -mx-[17px] mt-3 mb-3 h-[200px] overflow-hidden">
-        <img src={legionario} alt="" className="mascara-izq absolute right-0 top-0 h-full w-[58%] object-cover" />
-        <div className="absolute bottom-4 left-[18px] max-w-[60%]" style={{ textShadow: '0 2px 6px #000' }}>
+      <div className="relative -mx-[17px] mt-3 mb-3 h-[200px] overflow-hidden lg:mx-0 lg:h-[260px] lg:rounded-[14px] lg:border lg:border-ln">
+        <img src={legionario} alt="" className="mascara-izq absolute right-0 top-0 h-full w-[58%] object-cover lg:w-[45%]" />
+        <div className="absolute bottom-4 left-[18px] max-w-[60%] lg:bottom-8 lg:left-8 lg:max-w-[50%]" style={{ textShadow: '0 2px 6px #000' }}>
           <div className="etiqueta oro">Forjá tu fuerza</div>
-          <h2 className="mt-1 font-display text-[26px] font-semibold leading-tight">Cada serie cuenta</h2>
+          <h2 className="mt-1 font-display text-[26px] font-semibold leading-tight lg:text-[38px]">Cada serie cuenta</h2>
+          <div className="mt-4 hidden lg:block">
+            {enCurso ? (
+              <button className="btn" onClick={() => nav('/entrenar')}><Icono n="play" size={18} />Volver al entrenamiento en curso</button>
+            ) : (
+              <button className="btn" onClick={() => empezar.libre()}><Icono n="mas" size={18} />Empezar entrenamiento libre</button>
+            )}
+          </div>
         </div>
       </div>
 
-      {enCurso ? (
-        <button className="btn w-full" onClick={() => nav('/entrenar')}><Icono n="play" size={18} />Volver al entrenamiento en curso</button>
-      ) : (
-        <button className="btn w-full" onClick={() => empezar.libre()}><Icono n="mas" size={18} />Empezar entrenamiento libre</button>
-      )}
+      <div className="lg:hidden">
+        {enCurso ? (
+          <button className="btn w-full" onClick={() => nav('/entrenar')}><Icono n="play" size={18} />Volver al entrenamiento en curso</button>
+        ) : (
+          <button className="btn w-full" onClick={() => empezar.libre()}><Icono n="mas" size={18} />Empezar entrenamiento libre</button>
+        )}
+      </div>
 
       <div className="mt-7 mb-3 flex items-center justify-between">
         <h2 className="font-display text-[22px] font-semibold">Rutinas</h2>
@@ -52,10 +74,10 @@ export default function Entreno() {
           <Link to="/rutinas/nueva" className="btn">Crear rutina</Link>
         </Vacio>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
           {rutinas.map((r) => (
-            <li key={r.id} className="tarjeta entrar">
-              <div className="flex items-start justify-between gap-3">
+            <li key={r.id} className="tarjeta entrar flex flex-col">
+              <div className="flex flex-1 items-start justify-between gap-3">
                 <Link to={`/rutinas/${r.id}`} className="flex-1">
                   <h3 className="titulo-tarjeta">{r.nombre}</h3>
                   <p className="mt-1 text-[13px] oro">{r.dias.length ? r.dias.map((d) => NOMBRES_DIA[d]).join(' · ') : 'Sin día fijo'} · ≈ {minutosEstimados(r)} min</p>
@@ -75,6 +97,47 @@ export default function Entreno() {
           ))}
         </ul>
       )}
+
+      <div className="mt-8 mb-3">
+        <h2 className="font-display text-[22px] font-semibold">Plantillas</h2>
+        <p className="text-[13px] text-mu">Rutinas armadas para cargar con un toque.</p>
+      </div>
+      <ul className="grid gap-3 lg:grid-cols-2">
+        {PLANTILLAS.map((p) => (
+          <li key={p.id} className="hero text-left">
+            <div className="etiqueta oro">{p.nivel}</div>
+            <h3 className="titulo-tarjeta mt-1">{p.nombre}</h3>
+            <p className="mt-1 text-[14px] text-mu">{p.descripcion}</p>
+            <button className="btn-sec mt-4 w-full" onClick={() => setPlantilla(p)}>Ver y cargar</button>
+          </li>
+        ))}
+      </ul>
+
+      <Hoja abierta={!!plantilla} alCerrar={() => setPlantilla(null)} etiqueta={plantilla?.nivel} titulo={plantilla?.nombre ?? ''}>
+        {plantilla && (
+          <>
+            {plantilla.rutinas.map((r) => (
+              <div key={r.nombre} className="mb-4">
+                <div className="flex items-baseline justify-between">
+                  <h4 className="font-display text-[17px] font-semibold oro">{r.nombre}</h4>
+                  <span className="text-[12px] text-mu">{r.dias.map((d) => NOMBRES_DIA[d]).join(' · ')}</span>
+                </div>
+                <ul className="mt-1 text-[14px]">
+                  {r.ejercicios.map((e, i) => (
+                    <li key={i} className="flex justify-between gap-2 border-b border-ln2 py-1.5 last:border-0">
+                      <span>{buscarEjercicio(e.ejercicioId)?.nombre}{e.nota && <span className="text-mu"> · {e.nota}</span>}</span>
+                      <span className="num shrink-0 text-tx2">{textoObjetivo(e)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            <button className="btn w-full" disabled={cargando} onClick={() => cargarPlantilla(plantilla)}>
+              {cargando ? 'Cargando…' : `Cargar las ${plantilla.rutinas.length} rutinas`}
+            </button>
+          </>
+        )}
+      </Hoja>
     </div>
   );
 }
