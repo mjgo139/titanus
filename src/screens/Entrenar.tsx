@@ -27,6 +27,22 @@ export function textoDescanso(s: number) {
   return m ? `${m} min${r ? ` ${r} s` : ''}` : `${r} s`;
 }
 
+/** "Última vez": lo que hizo en este ejercicio la sesión anterior */
+function UltimaVez({ ultima, u }: { ultima?: EstadoEjercicio['ultima']; u: 'kg' | 'lb' }) {
+  if (!ultima?.series.length) {
+    return <p className="mt-1 text-[13px] text-mu2" data-testid="ultima-vez">Primera vez con este ejercicio: elegí un peso cómodo.</p>;
+  }
+  const pesos = [...new Set(ultima.series.map((x) => x.peso))];
+  const reps = ultima.series.map((x) => `${x.reps}${x.tipo === 'fallo' ? ' (F)' : x.tipo === 'calentamiento' ? ' (C)' : ''}`).join(' · ');
+  return (
+    <p className="mt-1 rounded-[8px] bg-goldbg/60 px-2 py-1 text-[13px]" data-testid="ultima-vez">
+      <span className="oro font-semibold">Última vez</span>
+      <span className="text-mu"> · {new Intl.DateTimeFormat('es-PY', { day: 'numeric', month: 'short' }).format(ultima.fecha).replace('.', '')}: </span>
+      <span className="text-tx2">{pesos.length === 1 ? `${formatoNumero(redondear(aUnidad(pesos[0], u)))} ${u} × ${reps}` : ultima.series.map((x) => `${formatoNumero(redondear(aUnidad(x.peso, u)))}×${x.reps}`).join(' · ') + ` ${u}`}</span>
+    </p>
+  );
+}
+
 /** Entrenamiento en vivo, al estilo Hevy */
 export default function Entrenar() {
   const { repo, usuario, perfil, cambiarPerfil, aviso } = useSesion();
@@ -176,6 +192,7 @@ export default function Entrenar() {
                 </button>
               </div>
               {e.objetivo && <p className="mt-1 text-[13px] text-mu" data-testid="objetivo">Objetivo: <span className="text-tx2">{e.objetivo}</span></p>}
+              <UltimaVez ultima={estados.get(e.ejercicioId)?.ultima} u={u} />
               <input aria-label={`Notas de ${ej?.nombre}`} placeholder="Agregar notas aquí…" value={e.nota ?? ''}
                 onChange={(ev) => { const v = ev.target.value; cambiar((x) => { x.ejercicios[i].nota = v; }); }}
                 className="mt-2 w-full bg-transparent text-[14px] text-tx2 outline-none placeholder:text-mu2" />

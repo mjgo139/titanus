@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.3.1',
+    fecha: '2026-11-14',
+    cambios: [
+      'Línea "Última vez" en cada ejercicio mientras entrenás (fecha, peso y repeticiones).',
+      'ANTERIOR ya no queda vacío si hoy hacés más series que la vez pasada.',
+      'Modo prueba: la sesión no se pierde al recargar ni cuando la app se actualiza sola.',
+    ],
+  },
+  {
     version: '1.3.0',
     fecha: '2026-11-14',
     cambios: [

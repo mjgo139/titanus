@@ -14,6 +14,11 @@ interface Datos {
 }
 
 const espera = (ms = 120) => new Promise((r) => setTimeout(r, ms));
+const CLAVE_SESION = 'titanus-prueba-datos';
+
+type DatosPlanos = {
+  perfil?: Perfil; rutinas: Rutina[]; propios: Ejercicio[]; estados: EstadoEjercicio[]; historial: Entrenamiento[]; cuerpo: RegistroCuerpo[];
+};
 const copia = <T,>(x: T): T => structuredClone(x);
 
 /** Modo prueba: todo vive en la memoria del navegador. Al recargar vuelve a los datos de ejemplo. */
@@ -25,9 +30,44 @@ export class RepoMemoria implements Repo {
   private cuentas = new Map<string, { u: Usuario; clave: string }>();
   private datos = new Map<string, Datos>();
 
-  constructor(private ahora = Date.now()) {
+  constructor(private ahora = Date.now(), private persistir = typeof sessionStorage !== 'undefined') {
     this.cuentas.set(USUARIO_PRUEBA.email, { u: USUARIO_PRUEBA, clave: CLAVE_PRUEBA });
     this.cargarEjemplo(USUARIO_PRUEBA, 'Marco');
+    this.restaurar();
+  }
+
+  /** El modo prueba guarda todo en la pestaña: sobrevive a recargas y a las actualizaciones automáticas */
+  private guardar() {
+    if (!this.persistir) return;
+    try {
+      const datos: Record<string, DatosPlanos> = {};
+      for (const [uid, d] of this.datos) {
+        datos[uid] = {
+          perfil: d.perfil, rutinas: [...d.rutinas.values()], propios: [...d.propios.values()],
+          estados: [...d.estados.values()], historial: d.historial, cuerpo: [...d.cuerpo.values()],
+        };
+      }
+      sessionStorage.setItem(CLAVE_SESION, JSON.stringify({ usuario: this.usuario, cuentas: [...this.cuentas.entries()], datos }));
+    } catch { /* sin espacio: queda solo en memoria */ }
+  }
+
+  private restaurar() {
+    if (!this.persistir) return;
+    try {
+      const t = sessionStorage.getItem(CLAVE_SESION);
+      if (!t) return;
+      const g = JSON.parse(t) as { usuario: Usuario | null; cuentas: [string, { u: Usuario; clave: string }][]; datos: Record<string, DatosPlanos> };
+      this.usuario = g.usuario;
+      this.cuentas = new Map(g.cuentas);
+      this.datos = new Map(Object.entries(g.datos).map(([uid, d]) => [uid, {
+        perfil: d.perfil,
+        rutinas: new Map(d.rutinas.map((x) => [x.id, x])),
+        propios: new Map(d.propios.map((x) => [x.id, x])),
+        estados: new Map(d.estados.map((x) => [x.ejercicioId, x])),
+        historial: d.historial,
+        cuerpo: new Map(d.cuerpo.map((x) => [x.id, x])),
+      }]));
+    } catch { /* datos viejos o dañados: se empieza de cero */ }
   }
 
   /** Carga la rutina Full body ya hecha durante 8 semanas (datos inventados) */
@@ -58,6 +98,7 @@ export class RepoMemoria implements Repo {
   }
 
   private avisar() {
+    this.guardar();
     for (const o of this.oyentes) o(this.usuario);
   }
 
@@ -125,13 +166,14 @@ export class RepoMemoria implements Repo {
   async leerPerfil(u: Usuario) {
     await espera(60);
     const d = this.d(u.uid);
-    if (!d.perfil) d.perfil = perfilInicial(u);
+    if (!d.perfil) { d.perfil = perfilInicial(u); this.guardar(); }
     return copia(d.perfil);
   }
 
   async guardarPerfil(uid: string, cambios: Partial<Perfil>) {
     const d = this.d(uid);
     if (d.perfil) d.perfil = { ...d.perfil, ...copia(cambios) };
+    this.guardar();
   }
 
   async esAdmin(uid: string) {
@@ -142,11 +184,11 @@ export class RepoMemoria implements Repo {
     await espera(60);
     return copia([...this.d(uid).rutinas.values()].sort((a, b) => a.orden - b.orden));
   }
-  async guardarRutina(uid: string, r: Rutina) { this.d(uid).rutinas.set(r.id, copia(r)); }
-  async borrarRutina(uid: string, id: string) { this.d(uid).rutinas.delete(id); }
+  async guardarRutina(uid: string, r: Rutina) { this.d(uid).rutinas.set(r.id, copia(r)); this.guardar(); }
+  async borrarRutina(uid: string, id: string) { this.d(uid).rutinas.delete(id); this.guardar(); }
 
   async leerPropios(uid: string) { return copia([...this.d(uid).propios.values()]); }
-  async guardarPropio(uid: string, e: Ejercicio) { this.d(uid).propios.set(e.id, copia(e)); }
+  async guardarPropio(uid: string, e: Ejercicio) { this.d(uid).propios.set(e.id, copia(e)); this.guardar(); }
 
   async leerEstados(uid: string, ids?: string[]) {
     const m = this.d(uid).estados;
@@ -161,6 +203,7 @@ export class RepoMemoria implements Repo {
     d.historial.unshift(copia(e));
     for (const s of estados) d.estados.set(s.ejercicioId, copia(s));
     if (d.perfil) d.perfil.resumen = copia(resumen);
+    this.guardar();
   }
 
   async leerHistorial(uid: string, limite: number, antesDe?: number) {
@@ -176,7 +219,7 @@ export class RepoMemoria implements Repo {
   async leerCuerpo(uid: string) {
     return copia([...this.d(uid).cuerpo.values()].sort((a, b) => a.fecha - b.fecha));
   }
-  async guardarCuerpo(uid: string, r: RegistroCuerpo) { this.d(uid).cuerpo.set(r.id, copia(r)); }
+  async guardarCuerpo(uid: string, r: RegistroCuerpo) { this.d(uid).cuerpo.set(r.id, copia(r)); this.guardar(); }
 
   async exportar(uid: string) {
     const d = this.d(uid);

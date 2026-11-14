@@ -12,6 +12,8 @@ const ir = (page: Page, nombre: 'Inicio' | 'Entreno' | 'Progreso' | 'Perfil') =>
 async function entrar(page: Page, tema: 'light' | 'dark' = 'dark') {
   await page.emulateMedia({ colorScheme: tema });
   await page.goto('/');
+  await page.evaluate(() => sessionStorage.clear());
+  await page.reload();
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('heading', { name: /Hola, Marco/ })).toBeVisible();
@@ -38,6 +40,12 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Hola, Lucía' })).toBeVisible();
   await expect(page.getByTestId('rango')).toHaveText('Recluta · Nivel 1');
   await captura(page, '03-inicio-vacio');
+});
+
+test('modo prueba: la sesión sobrevive a una recarga', async ({ page }) => {
+  await entrar(page);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: /Hola, Marco/ })).toBeVisible();
 });
 
 test('invitado: entra sin cuenta y después crea su cuenta sin perder nada', async ({ page }) => {
@@ -98,6 +106,8 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await page.getByRole('button', { name: 'Empezar rutina' }).first().click();
   await expect(page.getByTestId('metricas')).toContainText('Duración');
   await expect(page.getByRole('button', { name: /Copiar serie anterior 1/ }).first()).toContainText('kg ×');
+  await expect(page.getByTestId('ultima-vez').first()).toContainText('Última vez');
+  for (const j of [1, 2, 3, 4]) await expect(page.getByRole('button', { name: `Copiar serie anterior ${j}` }).first()).not.toHaveText('—');
   // Récord: subir el peso de la segunda serie (la primera es de calentamiento)
   const peso = page.getByLabel('Peso serie 2').first();
   await peso.fill(String(Number(await peso.inputValue()) + 10));

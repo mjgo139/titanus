@@ -242,7 +242,8 @@ describe('columna ANTERIOR por tipo de serie', () => {
     const previas = [{ peso: 60, reps: 8 }, { peso: 60, reps: 8 }, { peso: 60, reps: 12, tipo: 'fallo' as const }];
     const hoy = [0, 1, 2, 3].map((i) => ({ peso: 0, reps: 0, hecha: false, tipo: (i === 3 ? 'fallo' : 'normal') as 'fallo' | 'normal' }));
     expect(anteriorPara(previas, hoy, 0)).toEqual({ peso: 60, reps: 8 });
-    expect(anteriorPara(previas, hoy, 2)).toBeUndefined();
+    expect(anteriorPara(previas, hoy, 2)).toEqual({ peso: 60, reps: 8 });
+    expect(anteriorPara([{ peso: 60, reps: 8 }], hoy, 3)).toBeUndefined();
     expect(anteriorPara(previas, hoy, 3)).toEqual({ peso: 60, reps: 12, tipo: 'fallo' });
   });
 });

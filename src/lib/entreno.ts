@@ -18,7 +18,9 @@ export function anteriorPara(previas: Previa[] | undefined, series: Serie[], j: 
   if (!previas?.length) return undefined;
   const c = clase(series[j]?.tipo);
   const k = series.slice(0, j).filter((s) => clase(s.tipo) === c).length;
-  return previas.filter((p) => clase(p.tipo) === c)[k];
+  const mismas = previas.filter((p) => clase(p.tipo) === c);
+  // Si hoy hay más series que la vez pasada, se compara con la última de ese tipo
+  return mismas[k] ?? mismas[mismas.length - 1];
 }
 
 /** Un ejercicio nuevo dentro del entrenamiento, con los pesos de la última vez */
