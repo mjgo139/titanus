@@ -31,15 +31,17 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Pantallas en celular y PC (Playwright)
         run: npm run test:e2e
+      # Si el espacio de GitHub para adjuntos está lleno, no frena la publicación
       - name: Guardar capturas
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: capturas
           path: |
             capturas/
             playwright-report/
-          retention-days: 14
+          retention-days: 2
 
   pruebas-reglas:
     name: 2 · Pruebas de reglas (emulador)
@@ -72,11 +74,11 @@ jobs:
         working-directory: android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk titanus.apk
-      - uses: actions/upload-artifact@v4
+      # La APK pasa al paso de deploy por la caché (no usa el cupo de adjuntos de GitHub)
+      - uses: actions/cache/save@v4
         with:
-          name: titanus-apk
           path: titanus.apk
-          retention-days: 30
+          key: apk-${{ github.sha }}
 
   deploy:
     name: 4 · Deploy a Firebase
@@ -109,10 +111,12 @@ jobs:
 
       # El plan gratis de Firebase no permite archivos .apk en Hosting: la APK se publica como Release de GitHub
       - name: Bajar la APK armada
-        uses: actions/download-artifact@v4
+        uses: actions/cache/restore@v4
         with:
-          name: titanus-apk
-          path: apk
+          path: titanus.apk
+          key: apk-${{ github.sha }}
+          fail-on-cache-miss: true
+      - run: mkdir -p apk && mv titanus.apk apk/titanus.apk
       - name: Publicar la APK en GitHub (Release "apk-ultima")
         env:
           GH_TOKEN: ${{ github.token }}
