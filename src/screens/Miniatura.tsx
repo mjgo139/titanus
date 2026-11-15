@@ -9,13 +9,14 @@ const SIGLA: Record<Musculo, string> = {
  * Animación del ejercicio: alterna la foto de inicio y la de final del movimiento
  * (fotos de free-exercise-db, dominio público). Sin fotos, muestra la sigla del músculo.
  */
-export function Animacion({ id, nombre, className = '' }: { id: string; nombre?: string; className?: string }) {
+export function Animacion({ id, nombre, className = '', completa = false }: { id: string; nombre?: string; className?: string; completa?: boolean }) {
+  const ajuste = completa ? 'object-contain' : 'object-cover';
   const img = imagenesEjercicio(id);
   if (!img) return null;
   return (
     <div className={`relative overflow-hidden ${className}`} role="img" aria-label={nombre ? `Cómo se hace: ${nombre}` : 'Cómo se hace'}>
-      <img src={img[0]} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-      <img src={img[1]} alt="" loading="lazy" className="animar-movimiento absolute inset-0 h-full w-full object-cover" />
+      <img src={img[0]} alt="" loading="lazy" className={`absolute inset-0 h-full w-full ${ajuste}`} />
+      <img src={img[1]} alt="" loading="lazy" className={`animar-movimiento absolute inset-0 h-full w-full ${ajuste}`} />
     </div>
   );
 }

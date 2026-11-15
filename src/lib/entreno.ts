@@ -49,10 +49,13 @@ export function iniciarDesdeRutina(
   ahora = Date.now(),
   ajustes: AjustesSobrecarga = SOBRECARGA_POR_DEFECTO,
 ): Borrador {
+  // Si algún ejercicio nunca se hizo, primero se preparan pesos y reps (sin reloj)
+  const primeraVez = r.ejercicios.some((er) => !estados.get(er.ejercicioId)?.ultima);
   return {
     rutinaId: r.id,
     nombre: r.nombre,
     inicio: ahora,
+    ...(primeraVez ? { preparando: true } : {}),
     ejercicios: r.ejercicios.map((er) => {
       const fallo = er.alFallo ?? 0;
       const est = estados.get(er.ejercicioId);

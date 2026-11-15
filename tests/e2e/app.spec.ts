@@ -108,6 +108,15 @@ test('entreno: crear rutina con biblioteca y ejercicio propio', async ({ page })
   await captura(page, '08-editar-rutina');
   await page.getByRole('button', { name: 'Guardar rutina' }).click();
   await expect(page.getByRole('heading', { name: 'Hombros y abdomen' })).toBeVisible();
+  // primera vez: antes del reloj se cargan peso y reps de cada serie
+  await page.getByRole('listitem').filter({ hasText: 'Hombros y abdomen' }).getByRole('button', { name: /Empezar rutina/ }).click();
+  await expect(page.getByTestId('armado')).toBeVisible();
+  await expect(page.getByText('Primera vez con esta rutina')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Terminar', exact: true })).toHaveCount(0);
+  await page.getByLabel('Peso serie 1 de Plancha con peso').fill('10');
+  await captura(page, '08b-preparar-rutina');
+  await page.getByRole('button', { name: 'Empezar entrenamiento', exact: true }).click();
+  await expect(page.getByTestId('vista-foco')).toBeVisible();
 });
 
 test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resumen', async ({ page }) => {
@@ -285,9 +294,15 @@ test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que si
   await expect(page.getByTestId('posicion')).toHaveText('Serie 1 de 4');
   await expect(page.getByLabel('Peso', { exact: true })).toHaveValue('81.25');
   await expect(page.getByTestId('a-continuacion')).toContainText('Serie 2');
-  // Lo esencial entra en la pantalla sin bajar: el botón y el cronómetro
-  await expect(page.getByRole('button', { name: 'Serie hecha' })).toBeInViewport();
-  await expect(page.getByTestId('cronometro')).toBeInViewport();
+  // Lo esencial entra COMPLETO sin bajar, también en un celular bajo (barra del navegador incluida)
+  if (test.info().project.name === 'celular') await page.setViewportSize({ width: 412, height: 690 });
+  await expect(page.getByRole('button', { name: 'Serie hecha' })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByTestId('cronometro')).toBeInViewport({ ratio: 1 });
+  await expect(page.getByTestId('a-continuacion')).toBeInViewport({ ratio: 1 });
+  if (test.info().project.name === 'celular') {
+    const caja = await page.getByTestId('animacion-foco').boundingBox();
+    expect(caja!.height).toBeGreaterThan(110);
+  }
   await captura(page, '27-foco');
   await page.getByRole('button', { name: 'Serie hecha' }).click();
   await expect(page.getByRole('timer', { name: 'Descanso' })).toBeVisible();

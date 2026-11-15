@@ -185,7 +185,7 @@ export default function Entrenar() {
     cambiar((x) => { const l = x.ejercicios; const j = i + d; if (j < 0 || j >= l.length) return; [l[i], l[j]] = [l[j], l[i]]; });
   }
   // Sobrecarga manual: se pregunta una sola vez, al empezar
-  const pendientesSobrecarga = b.sobrecargaRevisada ? [] : b.ejercicios
+  const pendientesSobrecarga = b.sobrecargaRevisada || b.preparando ? [] : b.ejercicios
     .map((e, i) => ({ e, i }))
     .filter(({ e }) => e.sugerencia && e.sugerencia.accion !== 'mantener' && !e.sugerencia.aplicada && !e.series.some((x) => x.hecha));
   function cerrarSobrecarga(aplicar: boolean) {
@@ -219,13 +219,13 @@ export default function Entrenar() {
             <button aria-label="Minimizar" className="toque -ml-3 flex items-center justify-center oro" onClick={() => nav('/entreno')}>
               <Icono n="abajo" />
             </button>
-            <span className="flex-1 font-display text-[17px] font-semibold">Armá tu entrenamiento</span>
+            <span className="flex-1 font-display text-[17px] font-semibold">{b.rutinaId ? 'Prepará tu rutina' : 'Armá tu entrenamiento'}</span>
           </header>
-          <div className="etiqueta oro mt-4">Entrenamiento libre</div>
+          <div className="etiqueta oro mt-4">{b.rutinaId ? 'Primera vez con esta rutina' : 'Entrenamiento libre'}</div>
           <input aria-label="Nombre del entrenamiento" value={b.nombre}
             onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
             className="mt-1 w-full bg-transparent font-display text-[26px] font-semibold outline-none" />
-          <p className="text-[14px] text-mu">Elegí los ejercicios, las series, el peso y las reps. El reloj arranca recién cuando tocás <b className="oro">Empezar</b>.</p>
+          <p className="text-[14px] text-mu">{b.rutinaId ? 'Cargá el peso y las reps de cada serie. Desde la próxima vez se completan solos con lo que hiciste.' : 'Elegí los ejercicios, las series, el peso y las reps.'} El reloj arranca recién cuando tocás <b className="oro">Empezar</b>.</p>
 
           <ol className="mt-4 flex flex-col gap-3">
             {b.ejercicios.map((e, i) => {
@@ -237,7 +237,7 @@ export default function Entrenar() {
                     <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={44} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold oro">{ej?.nombre}</span>
-                      <span className="text-[12px] text-mu">{ej?.musculo} · {e.series.length} {e.series.length === 1 ? 'serie' : 'series'}</span>
+                      <span className="block truncate text-[12px] text-mu">{e.objetivo ?? `${ej?.musculo} · ${e.series.length} ${e.series.length === 1 ? 'serie' : 'series'}`}</span>
                     </span>
                   </div>
                   <div className="mt-3 grid grid-cols-[34px_minmax(0,1fr)_minmax(0,1fr)_32px] gap-2 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
@@ -245,14 +245,14 @@ export default function Entrenar() {
                   </div>
                   {e.series.map((s, j) => (
                     <div key={j} data-testid="serie-armado" className="mt-1.5 grid grid-cols-[34px_minmax(0,1fr)_minmax(0,1fr)_32px] items-center gap-2">
-                      <span className="num text-center text-[15px] font-bold oro">{j + 1}</span>
+                      <span className={`num text-center text-[15px] font-bold ${s.tipo === 'fallo' ? 'text-miss' : 'oro'}`}>{s.tipo === 'fallo' ? 'F' : s.tipo === 'calentamiento' ? 'C' : j + 1}</span>
                       <input aria-label={`Peso serie ${j + 1} de ${ej?.nombre}`} type="number" inputMode="decimal" step="0.5" min={0} placeholder="0"
                         className="h-10 w-full rounded-[8px] border border-ln2 bg-transparent text-center num text-[16px] outline-none focus:border-gold"
                         value={s.peso ? redondear(aUnidad(s.peso, u)) : ''}
                         onChange={(ev) => { const v = aKg(Number(ev.target.value) || 0, u); cambiar((x) => { x.ejercicios[i].series[j].peso = v; }); }} />
-                      <input aria-label={`Repeticiones serie ${j + 1} de ${ej?.nombre}`} type="number" inputMode="numeric" min={0} placeholder="0"
+                      <input aria-label={`Repeticiones serie ${j + 1} de ${ej?.nombre}`} type="number" inputMode="numeric" min={0}
                         className="h-10 w-full rounded-[8px] border border-ln2 bg-transparent text-center num text-[16px] outline-none focus:border-gold"
-                        value={s.reps || ''}
+                        value={s.reps || ''} placeholder={s.tipo === 'fallo' ? 'máx' : '0'}
                         onChange={(ev) => { const v = Math.max(0, Math.round(Number(ev.target.value) || 0)); cambiar((x) => { x.ejercicios[i].series[j].reps = v; }); }} />
                       <button aria-label={`Eliminar serie ${j + 1} de ${ej?.nombre}`} title="Eliminar serie" disabled={e.series.length <= 1}
                         onClick={() => cambiar((x) => { x.ejercicios[i].series.splice(j, 1); })}

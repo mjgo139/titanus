@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { Borrador } from '../lib/borrador';
 import { buscarEjercicio, imagenesEjercicio } from '../lib/biblioteca';
 import { DESCANSO_POR_DEFECTO, anteriorPara } from '../lib/entreno';
@@ -29,19 +30,19 @@ const kgTxt = (kg: number, u: Unidad) => `${formatoNumero(redondear(aUnidad(kg, 
 function Control({ etiqueta, valor, unidad, alCambiar, paso }: {
   etiqueta: string; valor: number; unidad: string; alCambiar: (n: number) => void; paso: number;
 }) {
-  const btn = 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ln3 text-[22px] leading-none oro active:scale-95';
+  const btn = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ln3 text-[22px] leading-none oro active:scale-95';
   return (
     <div className="min-w-0 flex-1">
-      <div className="etiqueta text-center">{etiqueta}</div>
-      <div className="mt-1 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-1">
+      <div className="etiqueta text-center text-[10px]">{etiqueta}</div>
+      <div className="mt-1 grid grid-cols-[40px_minmax(0,1fr)_40px] items-center gap-1">
         <button aria-label={`Menos ${etiqueta}`} className={btn} onClick={() => alCambiar(Math.max(0, redondear(valor - paso, 2)))}>−</button>
         <input aria-label={etiqueta} type="number" inputMode="decimal" step={paso}
-          className={`h-11 w-full min-w-0 bg-transparent text-center num leading-none outline-none ${String(redondear(valor, 2)).length > 4 ? 'text-[26px]' : String(redondear(valor, 2)).length > 3 ? 'text-[30px]' : 'text-[36px]'}`}
+          className={`h-10 w-full min-w-0 bg-transparent text-center num leading-none outline-none ${String(redondear(valor, 2)).length > 4 ? 'text-[22px]' : String(redondear(valor, 2)).length > 3 ? 'text-[26px]' : 'text-[30px]'}`}
           value={valor ? redondear(valor, 2) : ''} placeholder="0"
           onChange={(e) => alCambiar(Math.max(0, Number(e.target.value) || 0))} />
         <button aria-label={`Más ${etiqueta}`} className={btn} onClick={() => alCambiar(redondear(valor + paso, 2))}>+</button>
       </div>
-      <div className="mt-0.5 text-center text-[12px] text-mu">{unidad}</div>
+      <div className="text-center text-[11px] leading-tight text-mu">{unidad}</div>
     </div>
   );
 }
@@ -63,6 +64,21 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
   marcar: (i: number, j: number) => void;
   cambiar: (f: (x: Borrador) => Borrador | void) => void;
 }) {
+  // En el celular la columna mide exactamente lo que queda de pantalla debajo del encabezado
+  const col = useRef<HTMLDivElement>(null);
+  const [alto, setAlto] = useState<number>();
+  useLayoutEffect(() => {
+    const medir = () => {
+      const el = col.current;
+      if (!el || window.innerWidth >= 1024) { setAlto(undefined); return; }
+      const vh = window.visualViewport?.height ?? window.innerHeight;
+      setAlto(Math.max(420, Math.floor(vh - (el.getBoundingClientRect().top + window.scrollY) - 10)));
+    };
+    medir();
+    window.addEventListener('resize', medir);
+    window.visualViewport?.addEventListener('resize', medir);
+    return () => { window.removeEventListener('resize', medir); window.visualViewport?.removeEventListener('resize', medir); };
+  }, []);
   const e = b.ejercicios[pos.i];
   const s = e?.series[pos.j];
   if (!e || !s) return null;
@@ -80,58 +96,58 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
   const setValor = (campo: 'peso' | 'reps', v: number) =>
     cambiar((x) => { x.ejercicios[pos.i].series[pos.j][campo] = campo === 'peso' ? aKg(v, u) : Math.round(v); });
   const circ = 2 * Math.PI * 46;
-  const flecha = 'flex h-[60px] w-10 items-center justify-center rounded-[12px] border border-ln2 text-mu disabled:opacity-30';
+  const flecha = 'flex h-[52px] w-10 items-center justify-center rounded-[12px] border border-ln2 text-mu disabled:opacity-30';
   const conFoto = !!imagenesEjercicio(e.ejercicioId);
 
   return (
-    <div className="mt-3 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-stretch lg:gap-6" data-testid="vista-foco">
+    <div className="mt-2 lg:mt-3 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-stretch lg:gap-6" data-testid="vista-foco">
       {/* PC: animación grande a la izquierda */}
       <div className="hidden lg:block">
         {conFoto
-          ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} className="h-full min-h-[300px] w-full rounded-[16px] border border-ln" />
+          ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} completa className="h-full min-h-[300px] w-full rounded-[16px] border border-ln bg-sf" />
           : <div className="flex h-full min-h-[300px] items-center justify-center rounded-[16px] border border-ln bg-sf"><Miniatura musculo={ej?.musculo} tam={120} /></div>}
       </div>
 
       {/* En el celular ocupa todo el alto de la pantalla: la animación crece en el espacio libre */}
-      <div className="flex min-h-[calc(100dvh-132px)] flex-col gap-3 lg:min-h-0">
-        <div className="flex items-center gap-3">
+      <div ref={col} style={alto ? { height: alto } : undefined} className="flex h-[calc(100dvh-72px)] flex-col gap-2 lg:h-auto lg:gap-3" data-testid="foco-columna">
+        <div className="flex shrink-0 items-center gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="truncate font-display text-[24px] font-semibold leading-tight oro lg:text-[30px]">{ej?.nombre}</h2>
-            <p className="mt-0.5 truncate text-[13px] text-mu">{e.objetivo ?? `${e.series.length} series`}</p>
-            <p className="mt-1 text-[12px]">
+            <h2 className="truncate font-display text-[22px] font-semibold leading-tight oro lg:text-[30px]">{ej?.nombre}</h2>
+            <p className="truncate text-[12px] text-mu">{e.objetivo ?? `${e.series.length} series`}</p>
+            <p className="mt-0.5 text-[12px]">
               <span className="font-bold uppercase tracking-[.1em] oro" data-testid="posicion">Serie {pos.j + 1} de {e.series.length}</span>
               <span className="text-mu2"> · Ejercicio {pos.i + 1} de {b.ejercicios.length}</span>
             </p>
           </div>
         </div>
         {/* Series de este ejercicio: hechas, actual y pendientes */}
-        <div className="flex items-center gap-2" aria-label="Series del ejercicio">
+        <div className="flex shrink-0 items-center gap-2" aria-label="Series del ejercicio">
           {e.series.map((x, j) => {
             const actual = j === pos.j;
             return (
               <button key={j} onClick={() => setPos({ i: pos.i, j })} aria-label={`Ir a la serie ${j + 1}`}
-                className={`num flex h-9 min-w-9 flex-1 items-center justify-center rounded-[10px] border text-[15px] ${x.hecha ? 'border-goldh' : actual ? 'border-gold oro' : 'border-ln2 text-mu'}`}
+                className={`num flex h-8 min-w-8 flex-1 items-center justify-center rounded-[10px] border text-[15px] ${x.hecha ? 'border-goldh' : actual ? 'border-gold oro' : 'border-ln2 text-mu'}`}
                 style={x.hecha ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
                 {x.hecha ? <Icono n="check" size={16} /> : x.tipo === 'fallo' ? 'F' : x.tipo === 'calentamiento' ? 'C' : j + 1}
               </button>
             );
           })}
         </div>
-        <div className="h-1 overflow-hidden rounded-full bg-ln2" aria-label={`${hechas} de ${lista.length} series hechas en total`}>
+        <div className="h-1 shrink-0 overflow-hidden rounded-full bg-ln2" aria-label={`${hechas} de ${lista.length} series hechas en total`}>
           <div className="h-full transition-all" style={{ width: `${(hechas / lista.length) * 100}%`, background: 'var(--oro-grad)' }} />
         </div>
 
         {/* Celular: animación que llena el espacio libre */}
-        <div className="relative min-h-[150px] flex-1 overflow-hidden rounded-[16px] border border-ln lg:hidden">
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded-[16px] border border-ln bg-sf lg:hidden" data-testid="animacion-foco">
           <div className="absolute inset-0">
             {conFoto
-              ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} className="h-full w-full" />
+              ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} completa className="h-full w-full" />
               : <div className="flex h-full items-center justify-center bg-sf"><Miniatura musculo={ej?.musculo} tam={96} /></div>}
           </div>
         </div>
 
         {/* La serie actual */}
-        <div className={`tarjeta ${s.hecha ? 'border-goldh' : ''}`}>
+        <div className={`tarjeta shrink-0 py-3 ${s.hecha ? 'border-goldh' : ''}`}>
           <div className="flex items-center justify-between gap-2">
             <span className={`etiqueta truncate ${tipo === 'fallo' ? 'text-miss' : 'oro'}`}>{NOMBRE_TIPO[tipo]}</span>
             <button className="shrink-0 text-[13px] text-mu" aria-label="Copiar la vez anterior"
@@ -139,14 +155,14 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
               Anterior: <span className="text-tx2">{ant ? `${kgTxt(ant.peso, u)} × ${ant.reps}` : '—'}</span>
             </button>
           </div>
-          <div className="mt-3 flex items-stretch gap-2">
+          <div className="mt-2 flex items-stretch gap-2">
             <Control etiqueta="Peso" unidad={u} valor={redondear(aUnidad(s.peso, u), 2)} paso={u === 'kg' ? 2.5 : 5} alCambiar={(v) => setValor('peso', v)} />
             <div className="w-px bg-ln2" />
             <Control etiqueta="Reps" unidad={tipo === 'fallo' ? 'máximo' : 'repeticiones'} valor={s.reps} paso={1} alCambiar={(v) => setValor('reps', v)} />
           </div>
-          <div className="mt-4 grid grid-cols-[40px_minmax(0,1fr)_40px] items-center gap-2">
+          <div className="mt-3 grid grid-cols-[40px_minmax(0,1fr)_40px] items-center gap-2">
             <button className={flecha} aria-label="Serie anterior" disabled={k <= 0} onClick={() => setPos(lista[k - 1])}><Icono n="atras" size={18} /></button>
-            <button className="btn h-[60px] w-full text-[18px]" onClick={() => marcar(pos.i, pos.j)}
+            <button className="btn h-[52px] w-full text-[17px]" onClick={() => marcar(pos.i, pos.j)}
               aria-label={s.hecha ? 'Desmarcar serie' : 'Serie hecha'}>
               <Icono n="check" size={22} />{s.hecha ? 'Hecha · desmarcar' : 'Serie hecha'}
             </button>
@@ -157,9 +173,9 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
         </div>
 
         {/* Cronómetro de descanso y lo que sigue */}
-        <div className={`tarjeta flex items-center gap-4 py-3 ${descanso ? 'border-gold' : ''}`}
+        <div className={`tarjeta flex shrink-0 items-center gap-3 py-2.5 ${descanso ? 'border-gold' : ''}`}
           role={descanso ? 'timer' : undefined} aria-label={descanso ? 'Descanso' : undefined}>
-          <div className="relative h-[104px] w-[104px] shrink-0">
+          <div className="relative h-[78px] w-[78px] shrink-0 lg:h-[104px] lg:w-[104px]">
             <svg viewBox="0 0 104 104" className="h-full w-full -rotate-90">
               <circle cx="52" cy="52" r="46" fill="none" stroke="var(--ln2)" strokeWidth="6" />
               {descanso && (
@@ -168,8 +184,8 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
               )}
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="num oro text-[28px] leading-none" data-testid="cronometro">{reloj(descanso ? restante : e.descanso ?? DESCANSO_POR_DEFECTO)}</span>
-              <span className="mt-1 text-[10px] uppercase tracking-[.12em] text-mu">{descanso && restante <= 0 ? '¡Vamos!' : 'Descanso'}</span>
+              <span className="num oro text-[21px] leading-none lg:text-[28px]" data-testid="cronometro">{reloj(descanso ? restante : e.descanso ?? DESCANSO_POR_DEFECTO)}</span>
+              <span className="mt-0.5 text-[9px] uppercase tracking-[.12em] text-mu">{descanso && restante <= 0 ? '¡Vamos!' : 'Descanso'}</span>
             </div>
           </div>
           <div className="min-w-0 flex-1">
@@ -182,7 +198,7 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
             ) : (
               <p className="text-[13px] text-mu">Arranca solo al marcar la serie.</p>
             )}
-            <button className="mt-3 flex w-full items-baseline gap-2 border-t border-ln2 pt-2 text-left" disabled={!proxima}
+            <button className="mt-2 flex w-full items-baseline gap-2 border-t border-ln2 pt-2 text-left" disabled={!proxima}
               onClick={() => proxima && setPos(proxima)} data-testid="a-continuacion">
               <span className="etiqueta shrink-0">Sigue</span>
               <span className="min-w-0 flex-1 truncate text-[14px]">

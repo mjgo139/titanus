@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.6.2',
+    fecha: '2026-11-15',
+    cambios: [
+      'Vista de foco medida a tu pantalla: la animación se ve completa y "Serie hecha", el cronómetro y "Sigue" entran sin bajar.',
+      'La primera vez que empezás una rutina, primero cargás peso y reps de cada serie; el reloj arranca después.',
+    ],
+  },
+  {
     version: '1.6.1',
     fecha: '2026-11-14',
     cambios: [

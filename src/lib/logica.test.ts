@@ -109,6 +109,12 @@ describe('entrenamiento completo', () => {
     expect(b.ejercicios[1].series.map((s) => s.peso)).toEqual([0, 0]);
     expect(b.ejercicios[0].series.every((s) => s.reps === 8 && !s.hecha)).toBe(true);
   });
+  it('la primera vez con un ejercicio pide preparar pesos y reps antes del reloj', () => {
+    const prev = new Map([['press-banca', actualizarEstado(undefined, ej('press-banca', [[60, 8]]), 1)!]]);
+    expect(iniciarDesdeRutina(rutina, prev, SAB).preparando).toBe(true);
+    prev.set('aperturas', actualizarEstado(undefined, ej('aperturas', [[12, 12]]), 1)!);
+    expect(iniciarDesdeRutina(rutina, prev, SAB).preparando).toBeUndefined();
+  });
   it('al cerrar guarda solo lo hecho y actualiza el resumen', () => {
     const prev = new Map([['press-banca', actualizarEstado(undefined, ej('press-banca', [[60, 8]]), 1)!]]);
     const b = iniciarDesdeRutina(rutina, prev, SAB);
