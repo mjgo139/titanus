@@ -36,6 +36,9 @@ export interface Rutina {
   ejercicios: EjercicioRutina[];
   orden: number;
   creado: number;
+  /** Rutina asignada por su entrenador: el cliente la usa pero no la cambia */
+  asignadaPor?: string;
+  nombreAsignador?: string;
 }
 
 export type TipoSerie = 'normal' | 'calentamiento' | 'fallo' | 'drop';

@@ -5,7 +5,7 @@ import { Icono } from './Icono';
 import { useApp } from './contexto';
 import { useEffect, useState } from 'react';
 
-const PESTANAS = [
+const PESTANAS_BASE = [
   { a: '/', n: 'hoy', t: 'Inicio' },
   { a: '/entreno', n: 'entreno', t: 'Entreno' },
   { a: '/progreso', n: 'progreso', t: 'Progreso' },
@@ -48,7 +48,9 @@ function EnCurso() {
 
 /** Celular: barra de pestañas abajo. PC: barra lateral oscura de 248px */
 export function Marco() {
-  const { mensaje, repo } = useApp();
+  const { mensaje, repo, profesional } = useApp();
+  // Los profesionales tienen una pestaña más: sus clientes
+  const PESTANAS = profesional ? [...PESTANAS_BASE.slice(0, 3), { a: '/clientes', n: 'clientes', t: 'Clientes' }, PESTANAS_BASE[3]] : PESTANAS_BASE;
   const loc = useLocation();
   const enEntreno = loc.pathname.startsWith('/entrenar');
   return (
@@ -86,8 +88,8 @@ export function Marco() {
           <div className="mx-auto flex max-w-[480px] pt-2">
             {PESTANAS.map((p) => (
               <NavLink key={p.a} to={p.a} end={p.a === '/'}
-                className={({ isActive }) => `flex-1 flex flex-col items-center justify-center gap-1 h-[54px] text-[12px] ${isActive ? 'oro font-semibold' : 'text-tx2'}`}>
-                <Icono n={p.n} size={25} />{p.t}
+                className={({ isActive }) => `flex-1 flex flex-col items-center justify-center gap-1 h-[54px] ${PESTANAS.length > 4 ? 'text-[11px]' : 'text-[12px]'} ${isActive ? 'oro font-semibold' : 'text-tx2'}`}>
+                <Icono n={p.n} size={PESTANAS.length > 4 ? 23 : 25} />{p.t}
               </NavLink>
             ))}
           </div>

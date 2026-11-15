@@ -1,6 +1,7 @@
 import type {
   Ejercicio, Entrenamiento, EstadoEjercicio, Perfil, RegistroCuerpo, Rutina,
 } from '../lib/tipos';
+import type { Comentario, Objetivo, Profesional, Solicitud, TipoProfesional, Vinculo } from '../pro/tipos';
 
 export interface Usuario {
   uid: string;
@@ -54,6 +55,30 @@ export interface Repo {
   guardarCuerpo(uid: string, r: RegistroCuerpo): Promise<void>;
 
   exportar(uid: string): Promise<unknown>;
+
+  // ── Profesionales y clientes (base reutilizable) ──
+  /** Perfil de otra persona: solo si es su cliente (las reglas lo controlan) */
+  leerPerfilDe(uid: string): Promise<Perfil | null>;
+  leerProfesional(uid: string): Promise<Profesional | null>;
+  leerMiSolicitud(uid: string): Promise<Solicitud | null>;
+  enviarSolicitud(s: Solicitud): Promise<void>;
+  /** Admin */
+  leerSolicitudes(): Promise<Solicitud[]>;
+  aprobarSolicitud(s: Solicitud, codigo: string): Promise<Profesional>;
+  rechazarSolicitud(uid: string): Promise<void>;
+  leerProfesionales(): Promise<Profesional[]>;
+  cambiarEstadoProfesional(uid: string, activo: boolean): Promise<void>;
+  /** El cliente ingresa el código: así da su permiso */
+  vincular(cliente: { uid: string; nombre: string }, codigo: string, tipo: TipoProfesional): Promise<Vinculo>;
+  leerMisProfesionales(clienteId: string): Promise<Vinculo[]>;
+  leerClientes(profesionalId: string): Promise<Vinculo[]>;
+  terminarVinculo(id: string): Promise<void>;
+  leerComentarios(clienteId: string): Promise<Comentario[]>;
+  guardarComentario(clienteId: string, c: Comentario): Promise<void>;
+  marcarLeidos(clienteId: string, ids: string[]): Promise<void>;
+  leerObjetivos(clienteId: string): Promise<Objetivo[]>;
+  guardarObjetivo(clienteId: string, o: Objetivo): Promise<void>;
+  borrarObjetivo(clienteId: string, id: string): Promise<void>;
 }
 
 export class ErrorApp extends Error {}
@@ -73,6 +98,9 @@ export function mensajeError(e: unknown): string {
     'auth/credential-already-in-use': 'Esa cuenta de Google ya existe. Salí del modo invitado e ingresá con ella.',
     'auth/operation-not-allowed': 'Ese modo de acceso no está habilitado todavía.',
     'auth/requires-recent-login': 'Por seguridad, salí y volvé a ingresar antes de borrar la cuenta.',
+    'permission-denied': 'No tenés permiso para eso.',
+    'pro/codigo': 'Ese código no existe o el profesional ya no está activo.',
+    'pro/propio': 'No podés ser cliente de vos mismo.',
   };
   if (mapa[code]) return mapa[code];
   if (e instanceof Error && e.message) return e.message;

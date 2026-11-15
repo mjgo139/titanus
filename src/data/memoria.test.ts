@@ -19,7 +19,7 @@ describe('modo prueba en memoria', () => {
     await expect(r.ingresar(USUARIO_PRUEBA.email, 'x')).rejects.toMatchObject({ code: 'auth/invalid-credential' });
     let actual: string | null = null;
     r.escucharSesion((u) => { actual = u?.uid ?? null; });
-    await r.registrar('Ana', 'ana@ejemplo.com', 'secreta');
+    await r.registrar('Sofía', 'sofia@ejemplo.com', 'secreta');
     expect(actual).toMatch(/^u-/);
     expect(await r.leerRutinas(actual!)).toEqual([]);
     expect(await r.esAdmin(actual!)).toBe(false);
@@ -39,5 +39,34 @@ describe('modo prueba en memoria', () => {
     await r.ingresar(USUARIO_PRUEBA.email, CLAVE_PRUEBA);
     await r.borrarCuenta();
     await expect(r.ingresar(USUARIO_PRUEBA.email, CLAVE_PRUEBA)).rejects.toBeTruthy();
+  });
+});
+
+describe('modo prueba: entrenador y clientes', () => {
+  it('el entrenador ve a sus clientes; otro usuario no', async () => {
+    const r = new RepoMemoria();
+    await r.ingresar(USUARIO_PRUEBA.email, 'titanus');
+    const cs = await r.leerClientes(USUARIO_PRUEBA.uid);
+    expect(cs.map((c) => c.nombreCliente).sort()).toEqual(['Ana Ruiz', 'Bruno Paz', 'Carla Gómez']);
+    expect((await r.leerPerfilDe('c-ana'))?.nombre).toBe('Ana Ruiz');
+    await r.ingresar('bruno@ejemplo.com', 'titanus');
+    await expect(r.leerHistorial('c-ana', 5)).rejects.toMatchObject({ code: 'permission-denied' });
+  });
+  it('la clienta no cambia la rutina asignada y puede cortar el vínculo', async () => {
+    const r = new RepoMemoria();
+    await r.ingresar('ana@ejemplo.com', 'titanus');
+    const rs = await r.leerRutinas('c-ana');
+    const asignada = rs.find((x) => x.asignadaPor)!;
+    await expect(r.guardarRutina('c-ana', { ...asignada, nombre: 'Otra' })).rejects.toMatchObject({ code: 'permission-denied' });
+    const [v] = await r.leerMisProfesionales('c-ana');
+    await r.terminarVinculo(v.id);
+    await r.ingresar(USUARIO_PRUEBA.email, 'titanus');
+    await expect(r.leerPerfilDe('c-ana')).rejects.toMatchObject({ code: 'permission-denied' });
+  });
+  it('vincularse exige un código válido', async () => {
+    const r = new RepoMemoria();
+    await r.ingresar('carla@ejemplo.com', 'titanus');
+    await expect(r.vincular({ uid: 'c-carla', nombre: 'Carla' }, 'TIT-NADA', 'entrenador')).rejects.toMatchObject({ code: 'pro/codigo' });
+    await expect(r.vincular({ uid: 'prueba', nombre: 'Marco' }, 'tit m4rc', 'entrenador')).rejects.toMatchObject({ code: 'pro/propio' });
   });
 });

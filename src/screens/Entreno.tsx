@@ -80,13 +80,14 @@ export default function Entreno() {
               <div className="flex flex-1 items-start justify-between gap-3">
                 <Link to={`/rutinas/${r.id}`} className="flex-1">
                   <h3 className="titulo-tarjeta">{r.nombre}</h3>
+                  {r.asignadaPor && <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[.1em] oro" data-testid="de-tu-entrenador"><Icono n="escudo" size={13} />De tu entrenador{r.nombreAsignador ? ` · ${r.nombreAsignador}` : ''}</span>}
                   <p className="mt-1 text-[13px] oro">{r.dias.length ? r.dias.map((d) => NOMBRES_DIA[d]).join(' · ') : 'Sin día fijo'} · ≈ {minutosEstimados(r)} min</p>
                   <p className="mt-1 text-[14px] text-mu line-clamp-2">
                     {r.ejercicios.map((e) => buscarEjercicio(e.ejercicioId, propios)?.nombre).filter(Boolean).join(', ') || 'Sin ejercicios'}
                   </p>
                 </Link>
-                <Link to={`/rutinas/${r.id}`} aria-label={`Editar ${r.nombre}`} className="toque -mr-2 flex items-center justify-center text-mu">
-                  <Icono n="editar" size={20} />
+                <Link to={`/rutinas/${r.id}`} aria-label={r.asignadaPor ? `Ver ${r.nombre}` : `Editar ${r.nombre}`} className="toque -mr-2 flex items-center justify-center text-mu">
+                  <Icono n={r.asignadaPor ? 'escudo' : 'editar'} size={20} />
                 </Link>
               </div>
               <button className="btn mt-4 h-11 w-full text-[15px]" disabled={enCurso || !r.ejercicios.length}

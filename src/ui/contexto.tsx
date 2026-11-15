@@ -1,12 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Repo, Usuario } from '../data/repo';
 import type { Perfil, Tema } from '../lib/tipos';
+import type { Profesional } from '../pro/tipos';
 
 interface Ctx {
   repo: Repo;
   usuario: Usuario | null;
   perfil: Perfil | null;
   admin: boolean;
+  /** Si es profesional activo (entrenador, nutricionista…) */
+  profesional: Profesional | null;
+  recargarProfesional: () => Promise<void>;
   cargando: boolean;
   cambiarPerfil: (c: Partial<Perfil>) => Promise<void>;
   recargarPerfil: () => Promise<void>;
@@ -27,6 +31,7 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [admin, setAdmin] = useState(false);
+  const [profesional, setProfesional] = useState<Profesional | null>(null);
   const [cargando, setCargando] = useState(true);
   const [mensaje, setMensaje] = useState<string | null>(null);
 
@@ -38,6 +43,7 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
     if (!u) {
       setPerfil(null);
       setAdmin(false);
+      setProfesional(null);
       setCargando(false);
       return;
     }
@@ -46,9 +52,10 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
     const mismo = antes?.uid === u.uid;
     if (!mismo) setCargando(true);
     try {
-      const [p, a] = await Promise.all([repo.leerPerfil(u), repo.esAdmin(u.uid)]);
+      const [p, a, pro] = await Promise.all([repo.leerPerfil(u), repo.esAdmin(u.uid), repo.leerProfesional(u.uid).catch(() => null)]);
       setPerfil(p);
       setAdmin(a);
+      setProfesional(pro?.activo ? pro : null);
       aplicarTema(p.tema);
     } finally {
       setCargando(false);
@@ -73,13 +80,19 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
     if (usuario) setPerfil(await repo.leerPerfil(usuario));
   }, [repo, usuario]);
 
+  const recargarProfesional = useCallback(async () => {
+    if (!usuario) return;
+    const pro = await repo.leerProfesional(usuario.uid).catch(() => null);
+    setProfesional(pro?.activo ? pro : null);
+  }, [repo, usuario]);
+
   const aviso = useCallback((t: string) => {
     setMensaje(t);
     window.setTimeout(() => setMensaje((m) => (m === t ? null : m)), 2600);
   }, []);
 
-  const v = useMemo(() => ({ repo, usuario, perfil, admin, cargando, cambiarPerfil, recargarPerfil, aviso, mensaje }),
-    [repo, usuario, perfil, admin, cargando, cambiarPerfil, recargarPerfil, aviso, mensaje]);
+  const v = useMemo(() => ({ repo, usuario, perfil, admin, profesional, recargarProfesional, cargando, cambiarPerfil, recargarPerfil, aviso, mensaje }),
+    [repo, usuario, perfil, admin, profesional, recargarProfesional, cargando, cambiarPerfil, recargarPerfil, aviso, mensaje]);
   return <C.Provider value={v}>{children}</C.Provider>;
 }
 

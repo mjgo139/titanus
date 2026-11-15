@@ -13,6 +13,10 @@ const Resumen = lazy(() => import('./screens/Resumen'));
 const Progreso = lazy(() => import('./screens/Progreso'));
 const DetalleEjercicio = lazy(() => import('./screens/DetalleEjercicio'));
 const Perfil = lazy(() => import('./screens/Perfil'));
+const PanelClientes = lazy(() => import('./pro/PanelClientes'));
+const FichaCliente = lazy(() => import('./pro/FichaCliente'));
+const MiProfesional = lazy(() => import('./pro/MiProfesional'));
+const Admin = lazy(() => import('./pro/Admin'));
 
 export default function App() {
   const { usuario, perfil, cargando } = useApp();
@@ -34,6 +38,11 @@ export default function App() {
               <Route path="progreso" element={<Progreso />} />
               <Route path="progreso/ejercicio/:id" element={<DetalleEjercicio />} />
               <Route path="perfil" element={<Perfil />} />
+              <Route path="clientes" element={<PanelClientes />} />
+              <Route path="clientes/:uid" element={<FichaCliente />} />
+              <Route path="clientes/:uid/rutinas/:id" element={<EditarRutina />} />
+              <Route path="mi-entrenador" element={<MiProfesional />} />
+              <Route path="admin" element={<Admin />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

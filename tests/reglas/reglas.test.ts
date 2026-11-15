@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 import {
   assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, getDocs, collection, setDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, getDocs, collection, query, setDoc, updateDoc, where } from 'firebase/firestore';
 
 let env: RulesTestEnvironment;
 
@@ -83,5 +83,119 @@ describe('reglas de Firestore', () => {
     const ana = env.authenticatedContext('ana').firestore();
     await assertSucceeds(getDoc(doc(ana, 'config/admins')));
     await assertFails(setDoc(doc(ana, 'config/admins'), { uids: ['ana'] }));
+  });
+
+  describe('profesionales y clientes', () => {
+    // ana = admin · pepe = entrenador activo · beto = cliente de pepe · zoe = otra persona
+    const vinculo = (extra = {}) => ({
+      id: 'pepe_beto', profesionalId: 'pepe', clienteId: 'beto', tipo: 'entrenador',
+      nombreProfesional: 'Pepe', nombreCliente: 'Beto', codigo: 'TIT-PEPE', desde: 1, activo: true, ...extra,
+    });
+    async function preparar(activo = true) {
+      await env.withSecurityRulesDisabled(async (c) => {
+        const db = c.firestore();
+        await setDoc(doc(db, 'config/admins'), { uids: ['ana'] });
+        await setDoc(doc(db, 'profesionales/pepe'), { uid: 'pepe', tipo: 'entrenador', nombre: 'Pepe', codigo: 'TIT-PEPE', activo, alta: 1 });
+        await setDoc(doc(db, 'codigos/TIT-PEPE'), { codigo: 'TIT-PEPE', profesionalId: 'pepe', tipo: 'entrenador', nombre: 'Pepe' });
+        await setDoc(doc(db, 'users/beto'), perfil('beto'));
+        await setDoc(doc(db, 'users/beto/workouts/w1'), entreno);
+      });
+    }
+
+    it('solo el admin da de alta profesionales; nadie se nombra a sí mismo', async () => {
+      await preparar();
+      const zoe = env.authenticatedContext('zoe').firestore();
+      const ana = env.authenticatedContext('ana').firestore();
+      await assertFails(setDoc(doc(zoe, 'profesionales/zoe'), { uid: 'zoe', activo: true }));
+      await assertFails(setDoc(doc(zoe, 'codigos/TIT-ZOE1'), { profesionalId: 'zoe' }));
+      await assertSucceeds(setDoc(doc(ana, 'profesionales/zoe'), { uid: 'zoe', activo: true }));
+      // pedir ser profesional sí lo puede cualquiera, en estado pendiente
+      await assertSucceeds(setDoc(doc(zoe, 'solicitudes/zoe'), { uid: 'zoe', tipo: 'entrenador', nombre: 'Zoe', email: 'z@e.com', fecha: 1, estado: 'pendiente' }));
+      await assertFails(setDoc(doc(zoe, 'solicitudes/zoe'), { uid: 'zoe', tipo: 'entrenador', nombre: 'Zoe', email: 'z@e.com', fecha: 1, estado: 'aprobada' }));
+      await assertFails(getDocs(collection(zoe, 'solicitudes')));
+      await assertSucceeds(getDocs(collection(ana, 'solicitudes')));
+    });
+
+    it('sin vínculo el entrenador no ve nada del cliente', async () => {
+      await preparar();
+      const pepe = env.authenticatedContext('pepe').firestore();
+      await assertFails(getDoc(doc(pepe, 'users/beto')));
+      await assertFails(getDocs(collection(pepe, 'users/beto/workouts')));
+    });
+
+    it('el cliente se vincula con el código y el entrenador pasa a ver sus datos', async () => {
+      await preparar();
+      const beto = env.authenticatedContext('beto').firestore();
+      const pepe = env.authenticatedContext('pepe').firestore();
+      const zoe = env.authenticatedContext('zoe').firestore();
+      // código equivocado o vínculo a nombre de otro: no
+      await assertFails(setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo({ codigo: 'TIT-NADA' })));
+      await assertFails(setDoc(doc(zoe, 'vinculos/pepe_beto'), vinculo()));
+      await assertSucceeds(setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo()));
+      await assertSucceeds(getDoc(doc(pepe, 'users/beto')));
+      await assertSucceeds(getDocs(collection(pepe, 'users/beto/workouts')));
+      await assertSucceeds(getDocs(query(collection(pepe, 'vinculos'), where('profesionalId', '==', 'pepe'), where('activo', '==', true))));
+      await assertSucceeds(getDocs(query(collection(beto, 'vinculos'), where('clienteId', '==', 'beto'), where('activo', '==', true))));
+      // ver no es cambiar: el entrenador no toca entrenamientos ni el perfil
+      await assertFails(setDoc(doc(pepe, 'users/beto/workouts/w9'), entreno));
+      await assertFails(setDoc(doc(pepe, 'users/beto'), { nombre: 'X' }, { merge: true }));
+      // otra persona sigue sin ver nada
+      await assertFails(getDoc(doc(zoe, 'users/beto')));
+      await assertFails(getDocs(query(collection(zoe, 'vinculos'), where('profesionalId', '==', 'pepe'))));
+    });
+
+    it('rutinas asignadas: las maneja el entrenador; el cliente no las cambia', async () => {
+      await preparar();
+      const beto = env.authenticatedContext('beto').firestore();
+      const pepe = env.authenticatedContext('pepe').firestore();
+      await setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo());
+      const r = { nombre: 'Fuerza', ejercicios: [], dias: [1], orden: 0, asignadaPor: 'pepe', nombreAsignador: 'Pepe' };
+      await assertSucceeds(setDoc(doc(pepe, 'users/beto/routines/ra'), r));
+      await assertFails(setDoc(doc(pepe, 'users/beto/routines/rb'), { ...r, asignadaPor: 'otro' }));
+      await assertFails(setDoc(doc(beto, 'users/beto/routines/ra'), { ...r, nombre: 'Cambiada' }));
+      await assertFails(setDoc(doc(beto, 'users/beto/routines/rc'), r));
+      await assertSucceeds(setDoc(doc(beto, 'users/beto/routines/propia'), { nombre: 'Mía', ejercicios: [], dias: [], orden: 1 }));
+      await assertFails(setDoc(doc(pepe, 'users/beto/routines/propia'), { nombre: 'Mía', ejercicios: [], dias: [], orden: 1, asignadaPor: 'pepe' }));
+      await assertFails(deleteDoc(doc(pepe, 'users/beto/routines/propia')));
+      await assertSucceeds(deleteDoc(doc(pepe, 'users/beto/routines/ra')));
+    });
+
+    it('comentarios y objetivos', async () => {
+      await preparar();
+      const beto = env.authenticatedContext('beto').firestore();
+      const pepe = env.authenticatedContext('pepe').firestore();
+      await setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo());
+      const c = { autorId: 'pepe', autorNombre: 'Pepe', texto: 'Bien ahí', fecha: 1, leido: false };
+      await assertSucceeds(setDoc(doc(pepe, 'users/beto/comments/k1'), c));
+      await assertFails(setDoc(doc(pepe, 'users/beto/comments/k2'), { ...c, autorId: 'beto' }));
+      await assertSucceeds(updateDoc(doc(beto, 'users/beto/comments/k1'), { leido: true }));
+      await assertFails(updateDoc(doc(beto, 'users/beto/comments/k1'), { texto: 'otra cosa' }));
+      await assertSucceeds(setDoc(doc(beto, 'users/beto/comments/k3'), { ...c, autorId: 'beto', autorNombre: 'Beto' }));
+      const o = { tipo: 'frecuencia', titulo: '3 por semana', meta: 3, creadoPor: 'pepe', fecha: 1 };
+      await assertSucceeds(setDoc(doc(pepe, 'users/beto/goals/o1'), o));
+      await assertFails(setDoc(doc(beto, 'users/beto/goals/o2'), { ...o, creadoPor: 'beto' }));
+      await assertSucceeds(getDocs(collection(beto, 'users/beto/goals')));
+    });
+
+    it('al cortar el vínculo o dar de baja al entrenador, deja de ver', async () => {
+      await preparar();
+      const beto = env.authenticatedContext('beto').firestore();
+      const pepe = env.authenticatedContext('pepe').firestore();
+      await setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo());
+      await assertFails(updateDoc(doc(pepe, 'vinculos/pepe_beto'), { activo: true, clienteId: 'zoe' }));
+      await assertSucceeds(updateDoc(doc(beto, 'vinculos/pepe_beto'), { activo: false, hasta: 2 }));
+      await assertFails(getDoc(doc(pepe, 'users/beto')));
+      // se vuelve a vincular, y el admin lo da de baja
+      await assertSucceeds(setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo()));
+      await assertSucceeds(getDoc(doc(pepe, 'users/beto')));
+      await env.withSecurityRulesDisabled(async (x) => { await updateDoc(doc(x.firestore(), 'profesionales/pepe'), { activo: false }); });
+      await assertFails(getDoc(doc(pepe, 'users/beto')));
+    });
+
+    it('con un entrenador dado de baja no se puede vincular', async () => {
+      await preparar(false);
+      const beto = env.authenticatedContext('beto').firestore();
+      await assertFails(setDoc(doc(beto, 'vinculos/pepe_beto'), vinculo()));
+    });
   });
 });

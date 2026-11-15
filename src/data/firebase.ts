@@ -13,7 +13,9 @@ import type {
   Ejercicio, Entrenamiento, EstadoEjercicio, Perfil, RegistroCuerpo, Rutina,
 } from '../lib/tipos';
 import { firebaseConfig } from '../firebaseConfig';
-import type { Repo, Usuario } from './repo';
+import { ErrorApp, type Repo, type Usuario } from './repo';
+import type { Comentario, Objetivo, Profesional, Solicitud, TipoProfesional, Vinculo, Codigo } from '../pro/tipos';
+import { idVinculo, normalizarCodigo } from '../pro/logica';
 import { perfilInicial } from './semilla';
 
 /** Firestore no acepta `undefined`: lo quitamos antes de guardar */
@@ -102,7 +104,9 @@ export class RepoFirebase implements Repo {
     const hace = Date.now() - new Date(t.authTime).getTime();
     if (hace > 5 * 60_000) throw Object.assign(new Error('reciente'), { code: 'auth/requires-recent-login' });
     const uid = fu.uid;
-    for (const nombre of ['routines', 'customExercises', 'workouts', 'exerciseStats', 'bodyLogs']) {
+    // Se cortan los vínculos con profesionales antes de borrar
+    for (const v of await this.leerMisProfesionales(uid)) await this.terminarVinculo(v.id);
+    for (const nombre of ['routines', 'customExercises', 'workouts', 'exerciseStats', 'bodyLogs', 'comments', 'goals']) {
       const snap = await getDocs(this.col(uid, nombre));
       let lote = writeBatch(this.db);
       let n = 0;
@@ -210,6 +214,107 @@ export class RepoFirebase implements Repo {
       entrenamientos: await leer('workouts'),
       resumenesPorEjercicio: await leer('exerciseStats'),
       cuerpo: await leer('bodyLogs'),
+      comentarios: await leer('comments'),
+      objetivos: await leer('goals'),
+      vinculos: await this.leerMisProfesionales(uid),
     };
+  }
+
+  // ── Profesionales y clientes ──
+  private sinPermiso<T>(p: Promise<T>, siNo: T): Promise<T> {
+    return p.catch((e) => { if ((e as { code?: string })?.code === 'permission-denied') return siNo; throw e; });
+  }
+
+  async leerPerfilDe(uid: string) {
+    const s = await getDoc(this.u(uid));
+    return s.exists() ? ({ ...(s.data() as Perfil), uid, resumen: (s.data() as Perfil).resumen ?? { dias: [], total: 0 } }) : null;
+  }
+  async leerProfesional(uid: string) {
+    const s = await this.sinPermiso(getDoc(doc(this.db, 'profesionales', uid)), null);
+    return s?.exists() ? ({ ...(s.data() as Profesional), uid }) : null;
+  }
+  async leerMiSolicitud(uid: string) {
+    const s = await this.sinPermiso(getDoc(doc(this.db, 'solicitudes', uid)), null);
+    return s?.exists() ? ({ ...(s.data() as Solicitud), uid }) : null;
+  }
+  async enviarSolicitud(x: Solicitud) {
+    await setDoc(doc(this.db, 'solicitudes', x.uid), limpio(x));
+  }
+  async leerSolicitudes() {
+    const s = await getDocs(query(collection(this.db, 'solicitudes'), orderBy('fecha', 'desc'), limit(200)));
+    return s.docs.map((d) => ({ ...(d.data() as Solicitud), uid: d.id }));
+  }
+  async aprobarSolicitud(x: Solicitud, codigo: string) {
+    const p: Profesional = { uid: x.uid, tipo: x.tipo, nombre: x.nombre, codigo, activo: true, alta: Date.now() };
+    const c: Codigo = { codigo, profesionalId: x.uid, tipo: x.tipo, nombre: x.nombre };
+    const lote = writeBatch(this.db);
+    lote.set(doc(this.db, 'profesionales', x.uid), limpio(p));
+    lote.set(doc(this.db, 'codigos', codigo), limpio(c));
+    lote.set(doc(this.db, 'solicitudes', x.uid), { estado: 'aprobada' }, { merge: true });
+    await lote.commit();
+    return p;
+  }
+  async rechazarSolicitud(uid: string) {
+    await setDoc(doc(this.db, 'solicitudes', uid), { estado: 'rechazada' }, { merge: true });
+  }
+  async leerProfesionales() {
+    const s = await getDocs(collection(this.db, 'profesionales'));
+    return s.docs.map((d) => ({ ...(d.data() as Profesional), uid: d.id })).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }
+  async cambiarEstadoProfesional(uid: string, activo: boolean) {
+    await setDoc(doc(this.db, 'profesionales', uid), { activo }, { merge: true });
+  }
+  async vincular(cliente: { uid: string; nombre: string }, codigo: string, tipo: TipoProfesional) {
+    const cod = normalizarCodigo(codigo);
+    const s = await this.sinPermiso(getDoc(doc(this.db, 'codigos', cod)), null);
+    const c = s?.exists() ? (s.data() as Codigo) : null;
+    if (!c || c.tipo !== tipo) throw Object.assign(new ErrorApp('pro/codigo'), { code: 'pro/codigo' });
+    if (c.profesionalId === cliente.uid) throw Object.assign(new ErrorApp('pro/propio'), { code: 'pro/propio' });
+    const v: Vinculo = {
+      id: idVinculo(c.profesionalId, cliente.uid), profesionalId: c.profesionalId, clienteId: cliente.uid, tipo,
+      nombreProfesional: c.nombre, nombreCliente: cliente.nombre || 'Cliente', codigo: cod, desde: Date.now(), activo: true,
+    };
+    try {
+      await setDoc(doc(this.db, 'vinculos', v.id), limpio(v));
+    } catch (e) {
+      // Las reglas rechazan si el profesional está dado de baja
+      if ((e as { code?: string })?.code === 'permission-denied') throw Object.assign(new ErrorApp('pro/codigo'), { code: 'pro/codigo' });
+      throw e;
+    }
+    return v;
+  }
+  async leerMisProfesionales(clienteId: string) {
+    const s = await getDocs(query(collection(this.db, 'vinculos'), where('clienteId', '==', clienteId), where('activo', '==', true)));
+    return s.docs.map((d) => ({ ...(d.data() as Vinculo), id: d.id }));
+  }
+  async leerClientes(profesionalId: string) {
+    const s = await getDocs(query(collection(this.db, 'vinculos'), where('profesionalId', '==', profesionalId), where('activo', '==', true)));
+    return s.docs.map((d) => ({ ...(d.data() as Vinculo), id: d.id }));
+  }
+  async terminarVinculo(id: string) {
+    await setDoc(doc(this.db, 'vinculos', id), { activo: false, hasta: Date.now() }, { merge: true });
+  }
+  async leerComentarios(clienteId: string) {
+    const s = await getDocs(query(this.col(clienteId, 'comments'), orderBy('fecha', 'desc'), limit(100)));
+    return s.docs.map((d) => ({ ...(d.data() as Comentario), id: d.id }));
+  }
+  async guardarComentario(clienteId: string, c: Comentario) {
+    await sinBloquear(setDoc(doc(this.col(clienteId, 'comments'), c.id), limpio(c)));
+  }
+  async marcarLeidos(clienteId: string, ids: string[]) {
+    if (!ids.length) return;
+    const lote = writeBatch(this.db);
+    for (const id of ids) lote.set(doc(this.col(clienteId, 'comments'), id), { leido: true }, { merge: true });
+    await sinBloquear(lote.commit());
+  }
+  async leerObjetivos(clienteId: string) {
+    const s = await getDocs(this.col(clienteId, 'goals'));
+    return s.docs.map((d) => ({ ...(d.data() as Objetivo), id: d.id })).sort((a, b) => a.fecha - b.fecha);
+  }
+  async guardarObjetivo(clienteId: string, o: Objetivo) {
+    await sinBloquear(setDoc(doc(this.col(clienteId, 'goals'), o.id), limpio(o)));
+  }
+  async borrarObjetivo(clienteId: string, id: string) {
+    await sinBloquear(deleteDoc(doc(this.col(clienteId, 'goals'), id)));
   }
 }

@@ -35,6 +35,13 @@ const P: Record<string, string> = {
   abajo: 'M6 9l6 6 6-6',
   play: 'M8 5v14l11-7L8 5Z',
   pausa: 'M9 5v14M15 5v14',
+  clientes: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM2 21v-2c0-4.5 14-4.5 14 0v2M16 3.5a4 4 0 0 1 0 7.5M18 14c2.4.6 4 2 4 4.5V21',
+  mensaje: 'M4 5h16v11H9l-5 4V5ZM8 9h8M8 12h5',
+  objetivo: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 12h.01',
+  escudo: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z',
+  enlace: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+  copiar: 'M8 8h11v12H8zM5 16V4h11',
+  alerta: 'M12 3 2 20h20L12 3ZM12 10v4M12 17h.01',
   google: '',
 };
 

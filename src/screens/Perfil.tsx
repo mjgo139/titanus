@@ -10,6 +10,7 @@ import type { ModoSobrecarga, Recordatorio, Tema, Unidad } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Hoja, Seccion, Selector } from '../ui/piezas';
+import { SeccionPro } from '../pro/SeccionPerfil';
 
 export default function Perfil() {
   const { repo, usuario, perfil, admin, cambiarPerfil, aviso } = useSesion();
@@ -161,6 +162,8 @@ export default function Perfil() {
           )}
         </div>
       </Seccion>
+
+      <SeccionPro />
 
       <Seccion titulo="Tus datos">
         <div className="tarjeta py-1">

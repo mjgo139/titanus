@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.7.0',
+    fecha: '2026-11-15',
+    cambios: [
+      'Entrenadores: panel de clientes con alertas, código de invitación y enlace por WhatsApp.',
+      'Ficha de cada cliente: resumen, entrenamientos con comentarios, rutinas asignadas, progreso, objetivos y mensajes.',
+      'Clientes: se vinculan con el código, ven "De tu entrenador", objetivos y mensajes, y pueden cortar el vínculo.',
+      'Administración: aprobar solicitudes y dar de alta o de baja a los profesionales.',
+    ],
+  },
+  {
     version: '1.6.2',
     fecha: '2026-11-15',
     cambios: [

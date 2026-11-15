@@ -10,6 +10,7 @@ import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando } from '../ui/piezas';
 import { useEmpezar } from './empezar';
+import { AvisoHoy } from '../pro/AvisoHoy';
 
 export function minutosEstimados(r: Rutina): number {
   return Math.max(10, Math.round(r.ejercicios.reduce((t, e) => t + e.series * (e.descanso + 40), 0) / 60 / 5) * 5);
@@ -54,6 +55,8 @@ export default function Hoy() {
       </div>
 
       <div className="divisor my-[17px]" />
+
+      <AvisoHoy />
 
       {/* Celular: una columna. PC: dos columnas con filas alineadas (encabezado, tarjeta, título, contenido) */}
       <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-x-8 lg:gap-y-3">

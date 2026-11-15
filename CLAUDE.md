@@ -31,8 +31,9 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 - `src/lib/` lógica pura con pruebas (`logica.ts`, `entreno.ts`, `biblioteca.ts`, `frases.ts`).
 - `src/data/repo.ts` interfaz única de datos. `memoria.ts` = modo prueba; `firebase.ts` = real.
 - `src/screens/` pantallas: `Acceso` (portada), `Hoy` (Inicio), `Entreno` (libre + rutinas), `Entrenar` (en vivo, estilo Hevy), `Resumen`, `Progreso`, `DetalleEjercicio`, `Perfil`. `src/ui/` piezas comunes.
+- `src/pro/` **base reutilizable "profesional y sus clientes"** (sirve para entrenadores hoy y nutricionistas mañana): `tipos.ts`, `logica.ts` (con pruebas), `especialidades.ts` (palabras y prefijo de código por tipo; `TIPO_APP = 'entrenador'`), `piezas.tsx` (medallón, estado, comentarios, objetivos), pantallas genéricas `PanelClientes`, `FichaCliente` (pestañas que define cada especialidad), `MiProfesional` (lado del cliente), `Admin`, `SeccionPerfil`, `AvisoHoy`. Lo propio del gimnasio está en `src/pro/entrenador/` (`Ficha.tsx` con las secciones y `medir.ts` para objetivos).
 - `src/assets/` imágenes de estatuas del diseño del dueño (TITANUS_app.html).
-- Firestore: `users/{uid}` + subcolecciones `routines`, `customExercises`, `workouts`, `exerciseStats`, `bodyLogs`. Reglas en `firestore.rules`.
+- Firestore: `users/{uid}` + subcolecciones `routines`, `customExercises`, `workouts`, `exerciseStats`, `bodyLogs`, `comments`, `goals`. Colecciones de la plataforma: `profesionales/{uid}` y `codigos/{codigo}` (solo los escribe el admin), `solicitudes/{uid}` (las crea el usuario), `vinculos/{profId_clienteId}` (lo crea el cliente con un código válido = su permiso; cualquiera de los dos lo corta). Reglas en `firestore.rules`: un profesional **activo** con vínculo **activo** puede leer los datos del cliente, escribir rutinas con `asignadaPor` = él, comentarios y objetivos; nunca entrenamientos ni perfil.
 - Para ahorrar lecturas: el perfil guarda `resumen` (días entrenados) y `exerciseStats` guarda la última vez y los puntos del gráfico. El entrenamiento en curso se guarda en el teléfono y se sube una sola vez al terminar.
 
 ## Dirección de diseño (decidida por el dueño el 14/11/2026, manda sobre la sección "Estilo visual" de abajo)
@@ -51,6 +52,7 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 - **Sobrecarga progresiva (`src/lib/sobrecarga.ts`):** doble progresión. Perfil → `sobrecarga {modo: auto|manual|apagada, superior, inferior}` (kg). Auto carga el peso nuevo al empezar la rutina; manual pregunta al empezar (hoja "Sobrecarga progresiva", una vez por entrenamiento), nunca durante la serie.
 - **Regla de ancho:** las pruebas de pantallas fallan si algo es más ancho que la pantalla del celular.
 - **Modo prueba:** la cuenta de ejemplo y el invitado ven la plantilla Full body hecha 8 semanas (`datosDePrueba`).
+- **Profesionales (v1.7.0):** la app sigue sirviendo para usarla solo. El dueño (admin) aprueba en Perfil → Administrar profesionales; al aprobar se genera el código (`TIT-XXXX`). El entrenador invita con el código o el enlace `/?codigo=TIT-XXXX` (WhatsApp). El cliente acepta viendo los permisos. Rutinas asignadas: el cliente no las edita (ve "De tu entrenador"), pero sí ajusta peso/reps al entrenar. Estado del cliente: al día < 4 días, atención 4–7, inactivo > 7. Modo prueba: Marco es entrenador (`TIT-M4RC`) con Ana (`ana@ejemplo.com` / `titanus`), Bruno (inactivo) y Carla (nueva), y una solicitud pendiente de Diego. Para otra especialidad: agregar su tipo en `especialidades.ts`, su carpeta como `entrenador/` y cambiar `TIPO_APP`.
 - Rangos por entrenamientos: Recluta 0, Legionario 10, Decurión 30, Centurión 60, Tribuno 120, Legado 200, César 365. Nivel = total/5 + 1.
 
 ## Reglas de trabajo

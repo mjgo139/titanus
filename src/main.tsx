@@ -13,6 +13,10 @@ import './index.css';
 import App from './App';
 import type { Repo } from './data/repo';
 import { ProveedorApp } from './ui/contexto';
+import { guardarInvitacionDeLaUrl } from './pro/MiProfesional';
+
+// Enlace de invitación de un entrenador (?codigo=TIT-XXXX): se guarda para después de ingresar
+guardarInvitacionDeLaUrl();
 
 /** Modo prueba: al armar con --mode demo, o abriendo la web con ?prueba=1 */
 function esModoPrueba(): boolean {
