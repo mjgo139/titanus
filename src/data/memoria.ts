@@ -88,24 +88,26 @@ export class RepoMemoria implements Repo {
       if (!t) return;
       const g = JSON.parse(t) as { usuario: Usuario | null; cuentas: [string, { u: Usuario; clave: string }][]; datos: Record<string, DatosPlanos>; comun?: ComunPlano };
       this.usuario = g.usuario;
-      this.cuentas = new Map(g.cuentas);
-      this.datos = new Map(Object.entries(g.datos).map(([uid, d]) => [uid, {
-        perfil: d.perfil,
-        rutinas: new Map(d.rutinas.map((x) => [x.id, x])),
-        propios: new Map(d.propios.map((x) => [x.id, x])),
-        estados: new Map(d.estados.map((x) => [x.ejercicioId, x])),
-        historial: d.historial,
-        cuerpo: new Map(d.cuerpo.map((x) => [x.id, x])),
-        comentarios: new Map((d.comentarios ?? []).map((x) => [x.id, x])),
-        objetivos: new Map((d.objetivos ?? []).map((x) => [x.id, x])),
-      }]));
+      // Se suma lo guardado sobre los datos de ejemplo (no se reemplaza): si la sesión la guardó una versión
+      // anterior, igual aparecen las cuentas y clientes de ejemplo que se agregaron después.
+      for (const [email, c] of g.cuentas) this.cuentas.set(email, c);
+      for (const [uid, d] of Object.entries(g.datos ?? {})) {
+        this.datos.set(uid, {
+          perfil: d.perfil,
+          rutinas: new Map((d.rutinas ?? []).map((x) => [x.id, x])),
+          propios: new Map((d.propios ?? []).map((x) => [x.id, x])),
+          estados: new Map((d.estados ?? []).map((x) => [x.ejercicioId, x])),
+          historial: d.historial ?? [],
+          cuerpo: new Map((d.cuerpo ?? []).map((x) => [x.id, x])),
+          comentarios: new Map((d.comentarios ?? []).map((x) => [x.id, x])),
+          objetivos: new Map((d.objetivos ?? []).map((x) => [x.id, x])),
+        });
+      }
       if (g.comun) {
-        this.comun = {
-          profesionales: new Map(g.comun.profesionales.map((x) => [x.uid, x])),
-          solicitudes: new Map(g.comun.solicitudes.map((x) => [x.uid, x])),
-          codigos: new Map(g.comun.codigos.map((x) => [x.codigo, x])),
-          vinculos: new Map(g.comun.vinculos.map((x) => [x.id, x])),
-        };
+        for (const x of g.comun.profesionales ?? []) this.comun.profesionales.set(x.uid, x);
+        for (const x of g.comun.solicitudes ?? []) this.comun.solicitudes.set(x.uid, x);
+        for (const x of g.comun.codigos ?? []) this.comun.codigos.set(x.codigo, x);
+        for (const x of g.comun.vinculos ?? []) this.comun.vinculos.set(x.id, x);
       }
     } catch { /* datos viejos o dañados: se empieza de cero */ }
   }

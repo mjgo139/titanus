@@ -170,6 +170,14 @@ export default function Perfil() {
           <button className="fila w-full text-left" onClick={exportar}>
             <Icono n="descargar" className="oro" /><span className="flex-1 font-semibold">Exportar mis datos</span>
           </button>
+          {repo.modo === 'prueba' && (
+            <button className="fila w-full text-left" onClick={() => {
+              try { sessionStorage.removeItem('titanus-prueba-datos'); } catch { /* nada */ }
+              location.assign('/');
+            }}>
+              <Icono n="repetir" className="oro" /><span className="flex-1"><b>Volver a los datos de ejemplo</b><span className="block text-[12px] text-mu">Borra lo que probaste en esta pestaña</span></span>
+            </button>
+          )}
           <button className="fila w-full text-left" onClick={() => repo.salir()}>
             <Icono n="salir" className="text-mu" /><span className="flex-1 font-semibold">Cerrar sesión</span>
           </button>

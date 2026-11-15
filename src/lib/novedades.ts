@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.7.1',
+    fecha: '2026-11-15',
+    cambios: [
+      'Modo prueba: una pestaña abierta antes de una actualización ya no pierde las cuentas y clientes de ejemplo.',
+      'La ficha del cliente avisa si no puede cargar, en vez de quedarse cargando.',
+      'Modo prueba: botón "Volver a los datos de ejemplo" en Perfil.',
+    ],
+  },
+  {
     version: '1.7.0',
     fecha: '2026-11-15',
     cambios: [

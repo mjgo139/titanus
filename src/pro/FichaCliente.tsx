@@ -36,6 +36,7 @@ export default function FichaCliente() {
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   const [objetivos, setObjetivos] = useState<Objetivo[]>([]);
   const [cortar, setCortar] = useState(false);
+  const [error, setError] = useState(false);
   const secciones: Seccion[] = SECCIONES_ENTRENADOR;
   const actual = secciones.find((s) => s.id === params.get('ver'))?.id ?? secciones[0].id;
 
@@ -45,16 +46,35 @@ export default function FichaCliente() {
   useEffect(() => {
     if (!profesional) return;
     (async () => {
-      const v = (await repo.leerClientes(usuario.uid)).find((x) => x.clienteId === clienteId) ?? null;
-      setVinculo(v);
-      if (!v) return;
-      const [p] = await Promise.all([repo.leerPerfilDe(clienteId), recargarComentarios(), recargarObjetivos()]);
-      setPerfil(p);
+      try {
+        setError(false);
+        const v = (await repo.leerClientes(usuario.uid)).find((x) => x.clienteId === clienteId) ?? null;
+        setVinculo(v);
+        if (!v) return;
+        const [p] = await Promise.all([repo.leerPerfilDe(clienteId), recargarComentarios(), recargarObjetivos()]);
+        if (!p) setError(true);
+        setPerfil(p);
+      } catch {
+        setError(true);
+      }
     })();
   }, [repo, usuario.uid, clienteId, profesional, recargarComentarios, recargarObjetivos]);
 
   if (!profesional) return <Navigate to="/" replace />;
   if (vinculo === null) return <Navigate to="/clientes" replace />;
+  if (error) {
+    return (
+      <div>
+        <Encabezado atras="/clientes" etiqueta="Cliente" titulo={vinculo?.nombreCliente ?? 'Cliente'} />
+        <div className="tarjeta py-8 text-center" role="alert" data-testid="error-cliente">
+          <Icono n="alerta" size={30} className="oro mx-auto" />
+          <p className="mt-3 font-semibold">No se pudieron cargar los datos de este cliente.</p>
+          <p className="mt-1 text-[14px] text-mu">Revisá tu conexión y probá de nuevo. Si sigue igual, puede que haya cortado el vínculo.</p>
+          <button className="btn-sec mt-4" onClick={() => location.reload()}>Reintentar</button>
+        </div>
+      </div>
+    );
+  }
   if (!vinculo || !perfil) return <Cargando />;
 
   const ctx: CtxFicha = {

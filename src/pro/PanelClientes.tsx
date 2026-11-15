@@ -35,7 +35,7 @@ export default function PanelClientes() {
   useEffect(() => {
     if (!profesional) return;
     (async () => {
-      const vs = await repo.leerClientes(usuario.uid);
+      const vs = await repo.leerClientes(usuario.uid).catch(() => [] as Vinculo[]);
       const l = await Promise.all(vs.map(async (vinculo) => {
         const perfil = await repo.leerPerfilDe(vinculo.clienteId).catch(() => null);
         const dias = perfil?.resumen.dias ?? [];

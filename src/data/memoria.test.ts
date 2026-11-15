@@ -70,3 +70,34 @@ describe('modo prueba: entrenador y clientes', () => {
     await expect(r.vincular({ uid: 'prueba', nombre: 'Marco' }, 'tit m4rc', 'entrenador')).rejects.toMatchObject({ code: 'pro/propio' });
   });
 });
+
+describe('modo prueba: datos guardados por una versión anterior', () => {
+  it('suma las cuentas y clientes de ejemplo nuevos sin perder lo que había', async () => {
+    const guardado = new Map<string, string>();
+    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+      getItem: (k: string) => guardado.get(k) ?? null,
+      setItem: (k: string, v: string) => { guardado.set(k, v); },
+      removeItem: (k: string) => { guardado.delete(k); },
+    };
+    try {
+      // Así guardaba la sesión la versión 1.6: sin entrenador, sin clientes y sin la cuenta de Ana
+      const viejo = new RepoMemoria(Date.now(), false);
+      await viejo.ingresar(USUARIO_PRUEBA.email, 'titanus');
+      const plano = {
+        usuario: USUARIO_PRUEBA,
+        cuentas: [[USUARIO_PRUEBA.email, { u: USUARIO_PRUEBA, clave: 'titanus' }]],
+        datos: { [USUARIO_PRUEBA.uid]: { perfil: await viejo.leerPerfil(USUARIO_PRUEBA), rutinas: [], propios: [], estados: [], historial: [], cuerpo: [] } },
+      };
+      guardado.set('titanus-prueba-datos', JSON.stringify(plano));
+
+      const r = new RepoMemoria(Date.now(), true);
+      // Lo de antes se conserva (rutinas vacías) y aparecen los clientes de ejemplo
+      expect(await r.leerRutinas(USUARIO_PRUEBA.uid)).toEqual([]);
+      expect((await r.leerPerfilDe('c-ana'))?.nombre).toBe('Ana Ruiz');
+      await r.ingresar('ana@ejemplo.com', 'titanus');
+      expect((await r.leerMisProfesionales('c-ana')).length).toBe(1);
+    } finally {
+      delete (globalThis as { sessionStorage?: unknown }).sessionStorage;
+    }
+  });
+});

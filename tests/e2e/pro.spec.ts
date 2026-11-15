@@ -173,3 +173,32 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   await expect(page.getByText('Todavía no tenés clientes')).toBeVisible();
   await captura(page, '42-panel-vacio');
 });
+
+test('una pestaña con datos de una versión anterior igual ve los clientes de ejemplo', async ({ page }) => {
+  // Simula lo que guardaba la versión 1.6: solo la cuenta de Marco, sin clientes
+  await page.goto('/');
+  await page.evaluate(() => sessionStorage.setItem('titanus-prueba-datos', JSON.stringify({
+    usuario: null,
+    cuentas: [['marco@ejemplo.com', { u: { uid: 'prueba', email: 'marco@ejemplo.com', nombre: 'Marco' }, clave: 'titanus' }]],
+    datos: {},
+  })));
+  await page.reload();
+  await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+  await page.getByLabel('Correo').fill('marco@ejemplo.com');
+  await page.getByLabel('Contraseña').fill('titanus');
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await ir(page, 'Clientes');
+  await page.getByTestId('cliente').filter({ hasText: 'Ana Ruiz' }).click();
+  await expect(page.getByRole('heading', { name: /Ana Ruiz/ })).toBeVisible();
+  // Y Ana puede entrar
+  await ir(page, 'Perfil');
+  await page.getByRole('button', { name: 'Cerrar sesión' }).click();
+  await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+  await page.getByLabel('Correo').fill('ana@ejemplo.com');
+  await page.getByLabel('Contraseña').fill('titanus');
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await expect(page.getByRole('heading', { name: 'Ana Ruiz' })).toBeVisible();
+  // El botón de Perfil vuelve todo a cero
+  await page.getByRole('button', { name: /Volver a los datos de ejemplo/ }).click();
+  await expect(page.getByRole('button', { name: 'Iniciar sesión' })).toBeVisible();
+});
