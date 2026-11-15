@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { mensajeError } from '../data/repo';
-import avatar from '../assets/avatar.webp';
 import { NOMBRES_DIA, aUnidad, formatoNumero, rachaSemanas, rango, redondear, romano } from '../lib/logica';
 import { SOBRECARGA_POR_DEFECTO } from '../lib/sobrecarga';
 import { FormAcceso } from './Acceso';
 import { COMMIT, FECHA_ARMADO, NOVEDADES, VERSION } from '../lib/novedades';
 import { esNativo, programarRecordatorios } from '../lib/recordatorios';
-import type { ModoSobrecarga, Recordatorio, Tema, Unidad } from '../lib/tipos';
+import type { ModoSobrecarga, Recordatorio, Tema, Unidad, Figura } from '../lib/tipos';
+import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Hoja, Seccion, Selector } from '../ui/piezas';
@@ -57,7 +57,7 @@ export default function Perfil() {
       <div className="lg:sticky lg:top-6">
       <h1 className="titulo mt-6 mb-5 text-center lg:text-left">Perfil</h1>
       <div className="text-center">
-        <img src={avatar} alt="" className="mx-auto h-[100px] w-[100px] rounded-full border-2 border-gold object-cover" />
+        <img src={estatuas(perfil.figura).avatar} alt="" className="mx-auto h-[100px] w-[100px] rounded-full border-2 border-gold object-cover" />
         <h2 className="mt-3 font-display text-[25px] font-semibold">{perfil.nombre}</h2>
         <p className="oro mt-1">{rg.nombre} · Nivel {rg.nivel}</p>
         {rg.siguiente && (
@@ -96,6 +96,10 @@ export default function Perfil() {
       <Seccion titulo="Apariencia">
         <Selector<Tema> nombre="Apariencia" valor={perfil.tema} alCambiar={(t) => cambiarPerfil({ tema: t })}
           opciones={[{ v: 'oscuro', t: 'Noche romana' }, { v: 'claro', t: 'Mármol' }, { v: 'sistema', t: 'Sistema' }]} />
+        <div className="mt-3">
+          <Selector<Figura> nombre="Estatuas" valor={perfil.figura ?? 'hombre'} alCambiar={(f) => cambiarPerfil({ figura: f })}
+            opciones={[{ v: 'hombre', t: 'Legionario' }, { v: 'mujer', t: 'Legionaria' }]} />
+        </div>
       </Seccion>
 
       <Seccion titulo="Unidades">

@@ -115,6 +115,8 @@ export interface Recordatorio {
   dias: number[];
 }
 
+export type Figura = 'hombre' | 'mujer';
+
 export interface Perfil {
   uid: string;
   nombre: string;
@@ -123,6 +125,8 @@ export interface Perfil {
   unidad: Unidad;
   recordatorio: Recordatorio;
   sobrecarga?: AjustesSobrecarga;
+  /** Qué estatuas ve: legionario o legionaria */
+  figura?: Figura;
   creado: number;
   /** Fechas (ms) de los entrenamientos de las últimas semanas, para Hoy con 1 sola lectura */
   resumen: Resumen;

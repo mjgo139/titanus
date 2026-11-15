@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import espalda from '../assets/espalda.webp';
 import { buscarEjercicio } from '../lib/biblioteca';
 import {
   aKg, aUnidad, claveDia, contarSeries, duracion, fechaLarga, formatoNumero, formatoPeso, inicioDia, mejorSerie,
   rachaSemanas, rango, redondear, romano, semanasEnRango,
 } from '../lib/logica';
 import type { Ejercicio, Entrenamiento, EstadoEjercicio, RegistroCuerpo } from '../lib/tipos';
+import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando, GraficoBarras, GraficoLinea, Hoja, Selector, Vacio } from '../ui/piezas';
@@ -83,7 +83,7 @@ function ResumenProgreso() {
     <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
       <div>
       <div className="tarjeta relative min-h-[215px] overflow-hidden">
-        <img src={espalda} alt="" className="mascara-izq absolute -right-4 top-0 h-full w-[48%] object-cover" />
+        <img src={estatuas(perfil.figura).espalda} alt="" className="mascara-izq absolute -right-4 top-0 h-full w-[48%] object-cover" />
         <div className="relative z-[1]">
           <h3 className="font-display text-[20px] font-semibold">Tu evolución</h3>
           <p className="text-[12px] text-mu">Últimas 4 semanas</p>

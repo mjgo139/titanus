@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import avatar from '../assets/avatar.webp';
-import espalda from '../assets/espalda.webp';
 import { leerBorrador } from '../lib/borrador';
 import { fraseDelDia } from '../lib/frases';
 import { rachaSemanas, rango, romano, rutinaDeHoy, semanaActual } from '../lib/logica';
 import type { Rutina } from '../lib/tipos';
+import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando } from '../ui/piezas';
@@ -45,7 +44,7 @@ export default function Hoy() {
     <div className="pt-6">
       <div className="entrar flex items-center justify-between">
         <div className="flex items-center gap-[15px]">
-          <img src={avatar} alt="" className="h-[65px] w-[65px] rounded-full border-2 border-gold object-cover" />
+          <img src={estatuas(perfil.figura).avatar} alt="" className="h-[65px] w-[65px] rounded-full border-2 border-gold object-cover" />
           <div>
             <h1 className="font-display text-[20px] font-semibold">Hola, {perfil.nombre.split(' ')[0]}</h1>
             <p className="oro mt-1 text-[14px]" data-testid="rango">{r.nombre} · Nivel {r.nivel}</p>
@@ -81,7 +80,7 @@ export default function Hoy() {
         <div className="lg:col-start-1 lg:row-start-4">
           {!rutinas ? <Cargando /> : (
             <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:min-h-[232px]">
-              <img src={espalda} alt="" className="w-[40%] object-cover" />
+              <img src={estatuas(perfil.figura).espalda} alt="" className="w-[40%] object-cover" />
               <div className="flex flex-1 flex-col justify-center py-4 pr-4">
                 {deHoy ? <>
                   <div className="etiqueta oro">Día {romano(idx)} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : 'Primera sesión'}</div>

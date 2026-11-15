@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import legionario from '../assets/legionario.webp';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { leerBorrador } from '../lib/borrador';
 import { NOMBRES_DIA } from '../lib/logica';
 import type { Ejercicio, Rutina } from '../lib/tipos';
+import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando, Hoja, Vacio } from '../ui/piezas';
@@ -13,7 +13,7 @@ import { useEmpezar } from './empezar';
 import { minutosEstimados } from './Hoy';
 
 export default function Entreno() {
-  const { repo, usuario, aviso } = useSesion();
+  const { repo, usuario, perfil, aviso } = useSesion();
   const [plantilla, setPlantilla] = useState<Plantilla | null>(null);
   const [cargando, setCargando] = useState(false);
 
@@ -42,7 +42,7 @@ export default function Entreno() {
       <h1 className="titulo text-center lg:text-left">Entrenamiento</h1>
 
       <div className="relative -mx-[17px] mt-3 mb-3 h-[200px] overflow-hidden lg:mx-0 lg:h-[260px] lg:rounded-[14px] lg:border lg:border-ln">
-        <img src={legionario} alt="" className="mascara-izq absolute right-0 top-0 h-full w-[58%] object-cover lg:w-[45%]" />
+        <img src={estatuas(perfil.figura).legionario} alt="" className="mascara-izq absolute right-0 top-0 h-full w-[58%] object-cover lg:w-[45%]" />
         <div className="absolute bottom-4 left-[18px] max-w-[60%] lg:bottom-8 lg:left-8 lg:max-w-[50%]" style={{ textShadow: '0 2px 6px #000' }}>
           <div className="etiqueta oro">Forjá tu fuerza</div>
           <h2 className="mt-1 font-display text-[26px] font-semibold leading-tight lg:text-[38px]">Cada serie cuenta</h2>

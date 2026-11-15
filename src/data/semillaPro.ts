@@ -59,6 +59,9 @@ export function cargarEquipoDePrueba(ahora: number, h: {
     h.comun.vinculos.set(v.id, v);
   }
 
+  // Ana y Carla ven las estatuas de legionaria
+  for (const uid of ['c-ana', 'c-carla']) { const p = h.datos(uid).perfil; if (p) p.figura = 'mujer'; }
+
   // Ana: una rutina extra asignada por Marco, comentarios y objetivos
   const ana = h.datos('c-ana');
   ana.rutinas.set('r-marco-core', {

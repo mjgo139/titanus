@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.8.0',
+    fecha: '2026-11-15',
+    cambios: [
+      'Estatuas nuevas en alta calidad en la portada, Inicio, Entreno, Progreso, el resumen y el perfil.',
+      'Perfil → Apariencia: elegí ver estatuas de legionario o de legionaria.',
+    ],
+  },
+  {
     version: '1.7.1',
     fecha: '2026-11-15',
     cambios: [

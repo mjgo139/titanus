@@ -91,6 +91,8 @@ test('entrenador: panel de clientes, ficha, comentar, asignar rutina y fijar obj
 test('cliente: ve a su entrenador, la rutina asignada sin poder cambiarla y responde', async ({ page }) => {
   await entrar(page, 'ana@ejemplo.com');
   await expect(page.getByTestId('aviso-entrenador')).toContainText('1 nuevo');
+  // Ana eligió legionaria: ve esas estatuas
+  await expect(page.locator('img[src*="avatar-f"]').first()).toBeVisible();
   await captura(page, '37-cliente-inicio');
   await ir(page, 'Entreno');
   // No tiene pestaña de clientes

@@ -245,6 +245,8 @@ test('perfil: rango, apariencia, unidades, versión de admin y salir', async ({ 
   await page.getByRole('radio', { name: 'Automática' }).click();
   await expect(page.getByText('la rutina ya arranca con más peso')).toBeVisible();
   await page.getByRole('radio', { name: 'Libras (lb)' }).click();
+  await page.getByRole('radio', { name: 'Legionaria' }).click();
+  await expect(page.locator('img[src*="avatar-f"]').first()).toBeVisible();
   await expect(page.getByTestId('version')).toContainText('commit');
   await captura(page, '20-perfil');
   await page.getByRole('radio', { name: 'Mármol' }).click();

@@ -85,6 +85,12 @@ describe('reglas de Firestore', () => {
     await assertFails(setDoc(doc(ana, 'config/admins'), { uids: ['ana'] }));
   });
 
+  it('el perfil acepta legionario o legionaria y nada más', async () => {
+    const ana = env.authenticatedContext('ana').firestore();
+    await assertSucceeds(setDoc(doc(ana, 'users/ana'), { ...perfil('ana'), figura: 'mujer' }));
+    await assertFails(setDoc(doc(ana, 'users/ana'), { ...perfil('ana'), figura: 'robot' }));
+  });
+
   describe('profesionales y clientes', () => {
     // ana = admin · pepe = entrenador activo · beto = cliente de pepe · zoe = otra persona
     const vinculo = (extra = {}) => ({
