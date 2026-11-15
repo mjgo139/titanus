@@ -80,8 +80,8 @@ function Resumen(c: CtxFicha) {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="tarjeta">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section className="tarjeta min-w-0">
           <div className="etiqueta">Esta semana</div>
           <div className="mt-3 flex justify-between">
             {semanaActual(dias, ahora).map((x, i) => (
@@ -104,7 +104,7 @@ function Resumen(c: CtxFicha) {
           {d.historial.length > 0 && <button className="mt-2 text-[14px] font-semibold oro" onClick={() => c.irA('entrenos')}>Ver todos →</button>}
         </section>
 
-        <section>
+        <section className="min-w-0">
           <div className="mb-2 flex items-center justify-between">
             <span className="etiqueta">Objetivos</span>
             <button className="text-[13px] font-semibold oro" onClick={() => c.irA('objetivos')}>Administrar →</button>
@@ -283,8 +283,8 @@ function Progreso(c: CtxFicha) {
     .map((r) => ({ x: r.fecha, y: (r as unknown as Record<string, number>)[medida] }));
   const m = MEDIDAS.find((x) => x.v === medida)!;
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
-      <section>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
+      <section className="min-w-0">
         <div className="etiqueta mb-2">Ejercicios · {ejercicios.length}</div>
         {!ejercicios.length && <p className="tarjeta py-6 text-center text-mu">Sin registros todavía.</p>}
         <ul className="flex flex-col gap-2">
@@ -311,9 +311,9 @@ function Progreso(c: CtxFicha) {
           })}
         </ul>
       </section>
-      <section className="tarjeta">
+      <section className="tarjeta min-w-0">
         <div className="etiqueta">Cuerpo</div>
-        <div className="mt-3 overflow-x-auto"><Selector nombre="Medida" valor={medida} alCambiar={setMedida} opciones={MEDIDAS.map((x) => ({ v: x.v, t: x.t.replace(' corporal', '') }))} /></div>
+        <div className="mt-3 max-w-full overflow-x-auto"><Selector nombre="Medida" valor={medida} alCambiar={setMedida} opciones={MEDIDAS.map((x) => ({ v: x.v, t: x.t.replace(' corporal', '') }))} /></div>
         <div className="mt-3">
           {puntosCuerpo.length ? <GraficoLinea etiqueta={m.t} puntos={puntosCuerpo} formato={(n) => `${formatoNumero(redondear(n, 1))} ${m.u}`} />
             : <p className="py-6 text-center text-[14px] text-mu">Sin registros de {m.t.toLowerCase()}.</p>}
