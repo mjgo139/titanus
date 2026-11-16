@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { borrarBorrador, guardarBorrador, leerBorrador, type Borrador } from '../lib/borrador';
@@ -255,41 +255,49 @@ export default function Entrenar() {
         <button className="btn h-9 shrink-0 px-3.5 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
       </header>
 
-      {!(vista === 'foco' && b.ejercicios.length) && <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
-      <input aria-label="Nombre del entrenamiento" value={b.nombre}
-        onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
-        className="mt-4 w-full bg-transparent font-display text-[26px] font-semibold outline-none lg:mt-0 lg:text-[32px]" />
-
-      {/* Cabecera propia: anillo de avance con números romanos, tiempo y carga levantada */}
-      <div className="hero mt-3 flex items-center gap-4 px-4 py-3 text-left lg:mt-0" data-testid="metricas">
-        {(() => {
-          const total = b.ejercicios.reduce((t, e) => t + e.series.length, 0) || 1;
-          const avance = Math.min(1, hechas.length / total);
-          const R = 34, C = 2 * Math.PI * R;
-          return (
-            <div className="relative h-[84px] w-[84px] shrink-0" role="img" aria-label={`${hechas.length} de ${total} series hechas`}>
-              <svg viewBox="0 0 84 84" className="h-full w-full -rotate-90">
-                <circle cx="42" cy="42" r={R} fill="none" stroke="var(--ln2)" strokeWidth="5" />
-                <circle cx="42" cy="42" r={R} fill="none" stroke="var(--gold)" strokeWidth="5" strokeLinecap="round"
-                  strokeDasharray={C} strokeDashoffset={C * (1 - avance)} style={{ transition: 'stroke-dashoffset .5s ease' }} />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-                <span className="num text-[24px] oro">{hechas.length ? romano(hechas.length) : '0'}</span>
-                <span className="mt-1 text-[10px] uppercase tracking-[.12em] text-mu">de {romano(total)}</span>
+      {/* Cabecera de la lista: una sola franja con el avance, el nombre y las cifras */}
+      {!(vista === 'foco' && b.ejercicios.length) && (() => {
+        const total = b.ejercicios.reduce((t, e) => t + e.series.length, 0) || 1;
+        const avance = Math.min(1, hechas.length / total);
+        const R = 30, C = 2 * Math.PI * R;
+        const conEj = b.ejercicios.filter((e) => e.series.some((x) => x.hecha)).length;
+        const cifras: [ReactNode, ReactNode][] = [
+          [<>Carga<span className="hidden lg:inline"> levantada</span></>, <>{formatoNumero(redondear(aUnidad(volumen, u), 0))} <span className="text-[14px] text-mu">{u}</span></>],
+          ['Series', <>{hechas.length}<span className="text-[14px] text-mu"> / {total}</span></>],
+          ['Ejercicios', <>{conEj}<span className="text-[14px] text-mu"> / {b.ejercicios.length}</span></>],
+        ];
+        return (
+          <section className="hero mt-4 flex flex-wrap text-left items-center gap-x-6 gap-y-3 px-4 py-3 lg:flex-nowrap lg:px-6 lg:py-4" data-testid="metricas">
+            <div className="flex min-w-0 flex-1 items-center gap-4">
+              <div className="relative h-[72px] w-[72px] shrink-0" role="img" aria-label={`${hechas.length} de ${total} series hechas`}>
+                <svg viewBox="0 0 72 72" className="h-full w-full -rotate-90">
+                  <circle cx="36" cy="36" r={R} fill="none" stroke="var(--ln2)" strokeWidth="4" />
+                  <circle cx="36" cy="36" r={R} fill="none" stroke="var(--gold)" strokeWidth="4" strokeLinecap="round"
+                    strokeDasharray={C} strokeDashoffset={C * (1 - avance)} style={{ transition: 'stroke-dashoffset .5s ease' }} />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
+                  <span className="num text-[20px] oro">{hechas.length ? romano(hechas.length) : '0'}</span>
+                  <span className="mt-1 text-[9px] uppercase tracking-[.12em] text-mu">de {romano(total)}</span>
+                </div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="etiqueta">Entrenamiento en curso</div>
+                <input aria-label="Nombre del entrenamiento" value={b.nombre}
+                  onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
+                  className="w-full truncate border-b border-transparent bg-transparent font-display text-[24px] font-semibold leading-tight outline-none hover:border-ln2 focus:border-gold lg:text-[30px]" />
               </div>
             </div>
-          );
-        })()}
-        <div className="min-w-0 flex-1">
-          <div className="etiqueta">Carga levantada</div>
-          <div className="num mt-0.5 text-[30px] leading-none oro">{formatoNumero(redondear(aUnidad(volumen, u), 0))} <span className="text-[16px] text-mu">{u}</span></div>
-          <div className="mt-1.5 flex flex-wrap gap-x-3 text-[13px] text-mu">
-            <span>Series <b className="num text-tx">{hechas.length}</b></span>
-            <span>Ejercicios <b className="num text-tx">{b.ejercicios.filter((e) => e.series.some((x) => x.hecha)).length}/{b.ejercicios.length}</b></span>
-          </div>
-        </div>
-      </div>
-      </div>}
+            <dl className="grid w-full grid-cols-3 border-t border-ln2 pt-3 lg:flex lg:w-auto lg:shrink-0 lg:border-t-0 lg:pt-0">
+              {cifras.map(([t, v], k) => (
+                <div key={k} className={`min-w-0 px-2 first:pl-0 lg:px-6 lg:first:pl-6 ${k ? 'border-l border-ln2' : 'lg:border-l lg:border-ln2'}`}>
+                  <dt className="etiqueta truncate">{t}</dt>
+                  <dd className="num mt-1 text-[22px] leading-none oro lg:text-[26px]">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        );
+      })()}
 
       {b.ejercicios.length === 0 && (
         <div className="tarjeta mt-4 py-8 text-center">

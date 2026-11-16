@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.13.1',
+    fecha: '2026-11-16',
+    cambios: ['Cabecera de la lista renovada: una sola franja con el avance, el nombre y las cifras (carga, series y ejercicios).'],
+  },
+  {
     version: '1.13.0',
     fecha: '2026-11-16',
     cambios: [
