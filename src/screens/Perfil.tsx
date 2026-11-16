@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { mensajeError } from '../data/repo';
 import { NOMBRES_DIA, aUnidad, formatoNumero, rachaSemanas, rango, redondear, romano } from '../lib/logica';
@@ -171,6 +172,17 @@ export default function Perfil() {
 
       <Seccion titulo="Tus datos">
         <div className="tarjeta py-1">
+          <Link to="/conocerte?editar=1" className="fila w-full text-left" data-testid="datos-personales">
+            <Icono n="perfil" className="oro" />
+            <span className="flex-1"><b>Datos personales</b>
+              <span className="block text-[12px] text-mu">{[
+                perfil.nacimiento ? `${new Date().getFullYear() - Number(perfil.nacimiento.slice(0, 4))} años` : '',
+                perfil.altura ? `${perfil.altura} cm` : '',
+                perfil.objetivo ? { musculo: 'Ganar músculo', fuerza: 'Ganar fuerza', grasa: 'Perder grasa' }[perfil.objetivo] : '',
+                perfil.nivel ? perfil.nivel[0].toUpperCase() + perfil.nivel.slice(1) : '',
+              ].filter(Boolean).join(' · ') || 'Género, edad, peso, altura, objetivo y experiencia'}</span></span>
+            <Icono n="atras" size={18} className="rotate-180 text-mu" />
+          </Link>
           <button className="fila w-full text-left" onClick={exportar}>
             <Icono n="descargar" className="oro" /><span className="flex-1 font-semibold">Exportar mis datos</span>
           </button>

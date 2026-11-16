@@ -78,7 +78,7 @@ export default function Entreno() {
           {rutinas.map((r) => (
             <li key={r.id} className="tarjeta entrar flex flex-col">
               <div className="flex flex-1 items-start justify-between gap-3">
-                <Link to={`/rutinas/${r.id}`} className="flex-1">
+                <Link to={`/rutinas/${r.id}/ver`} className="flex-1" aria-label={`Abrir ${r.nombre}`}>
                   <h3 className="titulo-tarjeta">{r.nombre}</h3>
                   {r.asignadaPor && <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[.1em] oro" data-testid="de-tu-entrenador"><Icono n="escudo" size={13} />De tu entrenador{r.nombreAsignador ? ` · ${r.nombreAsignador}` : ''}</span>}
                   <p className="mt-1 text-[13px] oro">{r.dias.length ? r.dias.map((d) => NOMBRES_DIA[d]).join(' · ') : 'Sin día fijo'} · ≈ {minutosEstimados(r)} min</p>

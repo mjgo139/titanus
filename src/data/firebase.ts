@@ -196,6 +196,11 @@ export class RepoFirebase implements Repo {
     return s.docs.map((d) => ({ ...(d.data() as Entrenamiento), id: d.id }));
   }
 
+  async leerSesionesDeRutina(uid: string, rutinaId: string, limite: number) {
+    const s = await getDocs(query(this.col(uid, 'workouts'), where('rutinaId', '==', rutinaId), orderBy('inicio', 'desc'), limit(limite)));
+    return s.docs.map((d) => ({ ...(d.data() as Entrenamiento), id: d.id }));
+  }
+
   async leerCuerpo(uid: string) {
     const s = await getDocs(query(this.col(uid, 'bodyLogs'), orderBy('fecha', 'asc')));
     return s.docs.map((d) => ({ ...(d.data() as RegistroCuerpo), id: d.id }));

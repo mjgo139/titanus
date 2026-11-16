@@ -49,7 +49,7 @@ export function cargarEquipoDePrueba(ahora: number, h: {
       const d = h.datos(c.u.uid);
       d.perfil = {
         uid: c.u.uid, nombre: c.nombre, email: c.u.email, tema: 'oscuro', unidad: 'kg',
-        recordatorio: { activo: false, hora: '18:30', dias: [1, 3, 5] }, creado: ahora - c.hace * DIA, resumen: { dias: [], total: 0 },
+        recordatorio: { activo: false, hora: '18:30', dias: [1, 3, 5] }, creado: ahora - c.hace * DIA, resumen: { dias: [], total: 0 }, conocido: true,
       };
     }
     const v: Vinculo = {

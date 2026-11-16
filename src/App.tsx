@@ -13,6 +13,8 @@ const Resumen = lazy(() => import('./screens/Resumen'));
 const Progreso = lazy(() => import('./screens/Progreso'));
 const DetalleEjercicio = lazy(() => import('./screens/DetalleEjercicio'));
 const Perfil = lazy(() => import('./screens/Perfil'));
+const Conocerte = lazy(() => import('./screens/Conocerte'));
+const VerRutina = lazy(() => import('./screens/VerRutina'));
 const PanelClientes = lazy(() => import('./pro/PanelClientes'));
 const FichaCliente = lazy(() => import('./pro/FichaCliente'));
 const MiProfesional = lazy(() => import('./pro/MiProfesional'));
@@ -27,12 +29,18 @@ export default function App() {
         <Routes><Route path="*" element={<Acceso />} /></Routes>
       ) : (
         <Suspense fallback={<Cargando />}>
+          {!perfil.conocido ? (
+            // Primera vez: la bienvenida "Conocerte" antes que nada
+            <Routes><Route path="*" element={<Conocerte />} /></Routes>
+          ) : (
           <Routes>
+            <Route path="conocerte" element={<Conocerte />} />
             <Route element={<Marco />}>
               <Route index element={<Hoy />} />
               <Route path="entreno" element={<Entreno />} />
               <Route path="rutinas" element={<Navigate to="/entreno" replace />} />
               <Route path="rutinas/:id" element={<EditarRutina />} />
+              <Route path="rutinas/:id/ver" element={<VerRutina />} />
               <Route path="entrenar" element={<Entrenar />} />
               <Route path="resumen" element={<Resumen />} />
               <Route path="progreso" element={<Progreso />} />
@@ -46,6 +54,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
+          )}
         </Suspense>
       )}
     </BrowserRouter>

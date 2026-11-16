@@ -47,9 +47,35 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await page.getByLabel('Correo').fill('lucia@ejemplo.com');
   await page.getByLabel('Contraseña').fill('secreta1');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
+  // Bienvenida "Conocerte": seis preguntas
+  await expect(page.getByTestId('conocerte')).toBeVisible();
+  await page.getByRole('radio', { name: /Mujer/ }).click();
+  await captura(page, '02b-conocerte-genero');
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByLabel('Año').selectOption('1999');
+  await expect(page.getByText(/Tenés \d+ años/)).toBeVisible();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByLabel('Peso corporal', { exact: true }).fill('64.5');
+  await page.getByRole('button', { name: 'Más Peso corporal' }).click();
+  await captura(page, '02c-conocerte-peso');
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByLabel('Altura', { exact: true }).fill('168');
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('radio', { name: /Ganar fuerza/ }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('radio', { name: /Principiante/ }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await expect(page.getByText('Recomendado para vos')).toBeVisible();
+  await captura(page, '02d-conocerte-plan');
+  await page.getByRole('button', { name: 'Entrar a TITANUS' }).click();
   await expect(page.getByRole('heading', { name: 'Hola, Lucía' })).toBeVisible();
+  // Eligió mujer: ve las estatuas de legionaria y sus datos quedan en Perfil
+  await expect(page.locator('img[src*="avatar-f"]').first()).toBeVisible();
   await expect(page.getByTestId('rango')).toHaveText('Recluta · Nivel 1');
   await captura(page, '03-inicio-vacio');
+  await ir(page, 'Perfil');
+  await expect(page.getByTestId('datos-personales')).toContainText('168 cm');
+  await expect(page.getByTestId('datos-personales')).toContainText('Ganar fuerza');
 });
 
 test('modo prueba: la sesión sobrevive a una recarga', async ({ page }) => {
@@ -96,9 +122,14 @@ test('entreno: crear rutina con biblioteca y ejercicio propio', async ({ page })
   await page.getByPlaceholder('Ej.: Pecho y tríceps').fill('Hombros y abdomen');
   await page.getByRole('button', { name: 'Dom' }).click();
   await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
+  await expect(page.getByText('Tus más usados')).toBeVisible();
   await page.getByRole('button', { name: 'Hombros', exact: true }).click();
+  await page.getByRole('button', { name: 'Barra', exact: true }).click();
   await captura(page, '07-biblioteca');
-  await page.getByRole('button', { name: /Press militar/ }).click();
+  await page.getByRole('button', { name: 'Información de Press militar' }).click();
+  await expect(page.getByTestId('info-ejercicio')).toContainText('Sesiones');
+  await captura(page, '07b-info-ejercicio');
+  await page.getByTestId('info-ejercicio').getByRole('button', { name: 'Agregar ejercicio' }).click();
   await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
   await page.getByRole('button', { name: 'Crear ejercicio propio' }).click();
   await page.getByPlaceholder('Ej.: Remo en T').fill('Plancha con peso');
@@ -137,6 +168,7 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await page.getByRole('button', { name: 'Marcar serie 2 como hecha' }).first().click();
   await captura(page, '09-entrenar');
   await page.getByRole('button', { name: 'Saltar' }).click();
+  await page.getByRole('button', { name: 'Nota de Sentadilla' }).click();
   await page.getByLabel('Notas de Sentadilla').fill('Buena profundidad');
   await page.getByRole('button', { name: 'Tipo de la serie 3' }).first().click();
   await page.getByRole('button', { name: 'Al fallo' }).click();
@@ -348,4 +380,19 @@ test('editar rutina en un celular angosto: el mismo editor por serie, sin nada s
   await expect(otra.getByLabel('Peso serie 1 de Sentadilla')).toHaveValue('62.5');
   await expect(otra.getByLabel('Repeticiones serie 2 de Sentadilla')).toHaveValue('8');
   await expect(otra.getByTestId('serie-armado')).toHaveCount(5);
+});
+
+test('ficha de rutina: gráfico por sesión, ejercicios serie por serie y comenzar', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Entreno');
+  await page.getByRole('link', { name: 'Abrir A · Full body' }).click();
+  await expect(page.getByRole('heading', { name: 'A · Full body' })).toBeVisible();
+  await expect(page.getByTestId('grafico-rutina')).toContainText('Volumen por sesión');
+  await expect(page.getByTestId('ejercicio-rutina')).toHaveCount(7);
+  await captura(page, '08d-ficha-rutina');
+  await page.getByRole('radio', { name: 'Duración' }).click();
+  await expect(page.getByTestId('grafico-rutina')).toContainText('Duración por sesión');
+  await page.getByRole('button', { name: 'Comenzar rutina' }).click();
+  await sinSobrecarga(page);
+  await expect(page.getByRole('button', { name: 'Terminar', exact: true })).toBeVisible();
 });

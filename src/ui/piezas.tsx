@@ -183,8 +183,8 @@ export function GraficoLinea({ puntos, etiqueta, formato }: {
 }
 
 /** Barras por semana: valor sobre cada barra, fecha de cada semana y detalle al tocar */
-export function GraficoBarras({ datos, etiqueta, formato, formatoCorto, detalle }: {
-  datos: { fecha: number; y: number }[]; etiqueta: string; formato: (n: number) => string;
+export function GraficoBarras({ datos, etiqueta, formato, formatoCorto, detalle, mejor = 'Mejor semana' }: {
+  datos: { fecha: number; y: number }[]; etiqueta: string; formato: (n: number) => string; mejor?: string;
   formatoCorto?: (n: number) => string; detalle?: (i: number) => ReactNode;
 }) {
   const [sel, setSel] = useState<number | null>(null);
@@ -237,7 +237,7 @@ export function GraficoBarras({ datos, etiqueta, formato, formatoCorto, detalle 
         })}
       </svg>
       {detalle && <figcaption className="mt-2 rounded-[10px] border border-ln2 px-3 py-2 text-[13px]" data-testid="detalle-semana">{detalle(elegido)}</figcaption>}
-      {!detalle && <figcaption className="mt-1 text-right text-[12px] text-mu">Mejor semana: {formato(max)}</figcaption>}
+      {!detalle && <figcaption className="mt-1 text-right text-[12px] text-mu">{mejor}: {formato(max)}</figcaption>}
     </figure>
   );
 }

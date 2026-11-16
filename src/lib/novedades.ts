@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.10.0',
+    fecha: '2026-11-16',
+    cambios: [
+      'Bienvenida "Conocerte": género, nacimiento, peso (regla deslizable), altura, objetivo y experiencia, con un plan recomendado. Se edita en Perfil → Datos personales.',
+      'Biblioteca: filtro por equipo, "Tus más usados" y botón (i) con la animación y tus marcas del ejercicio.',
+      'Ficha de cada rutina: Comenzar, gráfico por sesión (volumen, repeticiones o duración) y ejercicios serie por serie.',
+      'Entrenando: la serie hecha se pinta de verde y cada ejercicio tiene botones de Descanso y Nota.',
+    ],
+  },
+  {
     version: '1.9.0',
     fecha: '2026-11-16',
     cambios: [

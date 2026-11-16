@@ -51,6 +51,8 @@ export interface Repo {
   ): Promise<void>;
   leerHistorial(uid: string, limite: number, antesDe?: number): Promise<Entrenamiento[]>;
 
+  /** Últimas sesiones de una rutina (para su ficha): lee solo esas */
+  leerSesionesDeRutina(uid: string, rutinaId: string, limite: number): Promise<Entrenamiento[]>;
   leerCuerpo(uid: string): Promise<RegistroCuerpo[]>;
   guardarCuerpo(uid: string, r: RegistroCuerpo): Promise<void>;
 

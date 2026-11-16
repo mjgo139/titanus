@@ -141,3 +141,10 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 @keyframes movimiento { 0%, 35% { opacity: 0; } 50%, 85% { opacity: 1; } 100% { opacity: 0; } }
 .animar-movimiento { animation: movimiento 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .animar-movimiento { animation: none; opacity: 0; } }
+
+/* Regla deslizable de la bienvenida: sin barra de desplazamiento, con imán suave */
+.regla { scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+.regla::-webkit-scrollbar { display: none; }
+
+/* Serie hecha: la fila entera se tiñe de verde ("hecho" de la guía), como en Hevy */
+.serie-hecha { background: color-mix(in srgb, var(--verde) 20%, transparent); }

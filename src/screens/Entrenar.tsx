@@ -62,6 +62,7 @@ export default function Entrenar() {
   const [pos, setPos] = useState<Posicion | null>(null);
   const [elegidos, setElegidos] = useState<Record<number, boolean>>({});
   const [eliminarEj, setEliminarEj] = useState<number | null>(null);
+  const [notaAbierta, setNotaAbierta] = useState<Record<number, boolean>>({});
   /** Valor elegido por el usuario en la hoja de sobrecarga (kg o reps, según el caso) */
   const [valores, setValores] = useState<Record<number, number>>({});
   const cambiarVista = (v: 'foco' | 'lista') => { setVista(v); try { localStorage.setItem('titanus-vista', v); } catch { /* nada */ } };
@@ -293,12 +294,22 @@ export default function Entrenar() {
                   <Icono n="progreso" size={14} className="oro shrink-0" />Sobrecarga aplicada: {formatoNumero(redondear(aUnidad(e.sugerencia.peso, u)))} {u}
                 </p>
               )}
-              <input aria-label={`Notas de ${ej?.nombre}`} placeholder="Agregar notas aquí…" value={e.nota ?? ''}
-                onChange={(ev) => { const v = ev.target.value; cambiar((x) => { x.ejercicios[i].nota = v; }); }}
-                className="mt-2 w-full bg-transparent text-[14px] text-tx2 outline-none placeholder:text-mu2" />
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <button className="chip h-8 gap-1.5 px-3 text-[13px]" onClick={() => setMenuEj(i)} aria-label={`Descanso de ${ej?.nombre}`}>
+                  <Icono n="reloj" size={15} className="oro" />Descanso: {textoDescanso(e.descanso ?? DESCANSO_POR_DEFECTO)}
+                </button>
+                <button className={`chip h-8 gap-1.5 px-3 text-[13px] ${e.nota || notaAbierta[i] ? 'chip-on' : ''}`} aria-label={`Nota de ${ej?.nombre}`}
+                  onClick={() => setNotaAbierta((x) => ({ ...x, [i]: !x[i] }))}>
+                  <Icono n="editar" size={14} />Nota
+                </button>
+              </div>
+              {(e.nota || notaAbierta[i]) && (
+                <input aria-label={`Notas de ${ej?.nombre}`} placeholder="Agregar notas aquí…" value={e.nota ?? ''} autoFocus={!e.nota}
+                  onChange={(ev) => { const v = ev.target.value; cambiar((x) => { x.ejercicios[i].nota = v; }); }}
+                  className="mt-2 w-full rounded-[8px] border border-ln2 bg-transparent px-3 py-2 text-[14px] text-tx2 outline-none placeholder:text-mu2 focus:border-gold" />
+              )}
               <AccionesEjercicio i={i} total={b.ejercicios.length} nombre={ej?.nombre ?? 'ejercicio'}
-                descanso={textoDescanso(e.descanso ?? DESCANSO_POR_DEFECTO)}
-                alDescanso={() => setMenuEj(i)} alMover={(d) => moverEjercicio(i, d)} alEliminar={() => setEliminarEj(i)} />
+                alMover={(d) => moverEjercicio(i, d)} alEliminar={() => setEliminarEj(i)} />
 
               <div className="mt-3 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px_32px] gap-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
                 <span className="text-center">Serie</span><span>Anterior</span><span className="text-center">{u}</span><span className="text-center">Reps</span><span className="text-center">✓</span><span />
@@ -309,7 +320,7 @@ export default function Entrenar() {
                 const a = anteriorPara(ant, e.series, j);
                 return (
                   <div key={j} data-testid="serie"
-                    className={`mt-1.5 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px_32px] items-center gap-1.5 rounded-[8px] px-0.5 py-1 ${s.hecha ? 'bg-okbg' : ''}`}>
+                    className={`mt-1.5 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px_32px] items-center gap-1.5 rounded-[8px] px-0.5 py-1 transition-colors ${s.hecha ? 'serie-hecha' : ''}`}>
                     <button aria-label={`Tipo de la serie ${j + 1}`} onClick={() => setMenuSerie({ i, j })}
                       className="h-9 rounded-[8px] text-center num text-[15px] font-bold" style={{ color: tipo.c }}>
                       {tipo.l || n}
@@ -328,8 +339,8 @@ export default function Entrenar() {
                       onChange={(ev) => { const v = Math.max(0, Math.round(Number(ev.target.value) || 0)); cambiar((x) => { x.ejercicios[i].series[j].reps = v; }); }} />
                     <button aria-label={s.hecha ? `Desmarcar serie ${j + 1}` : `Marcar serie ${j + 1} como hecha`} aria-pressed={s.hecha}
                       onClick={() => marcar(i, j)}
-                      className={`mx-auto flex h-8 w-8 items-center justify-center rounded-[8px] border ${s.hecha ? 'border-goldh rebote' : 'border-ln3 text-mu'}`}
-                      style={s.hecha ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
+                      className={`mx-auto flex h-8 w-8 items-center justify-center rounded-[8px] border ${s.hecha ? 'rebote' : 'border-ln3 text-mu'}`}
+                      style={s.hecha ? { background: 'var(--verde)', borderColor: 'var(--verde)', color: '#0b0a08' } : undefined}>
                       <Icono n="check" size={17} />
                     </button>
                     <button aria-label={`Eliminar serie ${j + 1} de ${ej?.nombre}`} title="Eliminar serie"

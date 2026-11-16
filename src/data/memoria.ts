@@ -118,6 +118,7 @@ export class RepoMemoria implements Repo {
     const perfil = perfilInicial(u);
     perfil.nombre = nombre;
     perfil.tema = 'oscuro';
+    perfil.conocido = true; // las cuentas de ejemplo ya pasaron la bienvenida
     perfil.resumen = { dias: s.dias, total: s.historial.length, semanas: s.semanas };
     perfil.creado = this.ahora - 60 * 86_400_000;
     this.datos.set(u.uid, {
@@ -267,6 +268,11 @@ export class RepoMemoria implements Repo {
     for (const s of estados) d.estados.set(s.ejercicioId, copia(s));
     if (d.perfil) d.perfil.resumen = copia(resumen);
     this.guardar();
+  }
+
+  async leerSesionesDeRutina(uid: string, rutinaId: string, limite: number) {
+    this.ver(uid);
+    return copia(this.d(uid).historial.filter((h) => h.rutinaId === rutinaId).sort((a, b) => b.inicio - a.inicio).slice(0, limite));
   }
 
   async leerHistorial(uid: string, limite: number, antesDe?: number) {

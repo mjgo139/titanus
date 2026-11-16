@@ -123,6 +123,8 @@ export interface Recordatorio {
 }
 
 export type Figura = 'hombre' | 'mujer';
+export type Objetivo = 'musculo' | 'fuerza' | 'grasa';
+export type Nivel = 'principiante' | 'intermedio' | 'avanzado';
 
 export interface Perfil {
   uid: string;
@@ -134,6 +136,16 @@ export interface Perfil {
   sobrecarga?: AjustesSobrecarga;
   /** Qué estatuas ve: legionario o legionaria */
   figura?: Figura;
+  // Datos de la bienvenida ("Conocerte"); todos opcionales
+  genero?: 'hombre' | 'mujer' | 'otro';
+  /** AAAA-MM-DD */
+  nacimiento?: string;
+  /** cm */
+  altura?: number;
+  objetivo?: Objetivo;
+  nivel?: Nivel;
+  /** Ya pasó (o salteó) la bienvenida */
+  conocido?: boolean;
   creado: number;
   /** Fechas (ms) de los entrenamientos de las últimas semanas, para Hoy con 1 sola lectura */
   resumen: Resumen;
