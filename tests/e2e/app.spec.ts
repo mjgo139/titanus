@@ -156,7 +156,7 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await page.getByRole('button', { name: 'Empezar rutina' }).first().click();
   await sinSobrecarga(page);
   await page.getByRole('button', { name: 'Ver todo' }).click();
-  await expect(page.getByTestId('metricas')).toContainText('Duración');
+  await expect(page.getByTestId('metricas')).toContainText('Campaña en curso');
   await expect(page.getByRole('button', { name: /Copiar serie anterior 1/ }).first()).toContainText('kg ×');
   await expect(page.getByTestId('ultima-vez').first()).toContainText('Última vez');
   for (const j of [1, 2, 3, 4]) await expect(page.getByRole('button', { name: `Copiar serie anterior ${j}` }).first()).not.toHaveText('—');
@@ -395,4 +395,31 @@ test('ficha de rutina: gráfico por sesión, ejercicios serie por serie y comenz
   await page.getByRole('button', { name: 'Comenzar rutina' }).click();
   await sinSobrecarga(page);
   await expect(page.getByRole('button', { name: 'Terminar', exact: true })).toBeVisible();
+});
+
+test('programas: tarjetas, empezar uno, hacer una sesión y ver el avance', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Entreno');
+  await expect(page.getByTestId('programa')).toHaveCount(6);
+  await expect(page.getByTestId('acceso-programa').first()).toHaveText('Gratis');
+  await page.getByTestId('programa').filter({ hasText: 'Más dominadas' }).scrollIntoViewIfNeeded();
+  await captura(page, '06b-programas');
+  await page.getByTestId('programa').filter({ hasText: 'Más dominadas' }).click();
+  await expect(page.getByRole('heading', { name: 'Más dominadas' })).toBeVisible();
+  await expect(page.getByTestId('semana-programa')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Empezar programa' }).click();
+  await expect(page.getByTestId('avance-programa')).toContainText('Sesión 1 de 12');
+  await captura(page, '06c-programa');
+  await page.getByRole('button', { name: /Empezar: semana 1/ }).click();
+  // Primera vez con algunos ejercicios: se preparan pesos y reps
+  await page.locator('[data-testid=armado], [data-testid=vista-foco], [data-testid=hoja-sobrecarga]').first().waitFor();
+  if (await page.getByTestId('armado').isVisible()) await page.getByRole('button', { name: 'Empezar entrenamiento', exact: true }).click();
+  await sinSobrecarga(page);
+  await page.getByRole('button', { name: 'Ver todo' }).click();
+  await page.getByRole('button', { name: 'Marcar serie 1 como hecha' }).first().click();
+  await page.getByRole('button', { name: 'Terminar', exact: true }).click();
+  await page.getByRole('button', { name: 'Guardar y terminar' }).click();
+  await ir(page, 'Inicio');
+  await expect(page.getByTestId('programa-en-curso')).toContainText('Sesión 2 de 12');
+  await captura(page, '06d-programa-en-inicio');
 });

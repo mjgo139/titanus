@@ -210,9 +210,9 @@ test('legionaria: estatuas con la cabeza a la vista en Inicio, Entreno y Progres
   await entrar(page, 'ana@ejemplo.com');
   await captura(page, '43-legionaria-inicio');
   await ir(page, 'Entreno');
-  await expect(page.locator('img[src*="legionario-f"]')).toBeVisible();
+  await expect(page.locator('img[src*="legionario-f"]').first()).toBeVisible();
   await captura(page, '44-legionaria-entreno');
   await ir(page, 'Progreso');
-  await expect(page.locator('img[src*="espalda-f"]')).toBeVisible();
+  await expect(page.locator('img[src*="espalda-f"]').first()).toBeVisible();
   await captura(page, '45-legionaria-progreso');
 });

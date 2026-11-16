@@ -146,6 +146,8 @@ export interface Perfil {
   nivel?: Nivel;
   /** Ya pasó (o salteó) la bienvenida */
   conocido?: boolean;
+  /** Programa en curso (ver src/lib/programas.ts) */
+  programa?: { id: string; inicio: number; hechas: string[] } | null;
   creado: number;
   /** Fechas (ms) de los entrenamientos de las últimas semanas, para Hoy con 1 sola lectura */
   resumen: Resumen;

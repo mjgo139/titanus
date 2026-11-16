@@ -15,6 +15,7 @@ const DetalleEjercicio = lazy(() => import('./screens/DetalleEjercicio'));
 const Perfil = lazy(() => import('./screens/Perfil'));
 const Conocerte = lazy(() => import('./screens/Conocerte'));
 const VerRutina = lazy(() => import('./screens/VerRutina'));
+const VerPrograma = lazy(() => import('./screens/Programas'));
 const PanelClientes = lazy(() => import('./pro/PanelClientes'));
 const FichaCliente = lazy(() => import('./pro/FichaCliente'));
 const MiProfesional = lazy(() => import('./pro/MiProfesional'));
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="rutinas" element={<Navigate to="/entreno" replace />} />
               <Route path="rutinas/:id" element={<EditarRutina />} />
               <Route path="rutinas/:id/ver" element={<VerRutina />} />
+              <Route path="programas/:id" element={<VerPrograma />} />
               <Route path="entrenar" element={<Entrenar />} />
               <Route path="resumen" element={<Resumen />} />
               <Route path="progreso" element={<Progreso />} />

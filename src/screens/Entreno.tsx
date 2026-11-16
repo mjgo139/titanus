@@ -10,6 +10,7 @@ import { Icono } from '../ui/Icono';
 import { Cargando, Hoja, Vacio } from '../ui/piezas';
 import { PLANTILLAS, rutinasDePlantilla, textoObjetivo, type Plantilla } from '../lib/plantillas';
 import { useEmpezar } from './empezar';
+import { ListaProgramas } from './Programas';
 import { minutosEstimados } from './Hoy';
 
 export default function Entreno() {
@@ -98,6 +99,12 @@ export default function Entreno() {
           ))}
         </ul>
       )}
+
+      <div className="mt-8 mb-3">
+        <h2 className="font-display text-[22px] font-semibold">Programas</h2>
+        <p className="text-[13px] text-mu">Planes de varias semanas con un objetivo. Seguís uno a la vez y la app marca tu avance.</p>
+      </div>
+      <ListaProgramas />
 
       <div className="mt-8 mb-3">
         <h2 className="font-display text-[22px] font-semibold">Plantillas</h2>

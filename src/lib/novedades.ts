@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.11.0',
+    fecha: '2026-11-16',
+    cambios: [
+      'Programas: planes de varias semanas con objetivo (Abdomen de acero, Más dominadas, De 10 a 30 flexiones, Brazos de centurión, Glúteos de gladiadora, Fuerza base 5×5). Todos gratis.',
+      'El programa en curso aparece en Inicio con tu avance y la próxima sesión; cada sesión terminada se marca sola.',
+      'Nueva cabecera del entrenamiento: anillo de series en números romanos, tiempo y carga levantada.',
+    ],
+  },
+  {
     version: '1.10.0',
     fecha: '2026-11-16',
     cambios: [

@@ -44,7 +44,7 @@ service cloud.firestore {
     function perfilValido(uid) {
       let d = request.resource.data;
       return d.keys().hasOnly(['uid', 'nombre', 'email', 'tema', 'unidad', 'recordatorio', 'creado', 'resumen', 'sobrecarga', 'figura',
-          'genero', 'nacimiento', 'altura', 'objetivo', 'nivel', 'conocido'])
+          'genero', 'nacimiento', 'altura', 'objetivo', 'nivel', 'conocido', 'programa'])
         && (!('uid' in d) || d.uid == uid)
         && (!('nombre' in d) || (d.nombre is string && d.nombre.size() <= 80))
         && (!('tema' in d) || d.tema in ['claro', 'oscuro', 'sistema'])
@@ -57,7 +57,8 @@ service cloud.firestore {
         && (!('altura' in d) || (d.altura is number && d.altura > 50 && d.altura < 260))
         && (!('objetivo' in d) || d.objetivo in ['musculo', 'fuerza', 'grasa'])
         && (!('nivel' in d) || d.nivel in ['principiante', 'intermedio', 'avanzado'])
-        && (!('conocido' in d) || d.conocido is bool);
+        && (!('conocido' in d) || d.conocido is bool)
+        && (!('programa' in d) || d.programa == null || (d.programa.id is string && d.programa.hechas is list && d.programa.hechas.size() <= 200));
     }
 
     function rutinaValida() {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { borrarBorrador, guardarBorrador, leerBorrador, type Borrador } from '../lib/borrador';
 import { DESCANSO_POR_DEFECTO, anteriorPara, aplicarSugerencia, cerrarEntrenamiento, ejercicioNuevo } from '../lib/entreno';
-import { aKg, aUnidad, formatoNumero, redondear, reloj, seriesHechas } from '../lib/logica';
+import { aKg, aUnidad, formatoNumero, redondear, reloj, romano, seriesHechas } from '../lib/logica';
 import { avisoFinDescanso, prepararAudio } from '../lib/sonido';
 import type { Ejercicio, EstadoEjercicio, Sensacion, TipoSerie } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
@@ -13,6 +13,7 @@ import { Biblioteca } from './Biblioteca';
 import { Animacion, Miniatura } from './Miniatura';
 import { Foco, siguientePendiente, type Posicion } from './Foco';
 import { AccionesEjercicio, TarjetaEjercicio, textoDescanso } from './TarjetaEjercicio';
+import { deIdSesion, marcarSesion } from '../lib/programas';
 export { textoDescanso };
 
 const TIPOS: { v: TipoSerie; t: string; l: string; c: string }[] = [
@@ -151,7 +152,10 @@ export default function Entrenar() {
       return;
     }
     await repo.guardarEntrenamiento(usuario.uid, c.entreno, c.estados, c.resumen);
-    await cambiarPerfil({ resumen: c.resumen });
+    // Si era una sesión de un programa, queda marcada (en la misma escritura del perfil)
+    const ses = deIdSesion(b.rutinaId);
+    const prog = ses && perfil.programa?.id === ses.programaId ? { programa: marcarSesion(perfil.programa, ses.clave) } : {};
+    await cambiarPerfil({ resumen: c.resumen, ...prog });
     borrarBorrador(usuario.uid);
     nav('/resumen', { replace: true, state: { entreno: c.entreno } });
   }
@@ -252,10 +256,34 @@ export default function Entrenar() {
         onChange={(e) => { const v = e.target.value; cambiar((x) => { x.nombre = v; }); }}
         className="mt-4 w-full bg-transparent font-display text-[26px] font-semibold outline-none lg:mt-0 lg:text-[32px]" />
 
-      <div className="tarjeta mt-3 grid grid-cols-3 py-3 text-center lg:mt-0" data-testid="metricas">
-        <div><div className="etiqueta">Duración</div><div className="num oro mt-1 text-[18px]">{reloj((ahora - b.inicio) / 1000)}</div></div>
-        <div><div className="etiqueta">Volumen</div><div className="num mt-1 text-[18px]">{formatoNumero(redondear(aUnidad(volumen, u), 0))} {u}</div></div>
-        <div><div className="etiqueta">Series</div><div className="num mt-1 text-[18px]">{hechas.length}</div></div>
+      {/* Cabecera propia: anillo de avance con números romanos, tiempo y carga levantada */}
+      <div className="hero mt-3 flex items-center gap-4 px-4 py-3 text-left lg:mt-0" data-testid="metricas">
+        {(() => {
+          const total = b.ejercicios.reduce((t, e) => t + e.series.length, 0) || 1;
+          const avance = Math.min(1, hechas.length / total);
+          const R = 34, C = 2 * Math.PI * R;
+          return (
+            <div className="relative h-[84px] w-[84px] shrink-0" role="img" aria-label={`${hechas.length} de ${total} series hechas`}>
+              <svg viewBox="0 0 84 84" className="h-full w-full -rotate-90">
+                <circle cx="42" cy="42" r={R} fill="none" stroke="var(--ln2)" strokeWidth="5" />
+                <circle cx="42" cy="42" r={R} fill="none" stroke="var(--gold)" strokeWidth="5" strokeLinecap="round"
+                  strokeDasharray={C} strokeDashoffset={C * (1 - avance)} style={{ transition: 'stroke-dashoffset .5s ease' }} />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
+                <span className="num text-[24px] oro">{hechas.length ? romano(hechas.length) : '0'}</span>
+                <span className="mt-1 text-[10px] uppercase tracking-[.12em] text-mu">de {romano(total)}</span>
+              </div>
+            </div>
+          );
+        })()}
+        <div className="min-w-0 flex-1">
+          <div className="etiqueta oro">Campaña en curso</div>
+          <div className="marca mt-0.5 text-[30px] leading-none tracking-[.04em]">{reloj((ahora - b.inicio) / 1000)}</div>
+          <div className="mt-1.5 flex flex-wrap gap-x-3 text-[13px] text-mu">
+            <span>Carga <b className="num text-tx">{formatoNumero(redondear(aUnidad(volumen, u), 0))} {u}</b></span>
+            <span>Series <b className="num text-tx">{hechas.length}</b></span>
+          </div>
+        </div>
       </div>
       </div>}
 
