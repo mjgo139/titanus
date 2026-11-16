@@ -24,6 +24,8 @@ export interface EjercicioRutina {
   /** Series extra al fallo (el "1×Máx" de la pizarra) */
   alFallo?: number;
   descanso: number; // segundos
+  /** Peso inicial planificado en kg (se usa mientras no haya historial de ese ejercicio) */
+  peso?: number;
   /** Alternativa o indicación, por ejemplo "o Jalón al pecho" */
   nota?: string;
 }

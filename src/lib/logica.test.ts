@@ -109,6 +109,13 @@ describe('entrenamiento completo', () => {
     expect(b.ejercicios[1].series.map((s) => s.peso)).toEqual([0, 0]);
     expect(b.ejercicios[0].series.every((s) => s.reps === 8 && !s.hecha)).toBe(true);
   });
+  it('usa el peso planificado de la rutina mientras no haya historial', () => {
+    const conPeso = { ...rutina, ejercicios: rutina.ejercicios.map((e) => ({ ...e, peso: 50 })) };
+    const prev = new Map([['press-banca', actualizarEstado(undefined, ej('press-banca', [[60, 8]]), 1)!]]);
+    const b = iniciarDesdeRutina(conPeso, prev, SAB);
+    expect(b.ejercicios.find((e) => e.ejercicioId === 'press-banca')!.series[0].peso).toBe(60);
+    expect(b.ejercicios.find((e) => e.ejercicioId === 'aperturas')!.series.every((s) => s.peso === 50)).toBe(true);
+  });
   it('la primera vez con un ejercicio pide preparar pesos y reps antes del reloj', () => {
     const prev = new Map([['press-banca', actualizarEstado(undefined, ej('press-banca', [[60, 8]]), 1)!]]);
     expect(iniciarDesdeRutina(rutina, prev, SAB).preparando).toBe(true);

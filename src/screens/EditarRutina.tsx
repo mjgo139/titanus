@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { buscarEjercicio } from '../lib/biblioteca';
-import { NOMBRES_DIA, nuevoId } from '../lib/logica';
-import type { Ejercicio, EjercicioRutina, Rutina } from '../lib/tipos';
+import { NOMBRES_DIA, aKg, aUnidad, formatoPeso, nuevoId, redondear } from '../lib/logica';
+import type { Ejercicio, EjercicioRutina, Rutina, Unidad } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando, Encabezado, Hoja, Seccion } from '../ui/piezas';
@@ -12,16 +12,37 @@ import { textoObjetivo } from '../lib/plantillas';
 import { olvidarDatos } from '../pro/entrenador/Ficha';
 import { useEmpezar } from './empezar';
 
-function Paso({ etiqueta, valor, alCambiar, min, max, paso = 1, sufijo = '' }: {
-  etiqueta: string; valor: number; alCambiar: (n: number) => void; min: number; max: number; paso?: number; sufijo?: string;
+function Paso({ etiqueta, valor, alCambiar, min, max, paso = 1, sufijo = '', vacio = '' }: {
+  etiqueta: string; valor: number; alCambiar: (n: number) => void; min: number; max: number; paso?: number; sufijo?: string; vacio?: string;
 }) {
+  const b = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ln oro disabled:opacity-30';
   return (
-    <div className="flex flex-col items-center">
-      <span className="text-[11px] font-bold uppercase tracking-[.1em] text-mu2">{etiqueta}</span>
-      <div className="mt-1 flex items-center gap-1">
-        <button aria-label={`Menos ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln oro" onClick={() => alCambiar(Math.max(min, valor - paso))}>−</button>
-        <span className="num w-12 text-center text-[16px]">{valor || (etiqueta === 'Hasta' || etiqueta === 'Al fallo' ? '—' : valor)}{valor ? sufijo : ''}</span>
-        <button aria-label={`Más ${etiqueta}`} className="h-8 w-8 rounded-full border border-ln oro" onClick={() => alCambiar(Math.min(max, valor + paso))}>+</button>
+    <div className="min-w-0">
+      <div className="truncate text-center text-[11px] font-bold uppercase tracking-[.1em] text-mu2">{etiqueta}</div>
+      <div className="mt-1 grid grid-cols-[36px_minmax(0,1fr)_36px] items-center gap-1">
+        <button aria-label={`Menos ${etiqueta}`} className={b} disabled={valor <= min} onClick={() => alCambiar(Math.max(min, valor - paso))}>−</button>
+        <span className="num truncate text-center text-[16px]">{valor ? `${valor}${sufijo}` : vacio || valor}</span>
+        <button aria-label={`Más ${etiqueta}`} className={b} disabled={valor >= max} onClick={() => alCambiar(Math.min(max, valor + paso))}>+</button>
+      </div>
+    </div>
+  );
+}
+
+/** Peso planificado: − / + o se escribe directo. Se guarda en kg; se muestra en la unidad del perfil. */
+function PasoPeso({ kg, unidad, alCambiar }: { kg: number; unidad: Unidad; alCambiar: (kg: number) => void }) {
+  const paso = unidad === 'kg' ? 2.5 : 5;
+  const v = kg ? redondear(aUnidad(kg, unidad)) : 0;
+  const poner = (x: number) => alCambiar(Math.max(0, aKg(Math.max(0, x), unidad)));
+  const b = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ln oro disabled:opacity-30';
+  return (
+    <div className="min-w-0">
+      <div className="truncate text-center text-[11px] font-bold uppercase tracking-[.1em] text-mu2">Peso ({unidad})</div>
+      <div className="mt-1 grid grid-cols-[36px_minmax(0,1fr)_36px] items-center gap-1">
+        <button aria-label="Menos peso" className={b} disabled={!v} onClick={() => poner(redondear(v - paso))}>−</button>
+        <input aria-label="Peso inicial" type="number" inputMode="decimal" min={0} step={paso} placeholder="—"
+          className="num h-9 w-full min-w-0 rounded-[8px] border border-ln2 bg-transparent text-center text-[16px] outline-none focus:border-gold"
+          value={v || ''} onChange={(ev) => poner(Number(ev.target.value) || 0)} />
+        <button aria-label="Más peso" className={b} onClick={() => poner(redondear(v + paso))}>+</button>
       </div>
     </div>
   );
@@ -66,7 +87,7 @@ export default function EditarRutina() {
               <Miniatura musculo={buscarEjercicio(e.ejercicioId, propios)?.musculo} id={e.ejercicioId} tam={40} />
               <span className="min-w-0 flex-1"><b className="block truncate oro">{buscarEjercicio(e.ejercicioId, propios)?.nombre ?? 'Ejercicio'}</b>
                 {e.nota && <span className="text-[12px] text-mu">{e.nota}</span>}</span>
-              <span className="num shrink-0 text-tx2">{textoObjetivo(e)}</span>
+              <span className="num shrink-0 text-right text-tx2">{textoObjetivo(e)}{e.peso ? <span className="block text-[12px] oro">{formatoPeso(e.peso, perfil.unidad)}</span> : null}</span>
             </li>
           ))}
         </ul>
@@ -139,22 +160,23 @@ export default function EditarRutina() {
                 <button aria-label="Quitar" className="h-8 w-8 flex items-center justify-center text-miss"
                   onClick={() => setR({ ...r, ejercicios: r.ejercicios.filter((_, j) => j !== i) })}><Icono n="basura" size={18} /></button>
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-y-3">
+              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
+                <PasoPeso kg={e.peso ?? 0} unidad={perfil.unidad} alCambiar={(kg) => cambiarEj(i, { peso: kg || undefined })} />
                 <Paso etiqueta="Series" valor={e.series} min={1} max={10} alCambiar={(n) => cambiarEj(i, { series: n })} />
                 <Paso etiqueta="Reps" valor={e.reps} min={1} max={50} alCambiar={(n) => cambiarEj(i, { reps: n, ...(e.repsMax && e.repsMax <= n ? { repsMax: 0 } : {}) })} />
-                <Paso etiqueta="Hasta" valor={e.repsMax ?? 0} min={0} max={50} alCambiar={(n) => {
+                <Paso etiqueta="Reps máx" vacio="—" valor={e.repsMax ?? 0} min={0} max={50} alCambiar={(n) => {
                   const actual = e.repsMax ?? 0;
                   const sube = n > actual;
                   cambiarEj(i, { repsMax: sube ? Math.max(n, e.reps + 1) : n > e.reps ? n : 0 });
                 }} />
-                <Paso etiqueta="Al fallo" valor={e.alFallo ?? 0} min={0} max={3} alCambiar={(n) => cambiarEj(i, { alFallo: n })} />
+                <Paso etiqueta="Al fallo" vacio="—" valor={e.alFallo ?? 0} min={0} max={3} alCambiar={(n) => cambiarEj(i, { alFallo: n })} />
                 <Paso etiqueta="Descanso" valor={e.descanso} min={15} max={300} paso={15} sufijo="s" alCambiar={(n) => cambiarEj(i, { descanso: n })} />
               </div>
-              <div className="mt-2 flex items-center justify-between gap-2 text-[13px]">
-                <span className="oro font-semibold">{textoObjetivo(e)}</span>
-                <input className="h-8 flex-1 rounded-[8px] border border-ln2 bg-transparent px-2 text-right outline-none" placeholder="Alternativa (opcional)"
-                  aria-label="Alternativa" value={e.nota ?? ''} onChange={(ev) => cambiarEj(i, { nota: ev.target.value })} />
+              <div className="mt-3 text-[14px] font-semibold oro" data-testid="resumen-ejercicio">
+                {textoObjetivo(e)}{e.peso ? ` · ${formatoPeso(e.peso, perfil.unidad)}` : ''}
               </div>
+              <input className="mt-2 h-10 w-full rounded-[8px] border border-ln2 bg-transparent px-3 text-[14px] outline-none focus:border-gold" placeholder="Alternativa o nota (opcional)"
+                aria-label="Alternativa" value={e.nota ?? ''} onChange={(ev) => cambiarEj(i, { nota: ev.target.value })} />
             </li>
           ))}
         </ul>

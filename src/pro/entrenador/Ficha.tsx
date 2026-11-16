@@ -221,7 +221,7 @@ function Rutinas(c: CtxFicha) {
                 <ul className="mt-2 text-[13px] text-mu">
                   {r.ejercicios.map((e, i) => (
                     <li key={i} className="flex justify-between gap-2 border-b border-ln2 py-1 last:border-0">
-                      <span className="truncate">{buscarEjercicio(e.ejercicioId, d.propios)?.nombre ?? 'Ejercicio'}</span><span className="num shrink-0 text-tx2">{textoObjetivo(e)}</span>
+                      <span className="truncate">{buscarEjercicio(e.ejercicioId, d.propios)?.nombre ?? 'Ejercicio'}</span><span className="num shrink-0 text-tx2">{textoObjetivo(e)}{e.peso ? ` · ${formatoPeso(e.peso, yo.unidad)}` : ''}</span>
                     </li>
                   ))}
                 </ul>

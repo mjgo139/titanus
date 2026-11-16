@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.8.2',
+    fecha: '2026-11-16',
+    cambios: [
+      'Editar rutina: cada ejercicio tiene su peso (kg o lb); se usa la primera vez y después sigue tu progresión.',
+      'Editar rutina: los controles van en dos columnas en el celular y ya no se superponen.',
+    ],
+  },
+  {
     version: '1.8.1',
     fecha: '2026-11-16',
     cambios: ['Las estatuas muestran siempre la cabeza, también en los recuadros anchos de la PC.'],

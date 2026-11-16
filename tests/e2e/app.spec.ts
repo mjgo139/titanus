@@ -318,3 +318,25 @@ test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que si
   await page.getByRole('button', { name: 'Entrenar Peso muerto en modo foco' }).click();
   await expect(page.getByRole('heading', { name: 'Peso muerto' })).toBeVisible();
 });
+
+test('editar rutina en un celular angosto: nada se superpone y se carga el peso', async ({ page }, info) => {
+  test.skip(info.project.name !== 'celular');
+  await page.setViewportSize({ width: 360, height: 760 });
+  await entrar(page);
+  await ir(page, 'Entreno');
+  await page.getByRole('link', { name: /Editar A · Full body/ }).click();
+  const tarjeta = page.getByRole('listitem').filter({ has: page.getByLabel('Peso inicial') }).first();
+  await expect(tarjeta.getByLabel('Peso inicial')).toBeVisible();
+  // Ningún botón − / + se pisa con otro
+  const cajas = await tarjeta.getByRole('button', { name: /^(Menos|Más) / }).evaluateAll((bs) => bs.map((b) => b.getBoundingClientRect().toJSON()));
+  expect(cajas.length).toBeGreaterThanOrEqual(12);
+  for (let a = 0; a < cajas.length; a++) for (let b = a + 1; b < cajas.length; b++) {
+    const x = cajas[a], y = cajas[b];
+    const pisa = x.left < y.right - 1 && y.left < x.right - 1 && x.top < y.bottom - 1 && y.top < x.bottom - 1;
+    expect(pisa, `botones ${a} y ${b} superpuestos`).toBe(false);
+  }
+  await tarjeta.getByLabel('Peso inicial').fill('62.5');
+  await tarjeta.getByRole('button', { name: 'Más peso' }).click();
+  await expect(tarjeta.getByTestId('resumen-ejercicio')).toContainText('65 kg');
+  await captura(page, '08c-editar-rutina-angosto');
+});

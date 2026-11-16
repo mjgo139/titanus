@@ -68,6 +68,8 @@ export function iniciarDesdeRutina(
         const a = anteriorPara(ult, e.series, j) ?? anteriorPara(ult, e.series.map((x) => ({ ...x, tipo: 'normal' as const })), j);
         return a ? { ...s, peso: a.peso } : s;
       });
+      // Sin historial: el peso planificado en la rutina (si lo tiene)
+      if (!ult?.length && er.peso) e.series = e.series.map((s) => ({ ...s, peso: er.peso! }));
       e.objetivo = textoObjetivo(er) + (er.nota ? ` · ${er.nota}` : '');
       // Sobrecarga progresiva: en modo automático ya se carga el peso sugerido; en manual solo se muestra
       const sug = sugerirSobrecarga(er.ejercicioId, est?.ultima, er, ajustes);
