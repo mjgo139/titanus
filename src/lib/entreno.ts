@@ -2,7 +2,7 @@ import type { Borrador } from './borrador';
 import {
   actualizarEstado, agregarDia, detectarRecords, nuevoId, seriesHechas, sumarSemana, volumenTotal,
 } from './logica';
-import { textoObjetivo } from './plantillas';
+import { filasDeRutina, textoObjetivo } from './plantillas';
 import { SOBRECARGA_POR_DEFECTO, sugerirSobrecarga } from './sobrecarga';
 import type {
   AjustesSobrecarga, EjercicioEntreno, Entrenamiento, EstadoEjercicio, Resumen, Rutina, Serie, Sugerencia, TipoSerie,
@@ -57,19 +57,19 @@ export function iniciarDesdeRutina(
     inicio: ahora,
     ...(primeraVez ? { preparando: true } : {}),
     ejercicios: r.ejercicios.map((er) => {
-      const fallo = er.alFallo ?? 0;
       const est = estados.get(er.ejercicioId);
-      const e = ejercicioNuevo(er.ejercicioId, est, er.series + fallo, er.reps, er.descanso);
-      // En una rutina mandan las repeticiones planificadas; las últimas son al fallo (1×Máx)
-      e.series = e.series.map((s, i) => (i < er.series ? { ...s, reps: er.reps } : { ...s, reps: 0, tipo: 'fallo' as const }));
+      // En una rutina mandan las series planificadas, una por una (tipo y reps)
+      const filas = filasDeRutina(er);
+      const e = ejercicioNuevo(er.ejercicioId, est, filas.length, er.reps, er.descanso);
+      e.series = filas.map((f, i) => ({ ...e.series[i], reps: f.reps, tipo: f.tipo }));
       // El peso inicial sale de la misma serie (por tipo) de la vez anterior
       const ult = est?.ultima?.series;
       e.series = e.series.map((s, j) => {
         const a = anteriorPara(ult, e.series, j) ?? anteriorPara(ult, e.series.map((x) => ({ ...x, tipo: 'normal' as const })), j);
         return a ? { ...s, peso: a.peso } : s;
       });
-      // Sin historial: el peso planificado en la rutina (si lo tiene)
-      if (!ult?.length && er.peso) e.series = e.series.map((s) => ({ ...s, peso: er.peso! }));
+      // Sin historial: el peso planificado en la rutina, serie por serie
+      if (!ult?.length) e.series = e.series.map((s, j) => ({ ...s, peso: filas[j]?.peso ?? 0 }));
       e.objetivo = textoObjetivo(er) + (er.nota ? ` · ${er.nota}` : '');
       // Sobrecarga progresiva: en modo automático ya se carga el peso sugerido; en manual solo se muestra
       const sug = sugerirSobrecarga(er.ejercicioId, est?.ultima, er, ajustes);

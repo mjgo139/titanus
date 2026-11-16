@@ -15,6 +15,9 @@ export interface Ejercicio {
   propio?: boolean;
 }
 
+/** Una serie planificada en la rutina */
+export interface SerieRutina { tipo?: TipoSerie; peso?: number; reps: number }
+
 export interface EjercicioRutina {
   ejercicioId: string;
   series: number;
@@ -26,6 +29,8 @@ export interface EjercicioRutina {
   descanso: number; // segundos
   /** Peso inicial planificado en kg (se usa mientras no haya historial de ese ejercicio) */
   peso?: number;
+  /** Serie por serie (tipo, peso en kg y reps). Si está, manda sobre series/reps/alFallo/peso */
+  detalle?: SerieRutina[];
   /** Alternativa o indicación, por ejemplo "o Jalón al pecho" */
   nota?: string;
 }

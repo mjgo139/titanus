@@ -319,24 +319,33 @@ test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que si
   await expect(page.getByRole('heading', { name: 'Peso muerto' })).toBeVisible();
 });
 
-test('editar rutina en un celular angosto: nada se superpone y se carga el peso', async ({ page }, info) => {
+test('editar rutina en un celular angosto: el mismo editor por serie, sin nada superpuesto', async ({ page }, info) => {
   test.skip(info.project.name !== 'celular');
   await page.setViewportSize({ width: 360, height: 760 });
   await entrar(page);
   await ir(page, 'Entreno');
   await page.getByRole('link', { name: /Editar A · Full body/ }).click();
-  const tarjeta = page.getByRole('listitem').filter({ has: page.getByLabel('Peso inicial') }).first();
-  await expect(tarjeta.getByLabel('Peso inicial')).toBeVisible();
-  // Ningún botón − / + se pisa con otro
-  const cajas = await tarjeta.getByRole('button', { name: /^(Menos|Más) / }).evaluateAll((bs) => bs.map((b) => b.getBoundingClientRect().toJSON()));
-  expect(cajas.length).toBeGreaterThanOrEqual(12);
+  const tarjeta = page.getByTestId('ejercicio-armado').first();
+  await expect(tarjeta.getByLabel('Peso serie 1 de Sentadilla')).toBeVisible();
+  // Ningún control se pisa con otro
+  const cajas = await tarjeta.locator('button, input').evaluateAll((bs) => bs.map((b) => b.getBoundingClientRect().toJSON()));
+  expect(cajas.length).toBeGreaterThanOrEqual(10);
   for (let a = 0; a < cajas.length; a++) for (let b = a + 1; b < cajas.length; b++) {
     const x = cajas[a], y = cajas[b];
     const pisa = x.left < y.right - 1 && y.left < x.right - 1 && x.top < y.bottom - 1 && y.top < x.bottom - 1;
-    expect(pisa, `botones ${a} y ${b} superpuestos`).toBe(false);
+    expect(pisa, `controles ${a} y ${b} superpuestos`).toBe(false);
   }
-  await tarjeta.getByLabel('Peso inicial').fill('62.5');
-  await tarjeta.getByRole('button', { name: 'Más peso' }).click();
-  await expect(tarjeta.getByTestId('resumen-ejercicio')).toContainText('65 kg');
+  // Peso y reps por serie, agregar una serie y marcar una de calentamiento
+  await tarjeta.getByLabel('Peso serie 1 de Sentadilla').fill('62.5');
+  await tarjeta.getByLabel('Repeticiones serie 2 de Sentadilla').fill('8');
+  await tarjeta.getByRole('button', { name: 'Más series de Sentadilla' }).click();
+  await tarjeta.getByRole('button', { name: /Tipo de la serie 1 de Sentadilla/ }).click();
+  await expect(tarjeta.getByRole('button', { name: /Tipo de la serie 1 de Sentadilla: calentamiento/ })).toBeVisible();
   await captura(page, '08c-editar-rutina-angosto');
+  await page.getByRole('button', { name: 'Guardar rutina' }).click();
+  await page.getByRole('link', { name: /Editar A · Full body/ }).click();
+  const otra = page.getByTestId('ejercicio-armado').first();
+  await expect(otra.getByLabel('Peso serie 1 de Sentadilla')).toHaveValue('62.5');
+  await expect(otra.getByLabel('Repeticiones serie 2 de Sentadilla')).toHaveValue('8');
+  await expect(otra.getByTestId('serie-armado')).toHaveCount(5);
 });

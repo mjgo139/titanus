@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.9.0',
+    fecha: '2026-11-16',
+    cambios: [
+      'Un solo editor de ejercicios en toda la app: una fila por serie con peso y reps, igual al editar una rutina, armar el libre o preparar la primera vez.',
+      'Las rutinas guardan peso y reps de cada serie; tocando el número de la serie la marcás como calentamiento (C) o al fallo (F).',
+    ],
+  },
+  {
     version: '1.8.3',
     fecha: '2026-11-16',
     cambios: ['La APK abre siempre la última versión publicada (se actualiza sola) y funciona sin conexión después de la primera vez.'],

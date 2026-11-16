@@ -1,5 +1,5 @@
 import { nuevoId } from './logica';
-import type { EjercicioRutina, Rutina } from './tipos';
+import type { TipoSerie, EjercicioRutina, Rutina } from './tipos';
 
 export interface Plantilla {
   id: string;
@@ -76,6 +76,39 @@ export function rutinasDePlantilla(p: Plantilla, ordenInicial: number, ahora = D
 
 /** "3×6 + 1 al fallo", "3×8–12" */
 export function textoObjetivo(e: EjercicioRutina): string {
-  const reps = e.repsMax && e.repsMax > e.reps ? `${e.reps}–${e.repsMax}` : `${e.reps}`;
-  return `${e.series}×${reps}${e.alFallo ? ` + ${e.alFallo} al fallo` : ''}`;
+  const normales = (e.detalle ?? []).filter((s) => (s.tipo ?? 'normal') === 'normal');
+  const distintas = new Set(normales.map((s) => s.reps)).size > 1;
+  const reps = distintas ? normales.map((s) => s.reps).join('/')
+    : e.repsMax && e.repsMax > e.reps ? `${e.reps}–${e.repsMax}` : `${e.reps}`;
+  const cal = (e.detalle ?? []).filter((s) => s.tipo === 'calentamiento').length;
+  const base = distintas ? `${e.series} series (${reps})` : `${e.series}×${reps}`;
+  return `${cal ? `${cal} cal. + ` : ''}${base}${e.alFallo ? ` + ${e.alFallo} al fallo` : ''}`;
+}
+
+/** Las series de un ejercicio de rutina, una por fila (se arman si la rutina es vieja y no las tiene) */
+export function filasDeRutina(e: EjercicioRutina): { tipo: TipoSerie; peso: number; reps: number }[] {
+  if (e.detalle?.length) return e.detalle.map((s) => ({ tipo: s.tipo ?? 'normal', peso: s.peso ?? 0, reps: s.reps }));
+  return [
+    ...Array.from({ length: e.series }, () => ({ tipo: 'normal' as const, peso: e.peso ?? 0, reps: e.reps })),
+    ...Array.from({ length: e.alFallo ?? 0 }, () => ({ tipo: 'fallo' as const, peso: e.peso ?? 0, reps: 0 })),
+  ];
+}
+
+/** Guarda las filas y mantiene al día el resumen (series, reps, al fallo, peso) que usan la sobrecarga y los textos */
+export function conFilas(e: EjercicioRutina, filas: { tipo?: TipoSerie; peso: number; reps: number }[]): EjercicioRutina {
+  const normales = filas.filter((s) => (s.tipo ?? 'normal') === 'normal');
+  const reps = normales[0]?.reps || e.reps || 10;
+  const peso = normales.find((s) => s.peso)?.peso;
+  const r: EjercicioRutina = {
+    ...e,
+    series: normales.length,
+    reps,
+    alFallo: filas.filter((s) => s.tipo === 'fallo').length || undefined,
+    peso: peso || undefined,
+    detalle: filas.map((s) => ({ tipo: s.tipo ?? 'normal', reps: s.reps, ...(s.peso ? { peso: s.peso } : {}) })),
+  };
+  if (r.repsMax && r.repsMax <= reps) delete r.repsMax;
+  if (!r.alFallo) delete r.alFallo;
+  if (!r.peso) delete r.peso;
+  return r;
 }

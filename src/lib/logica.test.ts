@@ -1,3 +1,4 @@
+import { conFilas, filasDeRutina } from './plantillas';
 import { describe, expect, it } from 'vitest';
 import {
   aKg, aUnidad, actualizarEstado, agregarDia, detectarRecords, duracion, e1rm, inicioSemana, mejorSerie,
@@ -108,6 +109,19 @@ describe('entrenamiento completo', () => {
     expect(b.ejercicios[0].series.map((s) => s.peso)).toEqual([60, 62.5, 62.5]);
     expect(b.ejercicios[1].series.map((s) => s.peso)).toEqual([0, 0]);
     expect(b.ejercicios[0].series.every((s) => s.reps === 8 && !s.hecha)).toBe(true);
+  });
+  it('la rutina guarda serie por serie y el entrenamiento arranca así', () => {
+    const base = rutina.ejercicios[0];
+    const e = conFilas(base, [
+      { tipo: 'calentamiento', peso: 20, reps: 12 }, { tipo: 'normal', peso: 50, reps: 10 }, { tipo: 'normal', peso: 55, reps: 8 }, { tipo: 'fallo', peso: 45, reps: 0 },
+    ]);
+    expect([e.series, e.reps, e.alFallo, e.peso]).toEqual([2, 10, 1, 50]);
+    expect(textoObjetivo(e)).toBe('1 cal. + 2 series (10/8) + 1 al fallo');
+    expect(filasDeRutina(e)).toHaveLength(4);
+    const b = iniciarDesdeRutina({ ...rutina, ejercicios: [e] }, new Map(), SAB);
+    expect(b.ejercicios[0].series.map((s) => [s.tipo, s.peso, s.reps])).toEqual([
+      ['calentamiento', 20, 12], ['normal', 50, 10], ['normal', 55, 8], ['fallo', 45, 0],
+    ]);
   });
   it('usa el peso planificado de la rutina mientras no haya historial', () => {
     const conPeso = { ...rutina, ejercicios: rutina.ejercicios.map((e) => ({ ...e, peso: 50 })) };
