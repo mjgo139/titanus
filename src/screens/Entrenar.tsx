@@ -101,7 +101,7 @@ export default function Entrenar() {
     });
   }, [usuario.uid]);
 
-  if (!b) return <Cargando />;
+  if (!b) return <Cargando forma="pagina" />;
 
   function marcar(i: number, j: number) {
     prepararAudio();

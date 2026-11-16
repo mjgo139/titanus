@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { leerBorrador } from '../lib/borrador';
-import { fraseDelDia } from '../lib/frases';
 import { rachaSemanas, rango, romano, rutinaDeHoy, semanaActual } from '../lib/logica';
 import type { Rutina } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
@@ -18,11 +17,9 @@ export function minutosEstimados(r: Rutina): number {
 
 export default function Hoy() {
   const { repo, usuario, perfil } = useSesion();
-  const nav = useNavigate();
   const empezar = useEmpezar();
   const [rutinas, setRutinas] = useState<Rutina[] | null>(null);
   const ahora = Date.now();
-  const frase = fraseDelDia(ahora);
   const enCurso = !!leerBorrador(usuario.uid);
 
   useEffect(() => { repo.leerRutinas(usuario.uid).then(setRutinas); }, [repo, usuario.uid]);
@@ -70,17 +67,12 @@ export default function Hoy() {
           </div>
         </div>
 
-        <figure className="hero m-0 flex flex-col justify-center lg:col-start-1 lg:row-start-2 lg:h-full">
-          <blockquote className="font-display text-[18px] italic leading-snug text-tx lg:text-[20px]">“{frase.texto}”</blockquote>
-          <figcaption className="oro mt-2 text-[14px]">— {frase.autor}</figcaption>
-        </figure>
-
-        <div className={`${encabezado} mt-3 lg:col-start-1 lg:row-start-3 lg:mt-4`}>
+        <div className={`${encabezado} mt-3 lg:col-start-1 lg:row-start-2 lg:mt-4`}>
           <h2 className={titulo}>Entrenamiento de hoy</h2>
         </div>
 
-        <div className="lg:col-start-1 lg:row-start-4">
-          {!rutinas ? <Cargando /> : (
+        <div className="lg:col-start-1 lg:row-start-3">
+          {!rutinas ? <Cargando forma="tarjeta" /> : (
             <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:min-h-[232px]">
               <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="w-[40%] object-cover" />
               <div className="flex flex-1 flex-col justify-center py-4 pr-4">
@@ -108,12 +100,12 @@ export default function Hoy() {
           )}
         </div>
 
-        <div className={`${encabezado} hidden lg:col-start-2 lg:row-start-1 lg:flex`}>
+        <div className={`${encabezado} mt-3 lg:col-start-2 lg:row-start-2 lg:mt-4`}>
           <h2 className={titulo}>Tu semana</h2>
           <span className="text-[13px] text-mu">{semana.filter((d) => d.hecho).length} de 7 días</span>
         </div>
 
-        <div className="tarjeta flex items-center justify-between px-3 py-3 lg:col-start-2 lg:row-start-2 lg:h-full lg:px-5">
+        <div className="tarjeta flex items-center justify-between px-3 py-3 lg:col-start-2 lg:row-start-3 lg:h-full lg:px-5">
           {semana.map((d) => (
             <div key={d.fecha} className="flex flex-col items-center gap-1.5">
               <span className={`text-[11px] font-bold ${d.hoy ? 'oro' : 'text-mu2'}`}>{d.letra}</span>
@@ -126,24 +118,7 @@ export default function Hoy() {
           ))}
         </div>
 
-        <div className={`${encabezado} hidden lg:col-start-2 lg:row-start-3 lg:mt-4 lg:flex`}>
-          <h2 className={titulo}>Accesos</h2>
-        </div>
-
-        <div className="mt-1 flex flex-col gap-[9px] lg:col-start-2 lg:row-start-4 lg:mt-0">
-          <div className="grid flex-1 grid-cols-2 gap-[9px]">
-            {[
-              { a: '/entreno', i: 'entreno', t: 'Rutinas', s: `${rutinas?.length ?? 0} planificadas` },
-              { a: '/progreso', i: 'progreso', t: 'Progreso', s: 'Tu evolución' },
-              { a: '/progreso?v=records', i: 'trofeo', t: 'Récords', s: 'Tus mejores marcas' },
-              { a: '/progreso?v=medidas', i: 'cuerpo', t: 'Medidas', s: 'Peso y cuerpo' },
-            ].map((x) => (
-              <button key={x.t} onClick={() => nav(x.a)} className="tarjeta flex min-h-[86px] items-center gap-3 text-left transition-colors hover:border-gold">
-                <Icono n={x.i} size={28} className="oro shrink-0" />
-                <span><strong className="block font-display text-[17px]">{x.t}</strong><span className="text-[13px] text-mu">{x.s}</span></span>
-              </button>
-            ))}
-          </div>
+        <div className="lg:col-span-2">
           {usuario.invitado && (
             <Link to="/perfil" className="tarjeta flex items-center gap-3 border-gold2 py-3">
               <Icono n="info" className="oro shrink-0" />

@@ -99,11 +99,14 @@ test('invitado: entra sin cuenta y después crea su cuenta sin perder nada', asy
   await expect(page.getByRole('heading', { name: 'Tito' })).toBeVisible();
 });
 
-test('inicio: rango, frase, racha y entrenamiento de hoy', async ({ page }) => {
+test('inicio: rango, racha, entrenamiento de hoy y semana (sin frase ni accesos)', async ({ page }) => {
   await entrar(page);
   await expect(page.getByTestId('rango')).toContainText('Nivel');
   await expect(page.getByTestId('racha')).not.toHaveText('—');
   await expect(page.getByRole('heading', { name: 'Entrenamiento de hoy' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tu semana' })).toBeVisible();
+  await expect(page.locator('blockquote')).toHaveCount(0);
+  await expect(page.getByText('Tus mejores marcas')).toHaveCount(0);
   await captura(page, '04-inicio');
   await entrar(page, 'light');
   await page.evaluate(() => localStorage.setItem('titanus-tema', 'claro'));
@@ -401,9 +404,14 @@ test('ficha de rutina: gráfico por sesión, ejercicios serie por serie y comenz
 test('programas: tarjetas, empezar uno, hacer una sesión y ver el avance', async ({ page }) => {
   await entrar(page);
   await ir(page, 'Entreno');
+  // Los programas no están en "Mis entrenos": tienen su propia página
+  await expect(page.getByTestId('programa')).toHaveCount(0);
+  await page.getByRole('link', { name: 'Programas' }).first().click();
   await expect(page.getByTestId('programa')).toHaveCount(6);
   await expect(page.getByTestId('acceso-programa').first()).toHaveText('Gratis');
-  await page.getByTestId('programa').filter({ hasText: 'Más dominadas' }).scrollIntoViewIfNeeded();
+  // Todas las tarjetas del mismo tamaño
+  const altos = await page.getByTestId('programa').evaluateAll((l) => l.map((e) => Math.round(e.getBoundingClientRect().height)));
+  expect(new Set(altos).size).toBe(1);
   await captura(page, '06b-programas');
   await page.getByTestId('programa').filter({ hasText: 'Más dominadas' }).click();
   await expect(page.getByRole('heading', { name: 'Más dominadas' })).toBeVisible();
@@ -422,5 +430,9 @@ test('programas: tarjetas, empezar uno, hacer una sesión y ver el avance', asyn
   await page.getByRole('button', { name: 'Guardar y terminar' }).click();
   await ir(page, 'Inicio');
   await expect(page.getByTestId('programa-en-curso')).toContainText('Sesión 2 de 12');
+  await ir(page, 'Entreno');
+  await page.getByRole('link', { name: 'Programas' }).first().click();
+  // El programa en curso va primero, con su avance
+  await expect(page.getByTestId('programa').first()).toContainText('Más dominadas');
   await captura(page, '06d-programa-en-inicio');
 });

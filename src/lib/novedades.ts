@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.12.0',
+    fecha: '2026-11-16',
+    cambios: [
+      'Inicio más limpio: sin la frase y sin los accesos repetidos de la barra de abajo.',
+      'Programas en su propia página: arriba de Entreno elegís "Mis entrenos" o "Programas". Todas las tarjetas del mismo tamaño.',
+      'Transiciones suaves: las pantallas se precargan y al cambiar de pestaña hay un fundido cruzado.',
+      'Mientras algo carga se ve su silueta con un brillo suave (esqueleto), en vez de "Cargando…".',
+    ],
+  },
+  {
     version: '1.11.1',
     fecha: '2026-11-16',
     cambios: [

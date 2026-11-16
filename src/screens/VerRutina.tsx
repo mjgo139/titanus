@@ -46,7 +46,7 @@ export default function VerRutina() {
   }, [repo, usuario.uid, id]);
 
   if (r === null) return <Navigate to="/entreno" replace />;
-  if (!r) return <Cargando />;
+  if (!r) return <Cargando forma="pagina" />;
 
   const valor = (w: Entrenamiento) => medida === 'volumen' ? aUnidad(w.volumen, u)
     : medida === 'reps' ? w.ejercicios.reduce((a, e) => a + seriesHechas(e).reduce((b, s) => b + s.reps, 0), 0)
@@ -66,7 +66,7 @@ export default function VerRutina() {
           </button>
           <div className="tarjeta mt-4" data-testid="grafico-rutina">
             <div className="etiqueta mb-2">{medida === 'volumen' ? 'Volumen por sesión' : medida === 'reps' ? 'Repeticiones por sesión' : 'Duración por sesión'}</div>
-            {!sesiones ? <Cargando /> : sesiones.length ? (
+            {!sesiones ? <Cargando forma="tarjeta" /> : sesiones.length ? (
               <GraficoBarras mejor="Mejor sesión" etiqueta={medida === 'volumen' ? 'Volumen por sesión' : medida === 'reps' ? 'Repeticiones por sesión' : 'Duración por sesión'}
                 datos={sesiones.map((w) => ({ fecha: w.inicio, y: valor(w) }))} formato={formato} formatoCorto={corto} />
             ) : (

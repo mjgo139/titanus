@@ -36,7 +36,7 @@ export default function EditarRutina() {
     });
   }, [repo, destino, id]);
 
-  if (!r) return <Cargando />;
+  if (!r) return <Cargando forma="pagina" />;
 
   // El cliente ve la rutina que le asignó su entrenador, pero no la cambia
   if (!clienteId && r.asignadaPor) {

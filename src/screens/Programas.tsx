@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, NavLink, Navigate, useParams } from 'react-router-dom';
 import busto from '../assets/busto.webp';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { NOMBRES_DIA } from '../lib/logica';
@@ -44,29 +44,48 @@ export function TarjetaPrograma({ p }: { p: Programa }) {
   const img = imagenDe(p, perfil.figura);
   const activo = perfil.programa?.id === p.id ? perfil.programa : null;
   return (
-    <Link to={`/programas/${p.id}`} className="hero relative flex min-h-[190px] w-full flex-col overflow-hidden p-4 text-left transition-colors hover:border-gold" data-testid="programa">
+    <Link to={`/programas/${p.id}`} className="hero relative flex h-[212px] w-full flex-col overflow-hidden p-4 text-left transition-colors hover:border-gold" data-testid="programa">
       <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[52%] object-cover opacity-90" style={{ objectPosition: img.pos }} />
       <div className="relative flex w-[66%] flex-1 flex-col">
         <div className="flex items-center gap-2">
           <span className="etiqueta oro">{p.categoria}</span><Sello p={p} />
         </div>
-        <h3 className="marca mt-2 text-[21px] leading-tight">{p.nombre}</h3>
-        <p className="mt-1 text-[14px] text-tx2">{p.lema}</p>
+        <h3 className="marca mt-2 line-clamp-2 text-[20px] leading-tight">{p.nombre}</h3>
+        <p className="mt-1 line-clamp-2 text-[14px] text-tx2">{p.lema}</p>
         <div className="mt-auto pt-3 text-[12px] text-mu">{p.semanas.length} semanas · {p.semanas[0].sesiones.length} días por semana</div>
       </div>
-      {activo && <div className="relative mt-3"><Avance hechas={activo.hechas.length} total={totalSesiones(p)} /></div>}
+      {activo && <div className="relative mt-2"><Avance hechas={activo.hechas.length} total={totalSesiones(p)} /></div>}
     </Link>
   );
 }
 
-/** Lista de programas para la pantalla Entreno */
-export function ListaProgramas() {
+/** Selector de arriba en Entreno y Programas: dos páginas hermanas */
+export function NavEntreno() {
+  const cls = ({ isActive }: { isActive: boolean }) =>
+    `flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${isActive ? '' : 'text-mu hover:text-tx'}`;
+  const oro = { background: 'var(--oro-grad)', color: 'var(--on)' };
   return (
-    <ul className="-mx-[17px] flex snap-x gap-3 overflow-x-auto px-[17px] pb-2 lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0 xl:grid-cols-3">
-      {PROGRAMAS.map((p) => (
-        <li key={p.id} className="w-[86%] shrink-0 snap-start sm:w-[60%] lg:w-auto"><TarjetaPrograma p={p} /></li>
-      ))}
-    </ul>
+    <nav aria-label="Secciones de entrenamiento" className="mx-auto mt-3 flex w-full max-w-[360px] rounded-full border border-ln2 p-[3px] lg:mx-0">
+      <NavLink to="/entreno" end className={cls} style={({ isActive }) => (isActive ? oro : undefined)}><Icono n="entreno" size={16} />Mis entrenos</NavLink>
+      <NavLink to="/programas" end className={cls} style={({ isActive }) => (isActive ? oro : undefined)}><Icono n="corona" size={16} />Programas</NavLink>
+    </nav>
+  );
+}
+
+/** Página de programas: todas las tarjetas del mismo tamaño */
+export function PaginaProgramas() {
+  const { perfil } = useSesion();
+  const activo = perfil.programa ? buscarPrograma(perfil.programa.id) : undefined;
+  const lista = activo ? [activo, ...PROGRAMAS.filter((p) => p.id !== activo.id)] : PROGRAMAS;
+  return (
+    <div className="pt-6">
+      <h1 className="titulo text-center lg:text-left">Programas</h1>
+      <NavEntreno />
+      <p className="mt-4 text-center text-[14px] text-mu lg:text-left">Planes de varias semanas con un objetivo. Seguís uno a la vez y la app marca tu avance.</p>
+      <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {lista.map((p) => <li key={p.id}><TarjetaPrograma p={p} /></li>)}
+      </ul>
+    </div>
   );
 }
 
@@ -117,7 +136,7 @@ export default function VerPrograma() {
 
   return (
     <div>
-      <Encabezado atras="/entreno" etiqueta={`Programa · ${p.categoria}`} titulo={p.nombre} linea={p.lema} />
+      <Encabezado atras="/programas" etiqueta={`Programa · ${p.categoria}`} titulo={p.nombre} linea={p.lema} />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
         <section className="flex flex-col gap-4">

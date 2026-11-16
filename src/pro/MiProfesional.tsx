@@ -95,7 +95,7 @@ export default function MiProfesional() {
 
   useEffect(() => { recargar(); }, [recargar]);
 
-  if (!vinculos) return <Cargando />;
+  if (!vinculos) return <Cargando forma="pagina" />;
   const v = vinculos[0];
 
   if (!v) {

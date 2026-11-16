@@ -127,8 +127,8 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
   .hoja-sale { animation: zoom-out .2s ease both; }
 }
 /* Cambio de pantalla: aparece suave y sube apenas (sin dejar transform al terminar) */
-@keyframes pagina { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.pagina { animation: pagina .32s cubic-bezier(.22,1,.36,1) backwards; }
+@keyframes pagina { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.pagina { animation: pagina .38s cubic-bezier(.2,.8,.2,1) backwards; }
 @media (prefers-reduced-motion: reduce) {
   .pagina, .hoja-entra, .hoja-sale, .velo-entra, .velo-sale, .subir, .entrar { animation-duration: 1ms !important; }
 }
@@ -151,3 +151,24 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 
 /* Barra del entrenamiento: filo dorado abajo en vez de la línea gris */
 .barra-entreno { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold2), transparent) 1; }
+
+/* Esqueletos: silueta de lo que carga, con un brillo dorado muy suave que recorre */
+.esqueleto {
+  border-radius: 12px;
+  background: linear-gradient(100deg, var(--sf2) 30%, color-mix(in srgb, var(--gold) 9%, var(--sf2)) 50%, var(--sf2) 70%);
+  background-size: 220% 100%;
+  animation: brillo 1.5s ease-in-out infinite;
+}
+@keyframes brillo { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+.aparece { animation: aparecer .3s ease both; }
+
+/* Fundido cruzado entre pantallas (navegadores con View Transitions); la barra de pestañas queda quieta */
+::view-transition-old(root) { animation: .22s ease both desaparecer; }
+::view-transition-new(root) { animation: .32s cubic-bezier(.2,.8,.2,1) both pagina; }
+.pestanas-fijas { view-transition-name: pestanas; }
+.lateral-fija { view-transition-name: lateral; }
+::view-transition-group(pestanas), ::view-transition-group(lateral) { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto { animation: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

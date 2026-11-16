@@ -75,7 +75,7 @@ export default function FichaCliente() {
       </div>
     );
   }
-  if (!vinculo || !perfil) return <Cargando />;
+  if (!vinculo || !perfil) return <Cargando forma="pagina" />;
 
   const ctx: CtxFicha = {
     vinculo, perfil, comentarios, objetivos, yo: { uid: usuario.uid, nombre: yoPerfil.nombre },

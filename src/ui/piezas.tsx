@@ -108,10 +108,37 @@ export function Celebracion({ visible, titulo, linea, icono = 'medalla', alCerra
   );
 }
 
-export function Cargando() {
+/**
+ * Esqueleto mientras carga: la silueta de lo que va a aparecer, con un brillo suave.
+ * forma: 'pagina' (título + tarjetas), 'lista' (tarjetas), 'tarjeta' (un bloque) o 'linea'.
+ */
+export function Cargando({ forma = 'lista' }: { forma?: 'pagina' | 'lista' | 'tarjeta' | 'linea' }) {
+  const B = ({ c = '' }: { c?: string }) => <div className={`esqueleto ${c}`} />;
   return (
-    <div className="flex items-center justify-center py-20 text-mu" aria-busy>
-      <span className="etiqueta">Cargando…</span>
+    <div role="status" aria-busy className="aparece" data-testid="esqueleto">
+      <span className="sr-only">Cargando…</span>
+      {forma === 'pagina' && (
+        <div className="pt-6">
+          <B c="mx-auto h-8 w-1/2 lg:mx-0 lg:w-1/3" />
+          <B c="mx-auto mt-3 h-4 w-2/3 lg:mx-0 lg:w-1/2" />
+          <div className="mt-6 grid gap-3 lg:grid-cols-2">
+            <B c="h-[180px]" /><B c="h-[180px] max-lg:hidden" />
+            <B c="h-[96px]" /><B c="h-[96px]" /><B c="h-[96px] max-lg:hidden" /><B c="h-[96px] max-lg:hidden" />
+          </div>
+        </div>
+      )}
+      {forma === 'lista' && (
+        <div className="flex flex-col gap-3 py-2">
+          {[0, 1, 2].map((k) => (
+            <div key={k} className="tarjeta flex items-center gap-3" style={{ opacity: 1 - k * 0.22 }}>
+              <B c="h-11 w-11 shrink-0 rounded-full" />
+              <div className="flex-1"><B c="h-4 w-2/3" /><B c="mt-2 h-3 w-1/3" /></div>
+            </div>
+          ))}
+        </div>
+      )}
+      {forma === 'tarjeta' && <B c="h-[165px] lg:h-[232px]" />}
+      {forma === 'linea' && <B c="h-4 w-full" />}
     </div>
   );
 }

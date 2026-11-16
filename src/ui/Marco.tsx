@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { flushSync } from 'react-dom';
+import { NavLink, Outlet, useLocation, useNavigate, type NavigateFunction } from 'react-router-dom';
 import { leerBorrador } from '../lib/borrador';
 import { reloj } from '../lib/logica';
 import { Icono } from './Icono';
@@ -46,22 +47,35 @@ function EnCurso() {
   );
 }
 
+/** Navega con fundido cruzado si el navegador lo permite (View Transitions); si no, normal */
+function navegarSuave(e: React.MouseEvent, nav: NavigateFunction, a: string) {
+  const d = document as Document & { startViewTransition?: (f: () => void) => unknown };
+  if (!d.startViewTransition || e.metaKey || e.ctrlKey || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  e.preventDefault();
+  d.startViewTransition(() => flushSync(() => nav(a)));
+}
+
+/** La pestaña Entreno también queda marcada en sus pantallas hermanas (programas, rutinas) */
+const activa = (a: string, isActive: boolean, ruta: string) =>
+  isActive || (a === '/entreno' && /^\/(programas|rutinas)/.test(ruta)) || (a === '/clientes' && ruta.startsWith('/clientes'));
+
 /** Celular: barra de pestañas abajo. PC: barra lateral oscura de 248px */
 export function Marco() {
   const { mensaje, repo, profesional } = useApp();
   // Los profesionales tienen una pestaña más: sus clientes
   const PESTANAS = profesional ? [...PESTANAS_BASE.slice(0, 3), { a: '/clientes', n: 'clientes', t: 'Clientes' }, PESTANAS_BASE[3]] : PESTANAS_BASE;
   const loc = useLocation();
+  const nav = useNavigate();
   const enEntreno = loc.pathname.startsWith('/entrenar');
   return (
     <div className="min-h-screen lg:pl-[248px]">
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-5 py-7 border-r border-ln2" style={{ background: 'var(--lateral)' }}>
+      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-5 py-7 border-r border-ln2" style={{ background: 'var(--lateral)' }}>
         <Logo />
         <div className="divisor mt-5" />
         <nav className="mt-6 flex flex-col gap-1" aria-label="Menú">
           {PESTANAS.map((p) => (
-            <NavLink key={p.a} to={p.a} end={p.a === '/'}
-              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 h-11 text-[14px] font-semibold transition-colors ${isActive ? 'bg-[#1d180f] text-[#f2c55c]' : 'text-[#c9bda7] hover:text-[#f7f1e7]'}`}>
+            <NavLink key={p.a} to={p.a} end={p.a === '/'} onClick={(e) => navegarSuave(e, nav, p.a)}
+              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 h-11 text-[14px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-[#1d180f] text-[#f2c55c]' : 'text-[#c9bda7] hover:text-[#f7f1e7]'}`}>
               <Icono n={p.n} size={20} />{p.t}
             </NavLink>
           ))}
@@ -83,12 +97,12 @@ export function Marco() {
       <EnCurso />
 
       {!enEntreno && (
-        <nav aria-label="Pestañas" className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-ln2"
+        <nav aria-label="Pestañas" className="pestanas-fijas lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-ln2"
           style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom))', background: 'linear-gradient(var(--sf), var(--nav))' }}>
           <div className="mx-auto flex max-w-[480px] pt-2">
             {PESTANAS.map((p) => (
-              <NavLink key={p.a} to={p.a} end={p.a === '/'}
-                className={({ isActive }) => `flex-1 flex flex-col items-center justify-center gap-1 h-[54px] ${PESTANAS.length > 4 ? 'text-[11px]' : 'text-[12px]'} ${isActive ? 'oro font-semibold' : 'text-tx2'}`}>
+              <NavLink key={p.a} to={p.a} end={p.a === '/'} onClick={(e) => navegarSuave(e, nav, p.a)}
+                className={({ isActive }) => `flex-1 flex flex-col items-center justify-center gap-1 h-[54px] transition-colors duration-300 ${PESTANAS.length > 4 ? 'text-[11px]' : 'text-[12px]'} ${activa(p.a, isActive, loc.pathname) ? 'oro font-semibold' : 'text-tx2'}`}>
                 <Icono n={p.n} size={PESTANAS.length > 4 ? 23 : 25} />{p.t}
               </NavLink>
             ))}

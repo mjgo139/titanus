@@ -10,7 +10,7 @@ import { Icono } from '../ui/Icono';
 import { Cargando, Hoja, Vacio } from '../ui/piezas';
 import { PLANTILLAS, rutinasDePlantilla, textoObjetivo, type Plantilla } from '../lib/plantillas';
 import { useEmpezar } from './empezar';
-import { ListaProgramas } from './Programas';
+import { NavEntreno } from './Programas';
 import { minutosEstimados } from './Hoy';
 
 export default function Entreno() {
@@ -41,6 +41,7 @@ export default function Entreno() {
   return (
     <div className="pt-6">
       <h1 className="titulo text-center lg:text-left">Entrenamiento</h1>
+      <NavEntreno />
 
       <div className="relative -mx-[17px] mt-3 mb-3 h-[200px] overflow-hidden lg:mx-0 lg:h-[260px] lg:rounded-[14px] lg:border lg:border-ln">
         <img src={estatuas(perfil.figura).legionario} alt="" style={{ objectPosition: foco(perfil.figura, 'legionario') }} className="mascara-izq absolute right-0 top-0 h-full w-[58%] object-cover lg:w-[45%]" />
@@ -99,12 +100,6 @@ export default function Entreno() {
           ))}
         </ul>
       )}
-
-      <div className="mt-8 mb-3">
-        <h2 className="font-display text-[22px] font-semibold">Programas</h2>
-        <p className="text-[13px] text-mu">Planes de varias semanas con un objetivo. Seguís uno a la vez y la app marca tu avance.</p>
-      </div>
-      <ListaProgramas />
 
       <div className="mt-8 mb-3">
         <h2 className="font-display text-[22px] font-semibold">Plantillas</h2>

@@ -21,7 +21,7 @@ export default function DetalleEjercicio() {
   }, [repo, usuario.uid, id]);
 
   const ej = buscarEjercicio(id, propios);
-  if (est === undefined) return <Cargando />;
+  if (est === undefined) return <Cargando forma="pagina" />;
 
   return (
     <div>
