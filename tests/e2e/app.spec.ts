@@ -39,13 +39,19 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await page.getByRole('button', { name: 'Enviar enlace' }).click();
   await expect(page.getByRole('status')).toContainText('Si existe una cuenta');
   await page.getByRole('button', { name: 'Ya tengo cuenta' }).click();
-  await page.getByLabel('Contraseña').fill('mala');
+  await page.getByLabel('Contraseña', { exact: true }).fill('mala');
+  // El ojito muestra y oculta la contraseña
+  await expect(page.getByLabel('Contraseña', { exact: true })).toHaveAttribute('type', 'password');
+  await page.getByRole('button', { name: 'Mostrar contraseña' }).click();
+  await expect(page.getByLabel('Contraseña', { exact: true })).toHaveAttribute('type', 'text');
+  await page.getByRole('button', { name: 'Ocultar contraseña' }).click();
+  await expect(page.getByLabel('Contraseña', { exact: true })).toHaveAttribute('type', 'password');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('alert')).toContainText('no coinciden');
   await page.getByRole('button', { name: '¿No tenés cuenta? Creala' }).click();
   await page.getByLabel('Nombre').fill('Lucía');
   await page.getByLabel('Correo').fill('lucia@ejemplo.com');
-  await page.getByLabel('Contraseña').fill('secreta1');
+  await page.getByLabel('Contraseña', { exact: true }).fill('secreta1');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
   // Bienvenida "Conocerte": seis preguntas
   await expect(page.getByTestId('conocerte')).toBeVisible();
@@ -57,6 +63,19 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await page.getByRole('button', { name: 'Continuar' }).click();
   await page.getByLabel('Peso corporal', { exact: true }).fill('64.5');
   await page.getByRole('button', { name: 'Más Peso corporal' }).click();
+  await expect(page.getByLabel('Peso corporal', { exact: true })).toHaveValue('64.6');
+  // La regla se arrastra con el mouse (PC): 50 px a la izquierda = +0,5 kg
+  const regla = (await page.getByTestId('regla').boundingBox())!;
+  await page.mouse.move(regla.x + regla.width / 2, regla.y + regla.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(regla.x + regla.width / 2 - 25, regla.y + regla.height / 2, { steps: 4 });
+  await page.mouse.move(regla.x + regla.width / 2 - 50, regla.y + regla.height / 2, { steps: 4 });
+  await page.mouse.up();
+  await expect(page.getByLabel('Peso corporal', { exact: true })).toHaveValue('65.1');
+  // y con las flechas del teclado
+  await page.getByTestId('regla').focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.getByLabel('Peso corporal', { exact: true })).toHaveValue('65');
   await captura(page, '02c-conocerte-peso');
   await page.getByRole('button', { name: 'Continuar' }).click();
   await page.getByLabel('Altura', { exact: true }).fill('168');
@@ -93,7 +112,7 @@ test('invitado: entra sin cuenta y después crea su cuenta sin perder nada', asy
   const hoja = page.getByRole('dialog');
   await hoja.getByLabel('Nombre').fill('Tito');
   await hoja.getByLabel('Correo').fill('tito@ejemplo.com');
-  await hoja.getByLabel('Contraseña').fill('secreta1');
+  await hoja.getByLabel('Contraseña', { exact: true }).fill('secreta1');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
   await expect(page.getByText('Modo invitado')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Tito' })).toBeVisible();
@@ -341,6 +360,12 @@ test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que si
     const caja = await page.getByTestId('animacion-foco').boundingBox();
     expect(caja!.height).toBeGreaterThan(110);
   }
+  if (test.info().project.name === 'pc') {
+    // PC grande (1920 px): tres columnas, con el orden de hoy a la vista
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await expect(page.getByTestId('orden-entreno')).toBeVisible();
+    await expect(page.getByTestId('orden-entreno').locator('[aria-current="step"]')).toContainText('Sentadilla');
+  }
   await captura(page, '27-foco');
   await page.getByRole('button', { name: 'Serie hecha' }).click();
   await expect(page.getByRole('timer', { name: 'Descanso' })).toBeVisible();
@@ -350,6 +375,16 @@ test('vista de foco: sobrecarga al empezar, serie, cronómetro grande, lo que si
   await expect(page.getByRole('heading', { name: 'Press de banca' })).toBeVisible();
   await page.getByRole('button', { name: 'Ver todo' }).click();
   await expect(page.getByRole('button', { name: 'Desmarcar serie 1' }).first()).toBeVisible();
+  // Cada ejercicio lleva su número y van uno debajo del otro, en orden
+  await expect(page.getByTestId('numero-ejercicio').nth(0)).toHaveText('I');
+  await expect(page.getByTestId('numero-ejercicio').nth(1)).toHaveText('II');
+  const t1 = (await page.getByTestId('ejercicio').nth(0).boundingBox())!;
+  const t2 = (await page.getByTestId('ejercicio').nth(1).boundingBox())!;
+  expect(t2.y).toBeGreaterThan(t1.y + t1.height - 1);
+  if (test.info().project.name === 'pc') {
+    await expect(page.getByTestId('orden-entreno')).toBeVisible();
+    await expect(page.getByTestId('orden-entreno').locator('[aria-current="step"]')).toContainText('Press de banca');
+  }
   await captura(page, '29-ver-todo');
   await page.getByRole('button', { name: 'Entrenar Peso muerto en modo foco' }).click();
   await expect(page.getByRole('heading', { name: 'Peso muerto' })).toBeVisible();

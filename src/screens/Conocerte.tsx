@@ -17,26 +17,23 @@ type Paso = 'genero' | 'nacimiento' | 'peso' | 'altura' | 'objetivo' | 'nivel' |
 const PASOS: Paso[] = ['genero', 'nacimiento', 'peso', 'altura', 'objetivo', 'nivel', 'plan'];
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
-/** Regla deslizable: se mueve con el dedo, con − / + o escribiendo el número */
+/** Regla deslizable: se arrastra con el dedo o el mouse, con la rueda, con las flechas, con − / + o escribiendo el número */
 function Regla({ valor, min, max, paso, etiqueta, sufijo, alCambiar, formato }: {
   valor: number; min: number; max: number; paso: number; etiqueta: string; sufijo: string;
   alCambiar: (n: number) => void; formato?: (n: number) => string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
   const PX = 10; // px por paso
-  const moviendo = useRef(false);
+  const arrastre = useRef<{ x: number; v: number } | null>(null);
+  const ajustar = (n: number) => Math.max(min, Math.min(max, redondear(Math.round((n - min) / paso) * paso + min, 1)));
+  const actual = Math.round((valor - min) / paso);
   const total = Math.round((max - min) / paso);
-  // Llevar la regla al valor cuando cambia desde afuera (botones, campo)
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || moviendo.current) return;
-    el.scrollLeft = Math.round((valor - min) / paso) * PX;
-  }, [valor, min, paso]);
+  const desde = Math.max(0, actual - 45);
+  const hasta = Math.min(total, actual + 45);
   return (
     <div>
       <div className="flex items-end justify-center gap-2">
         <button aria-label={`Menos ${etiqueta}`} className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-ln3 text-[20px] oro"
-          onClick={() => alCambiar(Math.max(min, redondear(valor - paso, 1)))}>−</button>
+          onClick={() => alCambiar(ajustar(valor - paso))}>−</button>
         <label className="flex items-baseline gap-1">
           <input aria-label={etiqueta} type="number" inputMode="decimal" step={paso} min={min} max={max}
             value={valor}
@@ -46,31 +43,42 @@ function Regla({ valor, min, max, paso, etiqueta, sufijo, alCambiar, formato }: 
           <span className="text-[18px] font-semibold text-mu">{sufijo}</span>
         </label>
         <button aria-label={`Más ${etiqueta}`} className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-ln3 text-[20px] oro"
-          onClick={() => alCambiar(Math.min(max, redondear(valor + paso, 1)))}>+</button>
+          onClick={() => alCambiar(ajustar(valor + paso))}>+</button>
       </div>
-      <div className="relative mt-6">
+      <div role="slider" tabIndex={0} aria-label={`Regla de ${etiqueta.toLowerCase()}`} aria-valuemin={min} aria-valuemax={max} aria-valuenow={valor}
+        data-testid="regla"
+        className="regla relative mt-6 h-[70px] cursor-grab touch-pan-y select-none overflow-hidden outline-none active:cursor-grabbing"
+        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); arrastre.current = { x: e.clientX, v: valor }; }}
+        onPointerMove={(e) => {
+          const a = arrastre.current; if (!a) return;
+          alCambiar(ajustar(a.v - ((e.clientX - a.x) / PX) * paso));
+        }}
+        onPointerUp={() => { arrastre.current = null; }}
+        onPointerCancel={() => { arrastre.current = null; }}
+        onWheel={(e) => {
+          const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          if (d) alCambiar(ajustar(valor + Math.sign(d) * paso));
+        }}
+        onKeyDown={(e) => {
+          const k = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 10, PageDown: -10 }[e.key];
+          if (k) { e.preventDefault(); alCambiar(ajustar(valor + k * paso)); }
+        }}>
         <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 w-[3px] -translate-x-1/2 rounded-full" style={{ background: 'var(--oro-grad)' }} />
-        <div ref={ref} className="regla overflow-x-auto" aria-hidden
-          onPointerDown={() => { moviendo.current = true; }} onPointerUp={() => { moviendo.current = false; }}
-          onScroll={(e) => {
-            if (!moviendo.current) return;
-            const n = Math.round(e.currentTarget.scrollLeft / PX);
-            alCambiar(Math.max(min, Math.min(max, redondear(min + n * paso, 1))));
-          }}>
-          <div className="relative flex h-[70px] items-end" style={{ width: `calc(100% + ${total * PX}px)`, paddingLeft: '50%', paddingRight: '50%' }}>
-            {Array.from({ length: total + 1 }, (_, k) => {
-              const v = min + k * paso;
-              const grande = Math.abs(v - Math.round(v / (paso * 10)) * paso * 10) < 1e-6;
-              return (
-                <span key={k} className="relative shrink-0" style={{ width: PX }}>
-                  <span className={`absolute bottom-0 left-0 w-px ${grande ? 'h-8 bg-tx2' : 'h-4 bg-ln3'}`} />
-                  {grande && <span className="absolute bottom-10 left-0 -translate-x-1/2 text-[12px] text-mu">{formatoNumero(redondear(v, 1))}</span>}
-                </span>
-              );
-            })}
-          </div>
+        <div className="pointer-events-none absolute inset-y-0 left-1/2" style={{ transform: `translateX(${-((valor - min) / paso) * PX}px)` }}>
+          {Array.from({ length: hasta - desde + 1 }, (_, j) => {
+            const k = desde + j;
+            const v = min + k * paso;
+            const grande = Math.abs(v - Math.round(v / (paso * 10)) * paso * 10) < 1e-6;
+            return (
+              <span key={k} className="absolute bottom-0" style={{ left: k * PX }}>
+                <span className={`absolute bottom-0 left-0 w-px ${grande ? 'h-8 bg-tx2' : 'h-4 bg-ln3'}`} />
+                {grande && <span className="absolute bottom-10 left-0 -translate-x-1/2 whitespace-nowrap text-[12px] text-mu">{formatoNumero(redondear(v, 1))}</span>}
+              </span>
+            );
+          })}
         </div>
       </div>
+      <p className="mt-2 text-center text-[12px] text-mu">Arrastrá la regla o usá las flechas</p>
     </div>
   );
 }

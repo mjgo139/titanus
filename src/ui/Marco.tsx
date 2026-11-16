@@ -85,7 +85,7 @@ export function Marco() {
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:max-w-[1180px] lg:px-10">
+      <main className={`mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:px-10 ${loc.pathname.startsWith('/entrenar') ? 'lg:max-w-[1480px]' : 'lg:max-w-[1180px]'}`}>
         {repo.modo === 'prueba' && (
           <div className="mt-3 rounded-full border border-ln2 px-4 py-1 text-center text-[11px] font-semibold uppercase tracking-[.12em] text-mu2 lg:mx-auto lg:max-w-[360px]">
             Modo prueba · datos inventados

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { Borrador } from '../lib/borrador';
 import { buscarEjercicio, imagenesEjercicio } from '../lib/biblioteca';
 import { DESCANSO_POR_DEFECTO, anteriorPara } from '../lib/entreno';
@@ -51,7 +51,7 @@ function Control({ etiqueta, valor, unidad, alCambiar, paso }: {
  * Vista de foco: lo esencial sin bajar la pantalla.
  * Ejercicio y serie, peso y reps, "Serie hecha", cronómetro de descanso y lo que sigue.
  */
-export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, setDescanso, marcar, cambiar }: {
+export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, setDescanso, marcar, cambiar, orden }: {
   b: Borrador;
   pos: Posicion;
   setPos: (p: Posicion) => void;
@@ -63,6 +63,8 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
   setDescanso: (f: (d: { fin: number; total: number } | null) => { fin: number; total: number } | null) => void;
   marcar: (i: number, j: number) => void;
   cambiar: (f: (x: Borrador) => Borrador | void) => void;
+  /** Índice del entrenamiento (solo en PC ancha) */
+  orden?: ReactNode;
 }) {
   // En el celular la columna mide exactamente lo que queda de pantalla debajo del encabezado
   const col = useRef<HTMLDivElement>(null);
@@ -100,16 +102,18 @@ export function Foco({ b, pos, setPos, estados, propios, u, ahora, descanso, set
   const conFoto = !!imagenesEjercicio(e.ejercicioId);
 
   return (
-    <div className="mt-2 lg:mt-3 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-stretch lg:gap-6" data-testid="vista-foco">
-      {/* PC: animación grande a la izquierda */}
-      <div className="hidden lg:block">
+    <div className="mt-2 lg:mt-4 lg:grid lg:h-[calc(100dvh-150px)] lg:min-h-[520px] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-6 min-[1440px]:grid-cols-[280px_minmax(0,1.2fr)_minmax(0,1fr)]" data-testid="vista-foco">
+      {/* PC ancha: el orden de los ejercicios a la izquierda */}
+      {orden && <div className="hidden min-h-0 min-[1440px]:block">{orden}</div>}
+      {/* PC: animación grande que llena el alto */}
+      <div className="hidden min-h-0 lg:flex lg:items-center">
         {conFoto
-          ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} completa className="h-full min-h-[300px] w-full rounded-[16px] border border-ln bg-sf" />
-          : <div className="flex h-full min-h-[300px] items-center justify-center rounded-[16px] border border-ln bg-sf"><Miniatura musculo={ej?.musculo} tam={120} /></div>}
+          ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} completa className="aspect-[3/2] max-h-full w-full overflow-hidden rounded-[16px] border border-ln bg-sf" />
+          : <div className="flex aspect-[3/2] w-full items-center justify-center rounded-[16px] border border-ln bg-sf"><Miniatura musculo={ej?.musculo} tam={120} /></div>}
       </div>
 
       {/* En el celular ocupa todo el alto de la pantalla: la animación crece en el espacio libre */}
-      <div ref={col} style={alto ? { height: alto } : undefined} className="flex h-[calc(100dvh-72px)] flex-col gap-2 lg:h-auto lg:gap-3" data-testid="foco-columna">
+      <div ref={col} style={alto ? { height: alto } : undefined} className="flex h-[calc(100dvh-72px)] flex-col gap-2 lg:h-auto lg:justify-center lg:gap-4" data-testid="foco-columna">
         <div className="flex shrink-0 items-center gap-3">
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-display text-[22px] font-semibold leading-tight oro lg:text-[30px]">{ej?.nombre}</h2>

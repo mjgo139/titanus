@@ -15,6 +15,7 @@ export function FormAcceso({ inicial, alTerminar }: { inicial: VistaAcceso; alTe
   const prueba = repo.modo === 'prueba';
   const [vista, setVista] = useState<VistaAcceso>(inicial);
   const [nombre, setNombre] = useState('');
+  const [verClave, setVerClave] = useState(false);
   const [email, setEmail] = useState(prueba && inicial === 'ingresar' ? USUARIO_PRUEBA.email : '');
   const [clave, setClave] = useState(prueba && inicial === 'ingresar' ? CLAVE_PRUEBA : '');
   const [error, setError] = useState('');
@@ -58,8 +59,15 @@ export function FormAcceso({ inicial, alTerminar }: { inicial: VistaAcceso; alTe
         <input className="campo" type="email" inputMode="email" placeholder="Correo electrónico" aria-label="Correo"
           value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
         {vista !== 'recuperar' && (
-          <input className="campo" type="password" placeholder="Contraseña" aria-label="Contraseña" value={clave} onChange={(e) => setClave(e.target.value)}
-            autoComplete={vista === 'registrar' ? 'new-password' : 'current-password'} />
+          <div className="relative">
+            <input className="campo w-full pr-12" type={verClave ? 'text' : 'password'} placeholder="Contraseña" aria-label="Contraseña" value={clave} onChange={(e) => setClave(e.target.value)}
+              autoComplete={vista === 'registrar' ? 'new-password' : 'current-password'} />
+            <button type="button" onClick={() => setVerClave((v) => !v)} aria-pressed={verClave}
+              aria-label={verClave ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-mu hover:oro">
+              <Icono n={verClave ? 'ojo-no' : 'ojo'} size={20} />
+            </button>
+          </div>
         )}
         {error && <p role="alert" className="rounded-[10px] bg-missbg text-miss px-4 py-3 text-[14px] font-medium">{error}</p>}
         {info && <p role="status" className="rounded-[10px] bg-okbg oro px-4 py-3 text-[14px] font-medium">{info}</p>}

@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.13.0',
+    fecha: '2026-11-16',
+    cambios: [
+      'La regla de peso y altura se arrastra también con el mouse, con la rueda y con las flechas del teclado.',
+      'Ojito para mostrar u ocultar la contraseña al ingresar o crear la cuenta.',
+      'Entrenar en PC aprovecha la pantalla: "Orden de hoy" a la izquierda, la animación grande y los controles al lado.',
+      'En la lista cada ejercicio lleva su número romano y van uno debajo del otro; en PC la tabla de series queda junto a los datos del ejercicio.',
+    ],
+  },
+  {
     version: '1.12.0',
     fecha: '2026-11-16',
     cambios: [

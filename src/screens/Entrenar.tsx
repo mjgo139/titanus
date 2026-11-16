@@ -14,6 +14,7 @@ import { Animacion, Miniatura } from './Miniatura';
 import { Foco, siguientePendiente, type Posicion } from './Foco';
 import { AccionesEjercicio, TarjetaEjercicio, textoDescanso } from './TarjetaEjercicio';
 import { deIdSesion, marcarSesion } from '../lib/programas';
+import { OrdenEntreno } from './OrdenEntreno';
 export { textoDescanso };
 
 const TIPOS: { v: TipoSerie; t: string; l: string; c: string }[] = [
@@ -300,17 +301,25 @@ export default function Entrenar() {
 
       {vista === 'foco' && posActual && b.ejercicios.length > 0 && (
         <Foco b={b} pos={posActual} setPos={setPos} estados={estados} propios={propios} u={u} ahora={ahora}
+          orden={<OrdenEntreno b={b} propios={propios} actual={posActual.i} className="h-full overflow-y-auto"
+            alElegir={(i) => { const j = b.ejercicios[i].series.findIndex((x) => !x.hecha); setPos({ i, j: j < 0 ? 0 : j }); }} />}
           descanso={descanso} setDescanso={setDescanso} marcar={marcar} cambiar={cambiar} />
       )}
 
-      {vista === 'lista' && <ol className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-stretch">
+      {vista === 'lista' && b.ejercicios.length > 0 && <div className="lg:mt-4 lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start lg:gap-6">
+      <OrdenEntreno b={b} propios={propios} className="sticky top-[64px] hidden lg:block"
+        actual={Math.max(0, b.ejercicios.findIndex((e) => e.series.some((x) => !x.hecha)))}
+        alElegir={(i) => document.getElementById(`ejercicio-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
+      <ol className="mt-4 flex flex-col gap-4 lg:mt-0">
         {b.ejercicios.map((e, i) => {
           const ej = buscarEjercicio(e.ejercicioId, propios);
           const ant = estados.get(e.ejercicioId)?.ultima?.series ?? [];
           let n = 0;
           return (
-            <li key={e.ejercicioId + i} className="tarjeta flex flex-col px-3 lg:px-4" data-testid="ejercicio">
+            <li key={e.ejercicioId + i} id={`ejercicio-${i}`} className="tarjeta flex scroll-mt-[72px] flex-col px-3 lg:px-5" data-testid="ejercicio">
               <div className="flex items-center gap-3">
+                <span className="num flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold2 text-[13px] oro" data-testid="numero-ejercicio"
+                  aria-label={`Ejercicio ${i + 1} de ${b.ejercicios.length}`}>{romano(i + 1)}</span>
                 <Miniatura musculo={ej?.musculo} id={e.ejercicioId} tam={48} />
                 <button className="flex-1 text-left font-display text-[18px] font-semibold oro leading-tight" onClick={() => setMenuEj(i)}>{ej?.nombre ?? 'Ejercicio'}</button>
                 <button className="chip h-8 shrink-0 gap-1 px-2.5 text-[12px]" aria-label={`Entrenar ${ej?.nombre} en modo foco`}
@@ -318,6 +327,8 @@ export default function Entrenar() {
                   <Icono n="play" size={12} />Foco
                 </button>
               </div>
+              <div className="lg:mt-2 lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-6">
+              <div className="min-w-0">
               {e.objetivo && <p className="mt-1 text-[13px] text-mu" data-testid="objetivo">Objetivo: <span className="text-tx2">{e.objetivo}</span></p>}
               <UltimaVez ultima={estados.get(e.ejercicioId)?.ultima} u={u} />
               {e.sugerencia?.aplicada && (
@@ -341,8 +352,10 @@ export default function Entrenar() {
               )}
               <AccionesEjercicio i={i} total={b.ejercicios.length} nombre={ej?.nombre ?? 'ejercicio'}
                 alMover={(d) => moverEjercicio(i, d)} alEliminar={() => setEliminarEj(i)} />
+              </div>
+              <div className="flex min-w-0 flex-col">
 
-              <div className="mt-3 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px_32px] gap-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
+              <div className="mt-3 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1fr)_120px_100px_44px_32px] gap-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-mu2">
                 <span className="text-center">Serie</span><span>Anterior</span><span className="text-center">{u}</span><span className="text-center">Reps</span><span className="text-center">✓</span><span />
               </div>
               {e.series.map((s, j) => {
@@ -351,7 +364,7 @@ export default function Entrenar() {
                 const a = anteriorPara(ant, e.series, j);
                 return (
                   <div key={j} data-testid="serie"
-                    className={`mt-1.5 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_44px_32px] items-center gap-1.5 rounded-[8px] px-0.5 py-1 transition-colors ${s.hecha ? 'serie-hecha' : ''}`}>
+                    className={`mt-1.5 grid grid-cols-[34px_minmax(0,1fr)_60px_50px_36px_26px] lg:grid-cols-[40px_minmax(0,1fr)_120px_100px_44px_32px] items-center gap-1.5 rounded-[8px] px-0.5 py-1 transition-colors ${s.hecha ? 'serie-hecha' : ''}`}>
                     <button aria-label={`Tipo de la serie ${j + 1}`} onClick={() => setMenuSerie({ i, j })}
                       className="h-9 rounded-[8px] text-center num text-[15px] font-bold" style={{ color: tipo.c }}>
                       {tipo.l || n}
@@ -391,10 +404,13 @@ export default function Entrenar() {
                 })}>
                 <Icono n="mas" size={16} />Agregar serie
               </button>
+              </div>
+              </div>
             </li>
           );
         })}
-      </ol>}
+      </ol>
+      </div>}
 
       <div className="lg:mx-auto lg:mt-2 lg:flex lg:max-w-[640px] lg:items-center lg:gap-4">
         <button className={`${vista === 'foco' && b.ejercicios.length ? 'btn-sec h-11' : 'btn'} mt-5 w-full lg:flex-1`} onClick={() => setBiblio(true)}><Icono n="mas" size={18} />Agregar ejercicio</button>

@@ -19,7 +19,7 @@ async function entrar(page: Page, email = 'marco@ejemplo.com', ruta = '/') {
   await page.goto(ruta);
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByLabel('Correo').fill(email);
-  await page.getByLabel('Contraseña').fill('titanus');
+  await page.getByLabel('Contraseña', { exact: true }).fill('titanus');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('heading', { name: /Hola,/ })).toBeVisible();
 }
@@ -131,7 +131,7 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   await page.getByRole('button', { name: 'Crear cuenta' }).first().click();
   await page.getByLabel('Nombre').fill('Lucas Benítez');
   await page.getByLabel('Correo').fill('lucas@ejemplo.com');
-  await page.getByLabel('Contraseña').fill('secreta1');
+  await page.getByLabel('Contraseña', { exact: true }).fill('secreta1');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
   await page.getByRole('button', { name: 'Omitir' }).click();
   await expect(page.getByTestId('aviso-invitacion')).toContainText('TIT-M4RC');
@@ -152,7 +152,7 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   // El admin aprueba
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByLabel('Correo').fill('marco@ejemplo.com');
-  await page.getByLabel('Contraseña').fill('titanus');
+  await page.getByLabel('Contraseña', { exact: true }).fill('titanus');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await ir(page, 'Perfil');
   await page.getByRole('link', { name: /Administrar profesionales/ }).click();
@@ -170,7 +170,7 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   await page.getByRole('button', { name: 'Cerrar sesión' }).click();
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByLabel('Correo').fill('lucas@ejemplo.com');
-  await page.getByLabel('Contraseña').fill('secreta1');
+  await page.getByLabel('Contraseña', { exact: true }).fill('secreta1');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await ir(page, 'Clientes');
   await expect(page.getByText('Todavía no tenés clientes')).toBeVisible();
@@ -188,7 +188,7 @@ test('una pestaña con datos de una versión anterior igual ve los clientes de e
   await page.reload();
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByLabel('Correo').fill('marco@ejemplo.com');
-  await page.getByLabel('Contraseña').fill('titanus');
+  await page.getByLabel('Contraseña', { exact: true }).fill('titanus');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await ir(page, 'Clientes');
   await page.getByTestId('cliente').filter({ hasText: 'Ana Ruiz' }).click();
@@ -198,7 +198,7 @@ test('una pestaña con datos de una versión anterior igual ve los clientes de e
   await page.getByRole('button', { name: 'Cerrar sesión' }).click();
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByLabel('Correo').fill('ana@ejemplo.com');
-  await page.getByLabel('Contraseña').fill('titanus');
+  await page.getByLabel('Contraseña', { exact: true }).fill('titanus');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('heading', { name: 'Ana Ruiz' })).toBeVisible();
   // El botón de Perfil vuelve todo a cero
