@@ -156,7 +156,8 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await page.getByRole('button', { name: 'Empezar rutina' }).first().click();
   await sinSobrecarga(page);
   await page.getByRole('button', { name: 'Ver todo' }).click();
-  await expect(page.getByTestId('metricas')).toContainText('Campaña en curso');
+  await expect(page.getByTestId('metricas')).toContainText('Carga levantada');
+  await expect(page.getByTestId('reloj-entreno')).toHaveCount(1);
   await expect(page.getByRole('button', { name: /Copiar serie anterior 1/ }).first()).toContainText('kg ×');
   await expect(page.getByTestId('ultima-vez').first()).toContainText('Última vez');
   for (const j of [1, 2, 3, 4]) await expect(page.getByRole('button', { name: `Copiar serie anterior ${j}` }).first()).not.toHaveText('—');

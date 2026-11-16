@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.11.1',
+    fecha: '2026-11-16',
+    cambios: [
+      'Barra del entrenamiento renovada: selector Foco | Lista, un solo reloj y filo dorado.',
+      'La tarjeta del anillo muestra la carga levantada, series y ejercicios (sin reloj repetido).',
+    ],
+  },
+  {
     version: '1.11.0',
     fecha: '2026-11-16',
     cambios: [

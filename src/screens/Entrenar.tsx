@@ -232,23 +232,26 @@ export default function Entrenar() {
           <button className="mt-4 w-full p-2 text-[14px] font-semibold text-miss" onClick={() => setDescartar(true)}>Descartar</button>
         </div>
       ) : (<>
-      <header className="sticky top-0 z-30 -mx-[17px] flex items-center gap-2 border-b border-ln2 px-[17px] py-2 backdrop-blur"
-        style={{ background: 'color-mix(in srgb, var(--bg) 88%, transparent)' }}>
-        <button aria-label="Minimizar" className="toque -ml-3 flex items-center justify-center oro" onClick={() => nav('/entreno')}>
-          <Icono n="abajo" />
+      <header className="barra-entreno sticky top-0 z-30 -mx-[17px] flex items-center gap-2 px-[17px] py-2 backdrop-blur"
+        style={{ background: 'color-mix(in srgb, var(--bg) 90%, transparent)' }}>
+        <button aria-label="Minimizar" title="Minimizar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold2 oro" onClick={() => nav('/entreno')}>
+          <Icono n="abajo" size={18} />
         </button>
-        <span className="hidden flex-1 font-display text-[17px] font-semibold sm:block">Entrenamiento</span>
-        {vista === 'foco' ? (
-          <button className="btn-sec h-9 shrink-0 px-3 text-[13px]" onClick={() => cambiarVista('lista')}>
-            <Icono n="rutinas" size={16} />Ver todo
-          </button>
-        ) : (
-          <button className="btn-sec h-9 shrink-0 px-3 text-[13px]" onClick={() => cambiarVista('foco')}>
-            <Icono n="play" size={14} />Modo foco
-          </button>
-        )}
-        <span className="ml-auto flex shrink-0 items-center gap-1 text-[13px] text-mu sm:ml-0"><Icono n="reloj" size={15} />{reloj((ahora - b.inicio) / 1000)}</span>
-        <button className="btn h-9 shrink-0 px-3 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
+        {/* Foco | Lista: las dos vistas del mismo entrenamiento */}
+        <div role="group" aria-label="Vista" className="flex shrink-0 rounded-full border border-ln2 p-[3px]">
+          {([['foco', 'Modo foco', 'Foco', 'play'], ['lista', 'Ver todo', 'Lista', 'rutinas']] as const).map(([v, etiqueta, texto, ic]) => (
+            <button key={v} aria-label={etiqueta} aria-pressed={vista === v} onClick={() => vista !== v && cambiarVista(v)}
+              className={`flex h-8 items-center gap-1 rounded-full px-3 text-[13px] font-semibold transition-colors ${vista === v ? '' : 'text-mu hover:text-tx'}`}
+              style={vista === v ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
+              <Icono n={ic} size={13} className="hidden sm:block" />{texto}
+            </button>
+          ))}
+        </div>
+        {/* El único reloj del entrenamiento */}
+        <span className="num ml-auto flex shrink-0 items-center gap-1 text-[17px] oro" data-testid="reloj-entreno" aria-label="Tiempo de entrenamiento">
+          <Icono n="reloj" size={15} />{reloj((ahora - b.inicio) / 1000)}
+        </span>
+        <button className="btn h-9 shrink-0 px-3.5 text-[14px]" onClick={() => setTerminar(true)}>Terminar</button>
       </header>
 
       {!(vista === 'foco' && b.ejercicios.length) && <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
@@ -277,11 +280,11 @@ export default function Entrenar() {
           );
         })()}
         <div className="min-w-0 flex-1">
-          <div className="etiqueta oro">Campaña en curso</div>
-          <div className="marca mt-0.5 text-[30px] leading-none tracking-[.04em]">{reloj((ahora - b.inicio) / 1000)}</div>
+          <div className="etiqueta">Carga levantada</div>
+          <div className="num mt-0.5 text-[30px] leading-none oro">{formatoNumero(redondear(aUnidad(volumen, u), 0))} <span className="text-[16px] text-mu">{u}</span></div>
           <div className="mt-1.5 flex flex-wrap gap-x-3 text-[13px] text-mu">
-            <span>Carga <b className="num text-tx">{formatoNumero(redondear(aUnidad(volumen, u), 0))} {u}</b></span>
             <span>Series <b className="num text-tx">{hechas.length}</b></span>
+            <span>Ejercicios <b className="num text-tx">{b.ejercicios.filter((e) => e.series.some((x) => x.hecha)).length}/{b.ejercicios.length}</b></span>
           </div>
         </div>
       </div>

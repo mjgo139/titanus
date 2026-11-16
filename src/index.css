@@ -148,3 +148,6 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 
 /* Serie hecha: la fila entera se tiñe de verde ("hecho" de la guía), como en Hevy */
 .serie-hecha { background: color-mix(in srgb, var(--verde) 20%, transparent); }
+
+/* Barra del entrenamiento: filo dorado abajo en vez de la línea gris */
+.barra-entreno { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold2), transparent) 1; }
