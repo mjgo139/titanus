@@ -204,3 +204,14 @@ test('una pestaña con datos de una versión anterior igual ve los clientes de e
   await page.getByRole('button', { name: /Volver a los datos de ejemplo/ }).click();
   await expect(page.getByRole('button', { name: 'Iniciar sesión' })).toBeVisible();
 });
+
+test('legionaria: estatuas con la cabeza a la vista en Inicio, Entreno y Progreso', async ({ page }) => {
+  await entrar(page, 'ana@ejemplo.com');
+  await captura(page, '43-legionaria-inicio');
+  await ir(page, 'Entreno');
+  await expect(page.locator('img[src*="legionario-f"]')).toBeVisible();
+  await captura(page, '44-legionaria-entreno');
+  await ir(page, 'Progreso');
+  await expect(page.locator('img[src*="espalda-f"]')).toBeVisible();
+  await captura(page, '45-legionaria-progreso');
+});

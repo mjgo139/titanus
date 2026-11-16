@@ -4,7 +4,7 @@ import { leerBorrador } from '../lib/borrador';
 import { fraseDelDia } from '../lib/frases';
 import { rachaSemanas, rango, romano, rutinaDeHoy, semanaActual } from '../lib/logica';
 import type { Rutina } from '../lib/tipos';
-import { estatuas } from '../ui/estatuas';
+import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Cargando } from '../ui/piezas';
@@ -80,7 +80,7 @@ export default function Hoy() {
         <div className="lg:col-start-1 lg:row-start-4">
           {!rutinas ? <Cargando /> : (
             <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:min-h-[232px]">
-              <img src={estatuas(perfil.figura).espalda} alt="" className="w-[40%] object-cover" />
+              <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="w-[40%] object-cover" />
               <div className="flex flex-1 flex-col justify-center py-4 pr-4">
                 {deHoy ? <>
                   <div className="etiqueta oro">Día {romano(idx)} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : 'Primera sesión'}</div>

@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.8.1',
+    fecha: '2026-11-16',
+    cambios: ['Las estatuas muestran siempre la cabeza, también en los recuadros anchos de la PC.'],
+  },
+  {
     version: '1.8.0',
     fecha: '2026-11-15',
     cambios: [

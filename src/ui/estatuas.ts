@@ -17,3 +17,15 @@ const ESTATUAS = {
 export function estatuas(figura: Figura | undefined) {
   return ESTATUAS[figura === 'mujer' ? 'mujer' : 'hombre'];
 }
+
+/**
+ * Dónde está la cabeza en cada imagen (posición vertical para object-position).
+ * Así, cuando el recuadro es ancho y bajo (PC), el recorte deja ver la cabeza en vez del torso.
+ */
+const FOCO = {
+  hombre: { capa: '50% 8%', espalda: '50% 8%', legionario: '50% 26%' },
+  mujer: { capa: '50% 6%', espalda: '50% 6%', legionario: '50% 4%' },
+};
+export function foco(figura: Figura | undefined, cual: 'capa' | 'espalda' | 'legionario'): string {
+  return FOCO[figura === 'mujer' ? 'mujer' : 'hombre'][cual];
+}
