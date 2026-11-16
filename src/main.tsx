@@ -42,7 +42,9 @@ async function crearRepo(): Promise<Repo> {
 
 /** Service worker: la versión nueva se activa sola y la página se recarga para que llegue siempre */
 async function registrarSW() {
-  if (Capacitor.isNativePlatform() || !('serviceWorker' in navigator) || import.meta.env.DEV) return;
+  // En la APK la app se abre desde la web publicada: también usa el service worker para funcionar sin conexión
+  const desdeLaWeb = location.protocol === 'https:' && !location.hostname.includes('localhost');
+  if ((Capacitor.isNativePlatform() && !desdeLaWeb) || !('serviceWorker' in navigator) || import.meta.env.DEV) return;
   const { registerSW } = await import('virtual:pwa-register');
   let recargando = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {

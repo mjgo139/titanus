@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.8.3',
+    fecha: '2026-11-16',
+    cambios: ['La APK abre siempre la última versión publicada (se actualiza sola) y funciona sin conexión después de la primera vez.'],
+  },
+  {
     version: '1.8.2',
     fecha: '2026-11-16',
     cambios: [

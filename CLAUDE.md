@@ -11,7 +11,7 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 | Firestore | modo nativo, edición Standard, región `southamerica-east1` (São Paulo) |
 | Auth | correo/contraseña, Google y anónimo ("Continuar como invitado") habilitados. Limpieza automática de anónimos: apagada |
 | Web | https://titanus-10398.web.app |
-| APK | se arma en cada push y se publica en el Release `apk-ultima`: https://github.com/mjgo139/titanus/releases/tag/apk-ultima (el plan Spark no permite `.apk` en Hosting) |
+| APK | se arma en cada push y se publica en el Release `apk-ultima`: https://github.com/mjgo139/titanus/releases/tag/apk-ultima (el plan Spark no permite `.apk` en Hosting). Desde v1.8.3 la APK carga `https://titanus-10398.web.app` (`server.url` en `capacitor.config.ts`) y usa el service worker: se actualiza sola; sin conexión la primera vez muestra `public/sin-conexion.html`. Instalar la APK de nuevo solo hace falta si cambia algo nativo (plugins, ícono, permisos). |
 | Admin | uids listados en el documento `config/admins` (`{ uids: [...] }`), cargado a mano en la consola. Nunca en el código. |
 | Secreto de deploy | `FIREBASE_SERVICE_ACCOUNT` en GitHub → Settings → Secrets → Actions (lo carga el dueño). La cuenta `firebase-adminsdk-fbsvc@…` necesita los roles Administrador de Firebase y Consumidor de Service Usage (ya asignados) |
 
