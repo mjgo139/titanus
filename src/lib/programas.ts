@@ -34,8 +34,8 @@ export interface Programa {
   lugar: Lugar;
   /** Qué hace falta para entrenarlo */
   equipo: string;
-  /** Carátula propia en public/programas/<id>.webp (si no hay, se usa la estatua) */
-  portada?: boolean;
+  /** Carátulas propias en public/programas/<id>-h.webp y <id>-m.webp (si falta una se usa la otra; si no hay ninguna, la estatua) */
+  portada?: { h?: boolean; m?: boolean };
   /** Estatua de la tarjeta */
   imagen: 'espalda' | 'legionario' | 'capa' | 'busto';
   semanas: SemanaPrograma[];
@@ -71,6 +71,7 @@ export const PROGRAMAS: Programa[] = [
   },
   {
     id: 'mas-dominadas',
+    portada: { h: true, m: true },
     nombre: 'Más dominadas',
     lema: 'Sumá dominadas en 30 días',
     descripcion: 'Método de volumen progresivo: muchas series cortas, sin llegar al fallo, y trabajo de espalda y bíceps que las sostiene. Si todavía no hacés una, usá banda elástica o hacé negativas (bajar en 5 segundos).',
@@ -91,6 +92,7 @@ export const PROGRAMAS: Programa[] = [
   },
   {
     id: 'flexiones-30',
+    portada: { h: true, m: true },
     nombre: 'De 10 a 30 flexiones',
     lema: 'Triplicá tus flexiones en un mes',
     descripcion: 'Sin equipamiento: flexiones con series escalonadas, tríceps y núcleo. Ideal para casa o para arrancar.',
@@ -108,6 +110,7 @@ export const PROGRAMAS: Programa[] = [
   },
   {
     id: 'brazos-centurion',
+    portada: { h: true, m: true },
     nombre: 'Brazos de centurión',
     lema: 'Bíceps y tríceps en 4 semanas',
     descripcion: 'Dos sesiones de brazos por semana con rangos de 8–12 y sobrecarga progresiva. Combinalo con tu rutina de siempre.',
@@ -124,6 +127,7 @@ export const PROGRAMAS: Programa[] = [
   },
   {
     id: 'gluteos-gladiadora',
+    portada: { m: true },
     nombre: 'Glúteos de gladiadora',
     lema: 'Glúteos y piernas fuertes en 6 semanas',
     descripcion: 'Tres días por semana centrados en glúteos: empuje de cadera, unilaterales y bisagra. Cada dos semanas cambian las repeticiones.',
@@ -145,6 +149,7 @@ export const PROGRAMAS: Programa[] = [
   },
   {
     id: 'fuerza-5x5',
+    portada: { h: true, m: true },
     nombre: 'Fuerza base 5×5',
     lema: 'Los básicos, más pesados cada semana',
     descripcion: 'El clásico 5×5: dos sesiones que se alternan (A y B) con sentadilla en todas. La sobrecarga progresiva te sugiere cuándo subir.',
@@ -160,6 +165,7 @@ export const PROGRAMAS: Programa[] = [
   // ——— Calistenia ———
   {
     id: 'calistenia-fundamentos',
+    portada: { h: true },
     nombre: 'Fundamentos de calistenia',
     lema: 'Dominá tu peso corporal en 4 semanas',
     descripcion: 'Los cuatro pilares de la calistenia: empuje (flexiones y fondos), tirón (dominadas), piernas y núcleo. Si una dominada todavía no sale, hacé negativas: subí con un salto y bajá en 5 segundos.',
@@ -203,6 +209,7 @@ export const PROGRAMAS: Programa[] = [
   // ——— En casa ———
   {
     id: 'casa-sin-equipo',
+    portada: { h: true, m: true },
     nombre: 'Legión en casa',
     lema: 'Cuerpo completo sin equipo, 30 minutos',
     descripcion: 'Tres sesiones por semana en el living: flexiones, piernas, glúteos y núcleo, con una soga (o saltos en el lugar) para el corazón. Cada semana suben las repeticiones.',
@@ -221,6 +228,7 @@ export const PROGRAMAS: Programa[] = [
   },
   {
     id: 'casa-mancuernas',
+    portada: { m: true },
     nombre: 'Casa con mancuernas',
     lema: 'Músculo en casa con un par de mancuernas',
     descripcion: 'Cuatro semanas de tren superior e inferior alternados (A y B) con lo justo: dos mancuernas y el suelo. Doble progresión: cuando completás el rango alto, subí el peso.',
@@ -234,6 +242,15 @@ export const PROGRAMAS: Programa[] = [
     }),
   },
 ];
+
+/** Archivo de la carátula según la figura de la persona (null = usar la estatua) */
+export function portadaDe(p: Programa, figura?: 'hombre' | 'mujer'): string | null {
+  if (!p.portada) return null;
+  const quiere = figura === 'mujer' ? 'm' : 'h';
+  const otra = quiere === 'm' ? 'h' : 'm';
+  const v = p.portada[quiere] ? quiere : p.portada[otra] ? otra : null;
+  return v ? `/programas/${p.id}-${v}.webp` : null;
+}
 
 export const buscarPrograma = (id: string) => PROGRAMAS.find((p) => p.id === id);
 

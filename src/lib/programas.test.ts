@@ -42,3 +42,17 @@ describe('lugares de los programas', () => {
     for (const p of PROGRAMAS) expect(p.equipo.length).toBeGreaterThan(3);
   });
 });
+
+describe('carátulas de los programas', () => {
+  it('elige la de la figura, si falta usa la otra y los archivos existen', async () => {
+    const { PROGRAMAS, portadaDe, buscarPrograma } = await import('./programas');
+    const { existsSync } = await import('node:fs');
+    expect(portadaDe(buscarPrograma('fuerza-5x5')!, 'mujer')).toBe('/programas/fuerza-5x5-m.webp');
+    expect(portadaDe(buscarPrograma('fuerza-5x5')!, 'hombre')).toBe('/programas/fuerza-5x5-h.webp');
+    expect(portadaDe(buscarPrograma('gluteos-gladiadora')!, 'hombre')).toBe('/programas/gluteos-gladiadora-m.webp');
+    for (const p of PROGRAMAS) for (const f of ['hombre', 'mujer'] as const) {
+      const r = portadaDe(p, f);
+      if (r) expect(existsSync(`public${r}`), r).toBe(true);
+    }
+  });
+});

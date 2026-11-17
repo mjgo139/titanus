@@ -48,6 +48,13 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
         globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,mp3}'],
+        // Las carátulas de programas no se descargan al instalar: se guardan la primera vez que se ven
+        globIgnores: ['programas/**'],
+        runtimeCaching: [{
+          urlPattern: ({ url }) => url.pathname.startsWith('/programas/') && url.pathname.endsWith('.webp'),
+          handler: 'CacheFirst',
+          options: { cacheName: 'caratulas', expiration: { maxEntries: 60 } },
+        }],
       },
     }),
   ],

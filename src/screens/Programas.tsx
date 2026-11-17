@@ -6,7 +6,7 @@ import { buscarEjercicio } from '../lib/biblioteca';
 import { NOMBRES_DIA } from '../lib/logica';
 import { textoObjetivo } from '../lib/plantillas';
 import {
-  LUGARES, PROGRAMAS, buscarPrograma, claveSesion, proximaSesion, rutinaDeSesion, textoAcceso, totalSesiones, type Lugar, type Programa,
+  LUGARES, PROGRAMAS, buscarPrograma, portadaDe, claveSesion, proximaSesion, rutinaDeSesion, textoAcceso, totalSesiones, type Lugar, type Programa,
 } from '../lib/programas';
 import { Animacion, Miniatura } from './Miniatura';
 import { imagenesEjercicio } from '../lib/biblioteca';
@@ -18,11 +18,20 @@ import { Icono } from '../ui/Icono';
 import { Encabezado, Hoja } from '../ui/piezas';
 import { useEmpezar } from './empezar';
 
+/** Punto de interés de cada carátula (para que el recorte deje ver la figura) */
+const FOCO_PORTADA: Record<string, string> = {
+  'casa-mancuernas-m': '60% 28%', 'casa-sin-equipo-m': '58% 45%', 'casa-sin-equipo-h': '58% 45%',
+  'calistenia-fundamentos-h': '70% 25%', 'flexiones-30-m': '70% 60%', 'flexiones-30-h': '70% 60%',
+  'fuerza-5x5-m': '55% 35%', 'fuerza-5x5-h': '55% 35%', 'brazos-centurion-m': '45% 25%', 'brazos-centurion-h': '45% 25%',
+  'mas-dominadas-m': '50% 25%', 'mas-dominadas-h': '50% 25%', 'gluteos-gladiadora-m': '65% 40%',
+};
+
 const nombreLugar = (l: Lugar) => LUGARES.find((x) => x.id === l)?.nombre ?? l;
 const iconoLugar = { gimnasio: 'pesa', calistenia: 'cuerpo', casa: 'hoy' } as const;
 
 function imagenDe(p: Programa, figura: Figura | undefined): { src: string; pos: string } {
-  if (p.portada) return { src: `/programas/${p.id}.webp`, pos: '50% 30%' };
+  const portada = portadaDe(p, figura);
+  if (portada) return { src: portada, pos: FOCO_PORTADA[portada.split('/').pop()!.replace('.webp', '')] ?? '50% 35%' };
   if (p.imagen === 'busto') return { src: busto, pos: '50% 20%' };
   return { src: estatuas(figura)[p.imagen], pos: foco(figura, p.imagen) };
 }
