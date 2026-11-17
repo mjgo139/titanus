@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.14.2',
+    fecha: '2026-11-16',
+    cambios: ['En Inicio (PC), "Entrenamiento de hoy" y "Tu semana" tienen la misma altura.'],
+  },
+  {
     version: '1.14.1',
     fecha: '2026-11-16',
     cambios: [

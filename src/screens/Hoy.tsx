@@ -76,7 +76,7 @@ export default function Hoy() {
 
         <div className="lg:col-start-1 lg:row-start-2">
           {!rutinas ? <Cargando forma="tarjeta" /> : (
-            <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:h-[212px]">
+            <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:h-[212px]" data-testid="tarjeta-hoy">
               <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="h-full w-[40%] object-cover" />
               <div className="flex flex-1 flex-col justify-center py-4 pr-4">
                 {deHoy ? <>
@@ -106,7 +106,7 @@ export default function Hoy() {
         <Grupo n={2} className="mt-4 lg:col-start-2 lg:row-start-1 lg:mt-0">Tu semana</Grupo>
 
         {/* Semana igual que en Stoica: día, número en Playfair, hoy subrayado en oro y la cuenta abajo */}
-        <div className="tarjeta flex flex-col px-3 py-4 lg:col-start-2 lg:row-start-2" data-testid="tu-semana">
+        <div className="tarjeta flex flex-col px-3 py-4 lg:col-start-2 lg:row-start-2 lg:h-[212px] lg:justify-between" data-testid="tu-semana">
           <div className="grid grid-cols-7 border-b border-ln2">
             {semana.map((d) => (
               <div key={d.fecha} className={`relative flex flex-col items-center gap-1 pb-3 ${d.hoy ? 'oro' : ''}`}

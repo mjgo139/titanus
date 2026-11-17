@@ -126,6 +126,14 @@ test('inicio: rango, racha, entrenamiento de hoy y semana (sin frase ni accesos)
   await expect(page.getByRole('heading', { name: 'Tu semana' })).toBeVisible();
   await expect(page.locator('blockquote')).toHaveCount(0);
   await expect(page.getByText('Tus mejores marcas')).toHaveCount(0);
+  if (test.info().project.name === 'pc') {
+    // Las dos tarjetas de Inicio miden lo mismo
+    await expect.poll(async () => {
+      const a = (await page.getByTestId('tarjeta-hoy').boundingBox())!;
+      const b = (await page.getByTestId('tu-semana').boundingBox())!;
+      return Math.round(Math.abs(a.height - b.height) + Math.abs(a.y - b.y));
+    }).toBeLessThan(3);
+  }
   await captura(page, '04-inicio');
   await entrar(page, 'light');
   await page.evaluate(() => localStorage.setItem('titanus-tema', 'claro'));
