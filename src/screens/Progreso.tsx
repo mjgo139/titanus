@@ -8,6 +8,7 @@ import {
 import type { Ejercicio, Entrenamiento, EstadoEjercicio, RegistroCuerpo } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
+import { Grupo } from '../ui/familia';
 import { Icono } from '../ui/Icono';
 import { Cargando, GraficoBarras, GraficoLinea, Hoja, Selector, Vacio } from '../ui/piezas';
 import { useEmpezar } from './empezar';
@@ -142,10 +143,7 @@ function ResumenProgreso() {
       <div>
       <Calendario dias={perfil.resumen.dias} />
 
-      <div className="mt-5 flex items-center justify-between">
-        <h3 className="font-display text-[20px] font-semibold">Logros</h3>
-        <Link to="/progreso?v=records" className="oro text-[14px]">Ver récords</Link>
-      </div>
+      <Grupo className="mt-6" extra={<Link to="/progreso?v=records" className="oro text-[14px] font-semibold">Ver récords</Link>}>Logros</Grupo>
       <div className="mt-3 grid grid-cols-3 gap-2">
         {[
           { i: 'fuego', v: romano(racha) === '—' ? '0' : romano(racha), t: 'Racha', s: racha === 1 ? 'semana' : 'semanas' },

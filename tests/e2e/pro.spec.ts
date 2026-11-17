@@ -21,7 +21,7 @@ async function entrar(page: Page, email = 'marco@ejemplo.com', ruta = '/') {
   await page.getByLabel('Correo').fill(email);
   await page.getByLabel('Contraseña', { exact: true }).fill('titanus');
   await page.getByRole('button', { name: 'Entrar' }).click();
-  await expect(page.getByRole('heading', { name: /Hola,/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches),/ })).toBeVisible();
 }
 
 test('entrenador: panel de clientes, ficha, comentar, asignar rutina y fijar objetivo', async ({ page }) => {
@@ -92,7 +92,7 @@ test('cliente: ve a su entrenador, la rutina asignada sin poder cambiarla y resp
   await entrar(page, 'ana@ejemplo.com');
   await expect(page.getByTestId('aviso-entrenador')).toContainText('1 nuevo');
   // Ana eligió legionaria: ve esas estatuas
-  await expect(page.locator('img[src*="avatar-f"]').first()).toBeVisible();
+  await expect(page.locator('img[src*="avatar-f"]:visible').first()).toBeVisible();
   await captura(page, '37-cliente-inicio');
   await ir(page, 'Entreno');
   // No tiene pestaña de clientes

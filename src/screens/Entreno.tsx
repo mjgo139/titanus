@@ -6,6 +6,7 @@ import { NOMBRES_DIA } from '../lib/logica';
 import type { Ejercicio, Rutina } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
+import { Grupo } from '../ui/familia';
 import { Icono } from '../ui/Icono';
 import { Cargando, Hoja, Vacio } from '../ui/piezas';
 import { PLANTILLAS, rutinasDePlantilla, textoObjetivo, type Plantilla } from '../lib/plantillas';
@@ -66,10 +67,7 @@ export default function Entreno() {
         )}
       </div>
 
-      <div className="mt-7 mb-3 flex items-center justify-between">
-        <h2 className="font-display text-[22px] font-semibold">Rutinas</h2>
-        <Link to="/rutinas/nueva" className="btn-sec h-9 px-3 text-[13px]"><Icono n="mas" size={16} />Nueva</Link>
-      </div>
+      <Grupo n={1} className="mt-7 mb-3" extra={<Link to="/rutinas/nueva" className="btn-sec h-9 px-3 text-[13px]"><Icono n="mas" size={16} />Nueva</Link>}>Mis rutinas</Grupo>
 
       {!rutinas ? <Cargando /> : rutinas.length === 0 ? (
         <Vacio titulo="Sin rutinas todavía" linea="Por ejemplo: «Pecho y tríceps» los lunes y jueves.">
@@ -102,8 +100,8 @@ export default function Entreno() {
       )}
 
       <div className="mt-8 mb-3">
-        <h2 className="font-display text-[22px] font-semibold">Plantillas</h2>
-        <p className="text-[13px] text-mu">Rutinas armadas para cargar con un toque.</p>
+        <Grupo n={2}>Plantillas</Grupo>
+        <p className="mt-2 text-[13px] text-mu">Rutinas armadas para cargar con un toque.</p>
       </div>
       <ul className="grid gap-3 lg:grid-cols-2">
         {PLANTILLAS.map((p) => (

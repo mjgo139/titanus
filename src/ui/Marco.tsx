@@ -1,7 +1,8 @@
 import { flushSync } from 'react-dom';
-import { NavLink, Outlet, useLocation, useNavigate, type NavigateFunction } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate, type NavigateFunction } from 'react-router-dom';
 import { leerBorrador } from '../lib/borrador';
-import { reloj } from '../lib/logica';
+import { rango, reloj } from '../lib/logica';
+import { estatuas } from './estatuas';
 import { Icono } from './Icono';
 import { useApp } from './contexto';
 import { useEffect, useState } from 'react';
@@ -61,7 +62,7 @@ const activa = (a: string, isActive: boolean, ruta: string) =>
 
 /** Celular: barra de pestañas abajo. PC: barra lateral oscura de 248px */
 export function Marco() {
-  const { mensaje, repo, profesional } = useApp();
+  const { mensaje, repo, profesional, perfil } = useApp();
   // Los profesionales tienen una pestaña más: sus clientes
   const PESTANAS = profesional ? [...PESTANAS_BASE.slice(0, 3), { a: '/clientes', n: 'clientes', t: 'Clientes' }, PESTANAS_BASE[3]] : PESTANAS_BASE;
   const loc = useLocation();
@@ -80,8 +81,21 @@ export function Marco() {
             </NavLink>
           ))}
         </nav>
-        <div className="mt-auto text-[11px] uppercase tracking-[.14em] text-[#7d7462]">
-          {repo.modo === 'prueba' ? 'Modo prueba' : 'Entrenamiento · Disciplina · Fuerza'}
+        {/* Como en Stoica: la persona al pie de la barra lateral */}
+        <div className="mt-auto">
+          {perfil && (
+            <Link to="/perfil" onClick={(e) => navegarSuave(e, nav, '/perfil')} data-testid="persona-lateral"
+              className="flex items-center gap-3 rounded-xl px-2 py-2 text-[14px] font-semibold text-[#c9bda7] transition-colors hover:bg-[#1d180f] hover:text-[#f7f1e7]">
+              <img src={estatuas(perfil.figura).avatar} alt="" className="h-9 w-9 rounded-full border border-[#a66c16] object-cover" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">{perfil.nombre.split(' ')[0]}</span>
+                <span className="block truncate text-[11px] font-semibold uppercase tracking-[.12em] text-[#7d7462]">{rango(perfil.resumen.total).nombre}</span>
+              </span>
+            </Link>
+          )}
+          <div className="mt-3 px-2 text-[10.5px] uppercase tracking-[.14em] text-[#7d7462]">
+            {repo.modo === 'prueba' ? 'Modo prueba' : 'Entrenamiento · Disciplina · Fuerza'}
+          </div>
         </div>
       </aside>
 

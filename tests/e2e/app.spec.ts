@@ -26,7 +26,7 @@ async function entrar(page: Page, tema: 'light' | 'dark' = 'dark') {
   await page.reload();
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await page.getByRole('button', { name: 'Entrar' }).click();
-  await expect(page.getByRole('heading', { name: /Hola, Marco/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches), Marco/ })).toBeVisible();
 }
 
 test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
@@ -87,9 +87,9 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await expect(page.getByText('Recomendado para vos')).toBeVisible();
   await captura(page, '02d-conocerte-plan');
   await page.getByRole('button', { name: 'Entrar a TITANUS' }).click();
-  await expect(page.getByRole('heading', { name: 'Hola, Lucía' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches), Lucía/ })).toBeVisible();
   // Eligió mujer: ve las estatuas de legionaria y sus datos quedan en Perfil
-  await expect(page.locator('img[src*="avatar-f"]').first()).toBeVisible();
+  await expect(page.locator('img[src*="avatar-f"]:visible').first()).toBeVisible();
   await expect(page.getByTestId('rango')).toHaveText('Recluta · Nivel 1');
   await captura(page, '03-inicio-vacio');
   await ir(page, 'Perfil');
@@ -100,7 +100,7 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
 test('modo prueba: la sesión sobrevive a una recarga', async ({ page }) => {
   await entrar(page);
   await page.reload();
-  await expect(page.getByRole('heading', { name: /Hola, Marco/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches), Marco/ })).toBeVisible();
 });
 
 test('invitado: entra sin cuenta y después crea su cuenta sin perder nada', async ({ page }) => {
@@ -206,7 +206,7 @@ test('entrenar estilo Hevy: anterior, tipos de serie, descanso, récord y resume
   await expect(page.getByRole('heading', { name: 'Récords nuevos' })).toBeVisible();
   await captura(page, '12-resumen');
   await page.getByRole('button', { name: 'Volver al inicio' }).click();
-  await expect(page.getByRole('heading', { name: /Hola, Marco/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches), Marco/ })).toBeVisible();
 });
 
 test('entrenamiento libre: minimizar, volver y guardar como rutina', async ({ page }) => {
@@ -301,7 +301,7 @@ test('perfil: rango, apariencia, unidades, versión de admin y salir', async ({ 
   await expect(page.getByText('la rutina ya arranca con más peso')).toBeVisible();
   await page.getByRole('radio', { name: 'Libras (lb)' }).click();
   await page.getByRole('radio', { name: 'Legionaria' }).click();
-  await expect(page.locator('img[src*="avatar-f"]').first()).toBeVisible();
+  await expect(page.locator('img[src*="avatar-f"]:visible').first()).toBeVisible();
   await expect(page.getByTestId('version')).toContainText('commit');
   await captura(page, '20-perfil');
   await page.getByRole('radio', { name: 'Mármol' }).click();

@@ -69,6 +69,20 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 @layer components {
   .marca { font-family: var(--f-marca); font-weight: 700; letter-spacing: .06em; }
   .etiqueta { @apply text-[11.5px] font-bold uppercase text-mu; letter-spacing: .14em; }
+  /* Familia estoica (igual que Stoica): título de sección, fichas, panel del día y laurel de fondo */
+  .grupo { @apply text-[11.5px] font-bold uppercase whitespace-nowrap; letter-spacing: .14em; color: var(--gold); }
+  .ficha {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-ln2 px-3 text-[13px] font-semibold text-tx;
+    height: 32px; background: color-mix(in srgb, var(--bg) 70%, transparent);
+  }
+  a.ficha:hover, button.ficha:hover { border-color: var(--gold); }
+  .panel-dia {
+    @apply relative overflow-hidden rounded-[20px] border border-gold2;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--gold) 14%, var(--sf)) 0%, var(--sf) 62%);
+    box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -14px rgba(0,0,0,.6);
+    padding: 20px 20px 18px;
+  }
+  .laurel-fondo { position: absolute; right: -30px; top: -20px; opacity: .13; pointer-events: none; }
   .titulo { font-family: var(--f-marca); @apply font-bold text-tx; font-size: 28px; line-height: 1.15; letter-spacing: .02em; }
   .titulo-tarjeta { font-family: var(--f-display); @apply font-semibold text-tx text-[20px] leading-tight; }
   .num { font-family: var(--f-display); @apply font-semibold; font-variant-numeric: tabular-nums; }

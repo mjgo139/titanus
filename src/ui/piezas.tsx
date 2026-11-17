@@ -1,3 +1,4 @@
+import { Grupo } from './familia';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icono } from './Icono';
@@ -27,13 +28,11 @@ export function Encabezado({ etiqueta, titulo, linea, atras, accion }: {
   );
 }
 
-export function Seccion({ titulo, children, accion }: { titulo: string; children: ReactNode; accion?: ReactNode }) {
+/** Sección con el título de la familia estoica: "TÍTULO ————" en oro con línea fina */
+export function Seccion({ titulo, children, accion, n }: { titulo: string; children: ReactNode; accion?: ReactNode; n?: number }) {
   return (
     <section className="mt-7">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="etiqueta">{titulo}</h2>
-        {accion}
-      </div>
+      <Grupo n={n} extra={accion} className="mb-3">{titulo}</Grupo>
       {children}
     </section>
   );

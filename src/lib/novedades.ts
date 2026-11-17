@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.14.0',
+    fecha: '2026-11-16',
+    cambios: [
+      'TITANUS ahora es de la familia de Stoica: "Panel del día" con laurel de fondo, saludo según la hora y fichas (fecha, racha, entrenamientos).',
+      'Títulos de sección al estilo de la familia: "I · Entrenamiento de hoy" en oro con línea fina, también en Entreno, Progreso y Perfil.',
+      'Tu semana como en Stoica: día, número grande, hoy subrayado en oro y "días entrenados" con barra.',
+      'En PC, tu nombre y rango al pie de la barra lateral.',
+    ],
+  },
+  {
     version: '1.13.1',
     fecha: '2026-11-16',
     cambios: ['Cabecera de la lista renovada: una sola franja con el avance, el nombre y las cifras (carga, series y ejercicios).'],
