@@ -37,3 +37,17 @@ export function Grupo({ n, children, extra, className = '' }: { n?: number; chil
 export function Ficha({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <span className={`ficha ${className}`}>{children}</span>;
 }
+
+/** Cabecera de página de la familia: etiqueta en oro, título grande y una línea (ritmo de Stoica) */
+export function CabeceraPagina({ etiqueta, titulo, linea, accion }: { etiqueta: string; titulo: ReactNode; linea?: ReactNode; accion?: ReactNode }) {
+  return (
+    <header className="flex items-end justify-between gap-4">
+      <div className="min-w-0">
+        <div className="grupo">{etiqueta}</div>
+        <h1 className="titulo mt-1.5">{titulo}</h1>
+        {linea && <p className="mt-1.5 text-[15px] font-medium text-mu">{linea}</p>}
+      </div>
+      {accion}
+    </header>
+  );
+}

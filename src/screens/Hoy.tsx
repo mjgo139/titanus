@@ -42,20 +42,20 @@ export default function Hoy() {
   const hechos = semana.filter((d) => d.hecho).length;
   const diaCorto = (f: string | number) => new Intl.DateTimeFormat('es-PY', { weekday: 'short' }).format(new Date(f)).replace('.', '').slice(0, 3);
   return (
-    <div className="pt-6">
+    <div className="flex flex-col gap-4 pt-6 lg:gap-5">
       {/* Panel del día: igual que en Stoica (laurel de fondo, saludo y fichas), con la estatua de TITANUS */}
       <section className="panel-dia entrar" data-testid="panel-dia">
         <Laurel fondo size={300} />
         <div className="relative flex items-start gap-4">
-          <img src={estatuas(perfil.figura).avatar} alt="" className="h-[64px] w-[64px] shrink-0 rounded-full border-2 border-gold object-cover lg:h-[76px] lg:w-[76px]" />
+          <img src={estatuas(perfil.figura).avatar} alt="" className="h-[64px] w-[64px] shrink-0 rounded-full border-2 border-gold object-cover lg:h-[84px] lg:w-[84px]" />
           <div className="min-w-0 flex-1">
             <div className="grupo">Panel del día</div>
-            <h1 className="mt-1 font-display text-[26px] font-bold leading-tight lg:text-[32px]">{saludo}, {perfil.nombre.split(' ')[0]}</h1>
+            <h1 className="mt-1 font-display text-[26px] font-bold leading-tight lg:mt-2 lg:text-[40px] lg:leading-[44px]">{saludo}, {perfil.nombre.split(' ')[0]}</h1>
             <p className="oro mt-1 text-[14px] font-semibold" data-testid="rango">{r.nombre} · Nivel {r.nivel}</p>
           </div>
           <Link to="/perfil" aria-label="Ir a mi perfil" className="toque flex items-center justify-center oro"><Icono n="corona" size={24} /></Link>
         </div>
-        <div className="relative mt-4 flex flex-wrap gap-2">
+        <div className="relative mt-4 flex flex-wrap gap-2 lg:mt-5">
           <Ficha><Icono n="calendario" size={15} className="oro" /><span className="first-letter:uppercase">{fechaLarga}</span></Ficha>
           <Link to="/progreso" className="ficha">
             <Icono n="fuego" size={15} className="oro" />
@@ -67,19 +67,17 @@ export default function Hoy() {
         </div>
       </section>
 
-      <div className="mt-4 flex flex-col gap-3">
-        <AvisoHoy />
-        <ProgramaEnCurso />
-      </div>
+      <AvisoHoy />
+      <ProgramaEnCurso />
 
       {/* Celular: una columna. PC: dos columnas con filas alineadas (título, contenido) */}
-      <div className="mt-2 flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-x-8 lg:gap-y-3">
-        <Grupo n={1} className="mt-4 lg:col-start-1 lg:row-start-2">Entrenamiento de hoy</Grupo>
+      <div className="mt-2 flex flex-col gap-3 lg:mt-0 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:items-start lg:gap-x-6 lg:gap-y-3">
+        <Grupo n={1} className="mt-4 lg:col-start-1 lg:row-start-1 lg:mt-0">Entrenamiento de hoy</Grupo>
 
-        <div className="lg:col-start-1 lg:row-start-3">
+        <div className="lg:col-start-1 lg:row-start-2">
           {!rutinas ? <Cargando forma="tarjeta" /> : (
-            <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:min-h-[232px]">
-              <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="w-[40%] object-cover" />
+            <div className="tarjeta flex h-full min-h-[165px] items-stretch gap-3 overflow-hidden p-0 lg:h-[212px]">
+              <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="h-full w-[40%] object-cover" />
               <div className="flex flex-1 flex-col justify-center py-4 pr-4">
                 {deHoy ? <>
                   <div className="etiqueta oro">Día {romano(idx)} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : 'Primera sesión'}</div>
@@ -105,10 +103,10 @@ export default function Hoy() {
           )}
         </div>
 
-        <Grupo n={2} className="mt-4 lg:col-start-2 lg:row-start-2">Tu semana</Grupo>
+        <Grupo n={2} className="mt-4 lg:col-start-2 lg:row-start-1 lg:mt-0">Tu semana</Grupo>
 
         {/* Semana igual que en Stoica: día, número en Playfair, hoy subrayado en oro y la cuenta abajo */}
-        <div className="tarjeta flex flex-col px-3 py-4 lg:col-start-2 lg:row-start-3 lg:h-full lg:justify-center lg:px-5" data-testid="tu-semana">
+        <div className="tarjeta flex flex-col px-3 py-4 lg:col-start-2 lg:row-start-2" data-testid="tu-semana">
           <div className="grid grid-cols-7 border-b border-ln2">
             {semana.map((d) => (
               <div key={d.fecha} className={`relative flex flex-col items-center gap-1 pb-3 ${d.hoy ? 'oro' : ''}`}
@@ -120,7 +118,7 @@ export default function Hoy() {
               </div>
             ))}
           </div>
-          <div className="pt-4 lg:pt-7">
+          <div className="pt-4">
             <div className="flex items-baseline gap-2">
               <span className="num text-[34px] leading-none">{hechos}</span><span className="num text-[18px] text-mu">/7</span>
               <span className="ml-1 text-[14px] font-semibold text-mu">días entrenados</span>

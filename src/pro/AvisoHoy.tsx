@@ -30,7 +30,7 @@ export function AvisoHoy() {
   }, [repo, usuario.uid, profesional]);
 
   return (
-    <div className="mb-4 flex flex-col gap-3 empty:hidden">
+    <div className="flex flex-col gap-3 empty:hidden">
       {!vinculo && invitacion && (
         <Link to="/mi-entrenador" className="tarjeta entrar flex items-center gap-3 border-gold" data-testid="aviso-invitacion">
           <Icono n="enlace" className="oro shrink-0" />

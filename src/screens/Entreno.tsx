@@ -6,7 +6,7 @@ import { NOMBRES_DIA } from '../lib/logica';
 import type { Ejercicio, Rutina } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
-import { Grupo } from '../ui/familia';
+import { CabeceraPagina, Grupo } from '../ui/familia';
 import { Icono } from '../ui/Icono';
 import { Cargando, Hoja, Vacio } from '../ui/piezas';
 import { PLANTILLAS, rutinasDePlantilla, textoObjetivo, type Plantilla } from '../lib/plantillas';
@@ -41,7 +41,7 @@ export default function Entreno() {
 
   return (
     <div className="pt-6">
-      <h1 className="titulo text-center lg:text-left">Entrenamiento</h1>
+      <CabeceraPagina etiqueta="Tu entrenamiento" titulo="Entrenamiento" linea="Rutinas, plantillas y entrenamiento libre." />
       <NavEntreno />
 
       <div className="relative -mx-[17px] mt-3 mb-3 h-[200px] overflow-hidden lg:mx-0 lg:h-[260px] lg:rounded-[14px] lg:border lg:border-ln">

@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.14.1',
+    fecha: '2026-11-16',
+    cambios: [
+      'En PC, las mismas medidas que Stoica: contenido hasta 1480 px con los mismos márgenes, barra lateral con renglones de 46 px e íconos más grandes.',
+      'Panel del día más amplio (saludo de 40 px), fichas, tarjetas y espacios iguales a Stoica.',
+      'Cada página empieza como en Stoica: etiqueta en oro, título grande y una línea de explicación.',
+    ],
+  },
+  {
     version: '1.14.0',
     fecha: '2026-11-16',
     cambios: [

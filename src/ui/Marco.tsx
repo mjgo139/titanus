@@ -70,14 +70,14 @@ export function Marco() {
   const enEntreno = loc.pathname.startsWith('/entrenar');
   return (
     <div className="min-h-screen lg:pl-[248px]">
-      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-5 py-7 border-r border-ln2" style={{ background: 'var(--lateral)' }}>
-        <Logo />
-        <div className="divisor mt-5" />
+      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-4 pt-7 pb-5 border-r border-ln2" style={{ background: 'var(--lateral)' }}>
+        <div className="px-2.5"><Logo /></div>
+        <div className="divisor mt-6" />
         <nav className="mt-6 flex flex-col gap-1" aria-label="Menú">
           {PESTANAS.map((p) => (
             <NavLink key={p.a} to={p.a} end={p.a === '/'} onClick={(e) => navegarSuave(e, nav, p.a)}
-              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 h-11 text-[14px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-[#1d180f] text-[#f2c55c]' : 'text-[#c9bda7] hover:text-[#f7f1e7]'}`}>
-              <Icono n={p.n} size={20} />{p.t}
+              className={({ isActive }) => `flex items-center gap-[14px] rounded-[10px] px-[14px] h-[46px] text-[14.5px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-[#1d180f] text-[#f2c55c]' : 'text-[#c9bda7] hover:text-[#f7f1e7]'}`}>
+              <Icono n={p.n} size={22} />{p.t}
             </NavLink>
           ))}
         </nav>
@@ -99,7 +99,7 @@ export function Marco() {
         </div>
       </aside>
 
-      <main className={`mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:px-10 ${loc.pathname.startsWith('/entrenar') ? 'lg:max-w-[1480px]' : 'lg:max-w-[1180px]'}`}>
+      <main className="mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:max-w-[1480px] lg:px-12 lg:pt-5 lg:pb-16">
         {repo.modo === 'prueba' && (
           <div className="mt-3 rounded-full border border-ln2 px-4 py-1 text-center text-[11px] font-semibold uppercase tracking-[.12em] text-mu2 lg:mx-auto lg:max-w-[360px]">
             Modo prueba · datos inventados

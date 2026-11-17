@@ -72,7 +72,7 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
   /* Familia estoica (igual que Stoica): título de sección, fichas, panel del día y laurel de fondo */
   .grupo { @apply text-[11.5px] font-bold uppercase whitespace-nowrap; letter-spacing: .14em; color: var(--gold); }
   .ficha {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-ln2 px-3 text-[13px] font-semibold text-tx;
+    @apply inline-flex items-center gap-2 rounded-full border border-ln2 px-3 text-[12.5px] font-bold text-tx;
     height: 32px; background: color-mix(in srgb, var(--bg) 70%, transparent);
   }
   a.ficha:hover, button.ficha:hover { border-color: var(--gold); }
@@ -82,15 +82,18 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
     box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -14px rgba(0,0,0,.6);
     padding: 20px 20px 18px;
   }
+  @media (min-width: 1024px) { .panel-dia { padding: 30px 34px; } }
   .laurel-fondo { position: absolute; right: -30px; top: -20px; opacity: .13; pointer-events: none; }
   .titulo { font-family: var(--f-marca); @apply font-bold text-tx; font-size: 28px; line-height: 1.15; letter-spacing: .02em; }
+  @media (min-width: 1024px) { .titulo { font-size: 36px; } }
   .titulo-tarjeta { font-family: var(--f-display); @apply font-semibold text-tx text-[20px] leading-tight; }
   .num { font-family: var(--f-display); @apply font-semibold; font-variant-numeric: tabular-nums; }
   .oro { color: var(--gold); }
   .tarjeta {
     background: var(--panel-grad);
-    @apply rounded-[14px] border border-ln; box-shadow: var(--sombra); padding: 15px 16px;
+    @apply rounded-[16px] border border-ln; box-shadow: var(--sombra); padding: 15px 16px;
   }
+  @media (min-width: 1024px) { .tarjeta { padding: 18px 20px; } }
   .hero {
     @apply rounded-[14px] border border-gold2 relative overflow-hidden text-center;
     background: linear-gradient(130deg, var(--bg2), var(--sf), var(--bg));

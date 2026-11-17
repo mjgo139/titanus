@@ -1,3 +1,4 @@
+import { CabeceraPagina } from '../ui/familia';
 import { useState } from 'react';
 import { Link, NavLink, Navigate, useParams } from 'react-router-dom';
 import busto from '../assets/busto.webp';
@@ -79,7 +80,7 @@ export function PaginaProgramas() {
   const lista = activo ? [activo, ...PROGRAMAS.filter((p) => p.id !== activo.id)] : PROGRAMAS;
   return (
     <div className="pt-6">
-      <h1 className="titulo text-center lg:text-left">Programas</h1>
+      <CabeceraPagina etiqueta="Planes con objetivo" titulo="Programas" />
       <NavEntreno />
       <p className="mt-4 text-center text-[14px] text-mu lg:text-left">Planes de varias semanas con un objetivo. Seguís uno a la vez y la app marca tu avance.</p>
       <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -97,7 +98,7 @@ export function ProgramaEnCurso() {
   if (!p || !perfil.programa) return null;
   const sig = proximaSesion(p, perfil.programa.hechas);
   return (
-    <div className="tarjeta mb-4 entrar" data-testid="programa-en-curso">
+    <div className="tarjeta entrar" data-testid="programa-en-curso">
       <div className="flex items-start gap-3">
         <Icono n="corona" className="oro shrink-0" />
         <div className="min-w-0 flex-1">

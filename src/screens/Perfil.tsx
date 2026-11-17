@@ -1,3 +1,4 @@
+import { CabeceraPagina } from '../ui/familia';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { mensajeError } from '../data/repo';
@@ -56,7 +57,7 @@ export default function Perfil() {
     <div>
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-10">
       <div className="lg:sticky lg:top-6">
-      <h1 className="titulo mt-6 mb-5 text-center lg:text-left">Perfil</h1>
+      <div className="mt-6 mb-5"><CabeceraPagina etiqueta="Tu cuenta" titulo="Perfil" linea="Datos, apariencia y ajustes." /></div>
       <div className="text-center">
         <img src={estatuas(perfil.figura).avatar} alt="" className="mx-auto h-[100px] w-[100px] rounded-full border-2 border-gold object-cover" />
         <h2 className="mt-3 font-display text-[25px] font-semibold">{perfil.nombre}</h2>

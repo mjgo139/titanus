@@ -8,7 +8,7 @@ import {
 import type { Ejercicio, Entrenamiento, EstadoEjercicio, RegistroCuerpo } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
-import { Grupo } from '../ui/familia';
+import { CabeceraPagina, Grupo } from '../ui/familia';
 import { Icono } from '../ui/Icono';
 import { Cargando, GraficoBarras, GraficoLinea, Hoja, Selector, Vacio } from '../ui/piezas';
 import { useEmpezar } from './empezar';
@@ -22,7 +22,7 @@ export default function Progreso() {
   const vista = (params.get('v') as Vista) || 'resumen';
   return (
     <div className="pt-6">
-      <h1 className="titulo mb-5 text-center lg:text-left">Progreso</h1>
+      <div className="mb-5"><CabeceraPagina etiqueta="Tu camino" titulo="Progreso" linea="Cada semana suma. Mirá cuánto avanzaste." /></div>
       <div className="lg:max-w-[560px]">
       <Selector nombre="Sección" valor={vista} alCambiar={(v) => setParams({ v }, { replace: true })}
         opciones={[{ v: 'resumen', t: 'Resumen' }, { v: 'historial', t: 'Historial' }, { v: 'records', t: 'Récords' }, { v: 'medidas', t: 'Medidas' }]} />
