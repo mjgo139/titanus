@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.15.0',
+    fecha: '2026-11-17',
+    cambios: [
+      'Programas separados por lugar: Gimnasio, Calistenia y En casa, con filtro arriba.',
+      'Cuatro programas nuevos: Fundamentos de calistenia, Gladiador de barra, Legión en casa (sin equipo) y Casa con mancuernas.',
+      'En la ficha de cada programa, cada ejercicio muestra su animación pequeñita, y se indica el equipo que hace falta.',
+    ],
+  },
+  {
     version: '1.14.2',
     fecha: '2026-11-16',
     cambios: ['En Inicio (PC), "Entrenamiento de hoy" y "Tu semana" tienen la misma altura.'],

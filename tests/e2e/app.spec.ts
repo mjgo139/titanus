@@ -450,15 +450,26 @@ test('programas: tarjetas, empezar uno, hacer una sesión y ver el avance', asyn
   // Los programas no están en "Mis entrenos": tienen su propia página
   await expect(page.getByTestId('programa')).toHaveCount(0);
   await page.getByRole('link', { name: 'Programas' }).first().click();
-  await expect(page.getByTestId('programa')).toHaveCount(6);
+  await expect(page.getByTestId('programa')).toHaveCount(10);
   await expect(page.getByTestId('acceso-programa').first()).toHaveText('Gratis');
+  // Separados por lugar: Gimnasio, Calistenia y En casa
+  await expect(page.getByTestId('seccion-gimnasio')).toBeVisible();
+  await expect(page.getByTestId('seccion-calistenia').getByTestId('programa')).toHaveCount(3);
+  await expect(page.getByTestId('seccion-casa').getByTestId('programa')).toHaveCount(2);
+  await page.getByTestId('filtro-lugar').getByRole('button', { name: /En casa/ }).click();
+  await expect(page.getByTestId('programa')).toHaveCount(2);
+  await expect(page.getByTestId('seccion-gimnasio')).toHaveCount(0);
+  await captura(page, '06b2-programas-en-casa');
+  await page.getByTestId('filtro-lugar').getByRole('button', { name: 'Todos' }).click();
   // Todas las tarjetas del mismo tamaño
   const altos = await page.getByTestId('programa').evaluateAll((l) => l.map((e) => Math.round(e.getBoundingClientRect().height)));
   expect(new Set(altos).size).toBe(1);
   await captura(page, '06b-programas');
-  await page.getByTestId('programa').filter({ hasText: 'Más dominadas' }).click();
+  await page.getByTestId('programa').filter({ has: page.getByRole('heading', { name: 'Más dominadas', exact: true }) }).click();
   await expect(page.getByRole('heading', { name: 'Más dominadas' })).toBeVisible();
   await expect(page.getByTestId('semana-programa')).toHaveCount(4);
+  // Cada ejercicio de la sesión muestra su animación pequeñita
+  await expect(page.getByTestId('ejercicio-programa').first().getByRole('img', { name: /Cómo se hace/ })).toBeVisible();
   await page.getByRole('button', { name: 'Empezar programa' }).click();
   await expect(page.getByTestId('avance-programa')).toContainText('Sesión 1 de 12');
   await captura(page, '06c-programa');

@@ -6,8 +6,11 @@ import { buscarEjercicio } from '../lib/biblioteca';
 import { NOMBRES_DIA } from '../lib/logica';
 import { textoObjetivo } from '../lib/plantillas';
 import {
-  PROGRAMAS, buscarPrograma, claveSesion, proximaSesion, rutinaDeSesion, textoAcceso, totalSesiones, type Programa,
+  LUGARES, PROGRAMAS, buscarPrograma, claveSesion, proximaSesion, rutinaDeSesion, textoAcceso, totalSesiones, type Lugar, type Programa,
 } from '../lib/programas';
+import { Animacion, Miniatura } from './Miniatura';
+import { imagenesEjercicio } from '../lib/biblioteca';
+import { Grupo } from '../ui/familia';
 import type { Figura } from '../lib/tipos';
 import { useSesion } from '../ui/contexto';
 import { estatuas, foco } from '../ui/estatuas';
@@ -15,7 +18,11 @@ import { Icono } from '../ui/Icono';
 import { Encabezado, Hoja } from '../ui/piezas';
 import { useEmpezar } from './empezar';
 
+const nombreLugar = (l: Lugar) => LUGARES.find((x) => x.id === l)?.nombre ?? l;
+const iconoLugar = { gimnasio: 'pesa', calistenia: 'cuerpo', casa: 'hoy' } as const;
+
 function imagenDe(p: Programa, figura: Figura | undefined): { src: string; pos: string } {
+  if (p.portada) return { src: `/programas/${p.id}.webp`, pos: '50% 30%' };
   if (p.imagen === 'busto') return { src: busto, pos: '50% 20%' };
   return { src: estatuas(figura)[p.imagen], pos: foco(figura, p.imagen) };
 }
@@ -49,11 +56,11 @@ export function TarjetaPrograma({ p }: { p: Programa }) {
       <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[52%] object-cover opacity-90" style={{ objectPosition: img.pos }} />
       <div className="relative flex w-[66%] flex-1 flex-col">
         <div className="flex items-center gap-2">
-          <span className="etiqueta oro">{p.categoria}</span><Sello p={p} />
+          <span className="etiqueta oro inline-flex items-center gap-1" data-testid="lugar-programa"><Icono n={iconoLugar[p.lugar]} size={13} />{nombreLugar(p.lugar)}</span><Sello p={p} />
         </div>
         <h3 className="marca mt-2 line-clamp-2 text-[20px] leading-tight">{p.nombre}</h3>
         <p className="mt-1 line-clamp-2 text-[14px] text-tx2">{p.lema}</p>
-        <div className="mt-auto pt-3 text-[12px] text-mu">{p.semanas.length} semanas · {p.semanas[0].sesiones.length} días por semana</div>
+        <div className="mt-auto pt-3 text-[12px] text-mu">{p.categoria} · {p.semanas.length} semanas · {p.semanas[0].sesiones.length} días</div>
       </div>
       {activo && <div className="relative mt-2"><Avance hechas={activo.hechas.length} total={totalSesiones(p)} /></div>}
     </Link>
@@ -73,24 +80,40 @@ export function NavEntreno() {
   );
 }
 
-/** Página de programas: todas las tarjetas del mismo tamaño */
+/** Página de programas: separados por lugar (Gimnasio · Calistenia · En casa), tarjetas del mismo tamaño */
 export function PaginaProgramas() {
   const { perfil } = useSesion();
+  const [filtro, setFiltro] = useState<Lugar | 'todos'>('todos');
   const activo = perfil.programa ? buscarPrograma(perfil.programa.id) : undefined;
-  const lista = activo ? [activo, ...PROGRAMAS.filter((p) => p.id !== activo.id)] : PROGRAMAS;
+  const lugares = filtro === 'todos' ? LUGARES : LUGARES.filter((l) => l.id === filtro);
+  const ordenar = (ps: Programa[]) => (activo ? [...ps.filter((p) => p.id === activo.id), ...ps.filter((p) => p.id !== activo.id)] : ps);
+  const chip = (activa: boolean) => `ficha h-9 px-4 ${activa ? 'border-gold oro' : 'text-mu'}`;
   return (
     <div className="pt-6">
-      <CabeceraPagina etiqueta="Planes con objetivo" titulo="Programas" />
+      <CabeceraPagina etiqueta="Planes con objetivo" titulo="Programas" linea="Planes de varias semanas. Seguís uno a la vez y la app marca tu avance." />
       <NavEntreno />
-      <p className="mt-4 text-center text-[14px] text-mu lg:text-left">Planes de varias semanas con un objetivo. Seguís uno a la vez y la app marca tu avance.</p>
-      <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {lista.map((p) => <li key={p.id}><TarjetaPrograma p={p} /></li>)}
-      </ul>
+      <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Dónde entrenás" data-testid="filtro-lugar">
+        <button className={chip(filtro === 'todos')} aria-pressed={filtro === 'todos'} onClick={() => setFiltro('todos')}>Todos</button>
+        {LUGARES.map((l) => (
+          <button key={l.id} className={chip(filtro === l.id)} aria-pressed={filtro === l.id} onClick={() => setFiltro(l.id)}>
+            <Icono n={iconoLugar[l.id]} size={15} />{l.nombre}
+            <span className="num text-[13px] text-mu">{PROGRAMAS.filter((p) => p.lugar === l.id).length}</span>
+          </button>
+        ))}
+      </div>
+      {lugares.map((l, i) => (
+        <section key={l.id} className="mt-6" data-testid={`seccion-${l.id}`}>
+          <Grupo n={i + 1}>{l.nombre}</Grupo>
+          <p className="mt-2 text-[14px] text-mu">{l.linea}</p>
+          <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {ordenar(PROGRAMAS.filter((p) => p.lugar === l.id)).map((p) => <li key={p.id}><TarjetaPrograma p={p} /></li>)}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }
 
-/** En Inicio: la próxima sesión del programa en curso */
 export function ProgramaEnCurso() {
   const { perfil } = useSesion();
   const empezar = useEmpezar();
@@ -137,7 +160,7 @@ export default function VerPrograma() {
 
   return (
     <div>
-      <Encabezado atras="/programas" etiqueta={`Programa · ${p.categoria}`} titulo={p.nombre} linea={p.lema} />
+      <Encabezado atras="/programas" etiqueta={`${nombreLugar(p.lugar)} · ${p.categoria}`} titulo={p.nombre} linea={p.lema} />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
         <section className="flex flex-col gap-4">
@@ -149,6 +172,8 @@ export default function VerPrograma() {
                 <span><b className="num oro text-[20px]">{p.semanas.length}</b> semanas</span>
                 <span><b className="num oro text-[20px]">{p.semanas[0].sesiones.length}</b> sesiones por semana</span>
                 <span>{p.nivel}</span>
+                <span className="inline-flex items-center gap-1.5 oro"><Icono n={iconoLugar[p.lugar]} size={14} />{nombreLugar(p.lugar)}</span>
+                <span className="text-[12px] text-mu">Equipo: {p.equipo}</span>
                 <span className="text-[12px] text-mu">Sugerido: {p.dias.map((d) => NOMBRES_DIA[d]).join(' · ')}</span>
               </div>
             </div>
@@ -181,7 +206,7 @@ export default function VerPrograma() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-display text-[22px] font-semibold">Semanas</h2>
+          <Grupo className="mb-3">Semanas</Grupo>
           <ul className="flex flex-col gap-2">
             {p.semanas.map((w, i) => {
               const ab = semanaAbierta === i;
@@ -208,11 +233,19 @@ export default function VerPrograma() {
                               <b className={hecha ? '' : 'oro'}>Sesión {k + 1} · {s.nombre}</b>
                               {hecha ? <span className="text-[12px]" style={{ color: 'var(--verde)' }}>Hecha</span> : null}
                             </div>
-                            <ul className="mt-1 text-[13px] text-mu">
-                              {s.ejercicios.map((e, x) => (
-                                <li key={x} className="flex justify-between gap-2"><span className="truncate">{buscarEjercicio(e.ejercicioId, [])?.nombre}</span>
-                                  <span className="num shrink-0 text-tx2">{textoObjetivo(e)}{e.nota ? ` ${e.nota}` : ''}</span></li>
-                              ))}
+                            <ul className="mt-2 flex flex-col gap-1.5 text-[13px] text-mu">
+                              {s.ejercicios.map((e, x) => {
+                                const ej = buscarEjercicio(e.ejercicioId, []);
+                                return (
+                                  <li key={x} className="flex items-center gap-3" data-testid="ejercicio-programa">
+                                    {imagenesEjercicio(e.ejercicioId)
+                                      ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} className="h-[40px] w-[56px] shrink-0 rounded-[8px] border border-ln2 bg-sf" />
+                                      : <Miniatura musculo={ej?.musculo} tam={40} />}
+                                    <span className="min-w-0 flex-1 truncate text-[14px] text-tx2">{ej?.nombre}</span>
+                                    <span className="num shrink-0 text-right text-tx2">{textoObjetivo(e)}{e.nota ? <span className="block text-[11px] text-mu">{e.nota}</span> : null}</span>
+                                  </li>
+                                );
+                              })}
                             </ul>
                             {activo && !hecha && (
                               <button className="btn-sec mt-2 h-9 w-full text-[13px]" onClick={() => empezar.rutina(rutinaDeSesion(p, i, k))}>

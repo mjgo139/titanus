@@ -34,3 +34,11 @@ describe('programas', () => {
     expect(b.ejercicios[0].series[0].reps).toBe(40);
   });
 });
+
+describe('lugares de los programas', () => {
+  it('cada lugar (gimnasio, calistenia, en casa) tiene al menos dos programas', async () => {
+    const { PROGRAMAS, LUGARES } = await import('./programas');
+    for (const l of LUGARES) expect(PROGRAMAS.filter((p) => p.lugar === l.id).length).toBeGreaterThanOrEqual(2);
+    for (const p of PROGRAMAS) expect(p.equipo.length).toBeGreaterThan(3);
+  });
+});

@@ -38,7 +38,8 @@ export function cargarEquipoDePrueba(ahora: number, h: {
   });
 
   const clientes: { u: Usuario; nombre: string; desfase?: number; hace: number }[] = [
-    { u: { uid: 'c-ana', email: 'ana@ejemplo.com', nombre: 'Ana Ruiz' }, nombre: 'Ana Ruiz', desfase: 1, hace: 40 },
+    // Ana siempre "al día": se corre su calendario para que haya entrenado hace 1 o 2 días, sea el día que sea
+    { u: { uid: 'c-ana', email: 'ana@ejemplo.com', nombre: 'Ana Ruiz' }, nombre: 'Ana Ruiz', desfase: desfaseAlDia(ahora), hace: 40 },
     { u: { uid: 'c-bruno', email: 'bruno@ejemplo.com', nombre: 'Bruno Paz' }, nombre: 'Bruno Paz', desfase: 9, hace: 55 },
     { u: { uid: 'c-carla', email: 'carla@ejemplo.com', nombre: 'Carla Gómez' }, nombre: 'Carla Gómez', hace: 2 },
   ];
@@ -94,4 +95,10 @@ export function cargarEquipoDePrueba(ahora: number, h: {
   h.datos('c-bruno').comentarios.set('k4', {
     id: 'k4', autorId: marco.uid, autorNombre: 'Marco', texto: '¿Todo bien? Hace unos días que no te veo entrenar.', fecha: ahora - 2 * DIA, leido: false,
   });
+}
+
+/** Días a correr el calendario de ejemplo (entrena lun/mié/vie) para que el último entrenamiento sea de hace 1–2 días */
+function desfaseAlDia(ahora: number): number {
+  for (let k = 1; k <= 3; k++) if ([1, 3, 5].includes(new Date(ahora - k * DIA).getDay())) return k - 1;
+  return 0;
 }
