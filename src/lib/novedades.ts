@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.16.1',
+    fecha: '2026-11-18',
+    cambios: ['Ícono con las mismas proporciones que el de Stoica: laurel abierto con hojitas interiores y la T al centro.'],
+  },
+  {
     version: '1.16.0',
     fecha: '2026-11-18',
     cambios: ['Ícono nuevo de la familia Stoica: laurel dorado y T marfil.', 'La app ahora se llama "Titanus" en el teléfono.'],
