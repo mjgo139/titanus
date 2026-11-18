@@ -28,8 +28,8 @@ export default defineConfig({
       injectRegister: null,
       includeAssets: ['icono.svg', 'icono-192.png', 'icono-512.png'],
       manifest: {
-        name: 'TITANUS',
-        short_name: 'TITANUS',
+        name: 'Titanus',
+        short_name: 'Titanus',
         description: 'Entrenamiento · Disciplina · Fuerza. Registrá cada serie como un legionario.',
         lang: 'es',
         theme_color: '#090909',
