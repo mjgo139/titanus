@@ -20,10 +20,11 @@ import { useEmpezar } from './empezar';
 
 /** Punto de interés de cada carátula (para que el recorte deje ver la figura) */
 const FOCO_PORTADA: Record<string, string> = {
-  'casa-mancuernas-m': '60% 28%', 'casa-sin-equipo-m': '58% 45%', 'casa-sin-equipo-h': '58% 45%',
-  'calistenia-fundamentos-h': '70% 25%', 'flexiones-30-m': '70% 60%', 'flexiones-30-h': '70% 60%',
-  'fuerza-5x5-m': '55% 35%', 'fuerza-5x5-h': '55% 35%', 'brazos-centurion-m': '45% 25%', 'brazos-centurion-h': '45% 25%',
-  'mas-dominadas-m': '50% 25%', 'mas-dominadas-h': '50% 25%', 'gluteos-gladiadora-m': '65% 40%',
+  // y = 0 %: se muestra desde la cabeza; solo las flexiones (figura baja) bajan un poco
+  'casa-mancuernas-m': '60% 0%', 'casa-sin-equipo-m': '60% 2%', 'casa-sin-equipo-h': '60% 2%',
+  'calistenia-fundamentos-h': '70% 0%', 'flexiones-30-m': '75% 18%', 'flexiones-30-h': '75% 18%',
+  'fuerza-5x5-m': '55% 0%', 'fuerza-5x5-h': '55% 0%', 'brazos-centurion-m': '60% 0%', 'brazos-centurion-h': '60% 0%',
+  'mas-dominadas-m': '50% 0%', 'mas-dominadas-h': '50% 0%', 'gluteos-gladiadora-m': '65% 0%',
 };
 
 const nombreLugar = (l: Lugar) => LUGARES.find((x) => x.id === l)?.nombre ?? l;
@@ -31,7 +32,7 @@ const iconoLugar = { gimnasio: 'pesa', calistenia: 'cuerpo', casa: 'hoy' } as co
 
 function imagenDe(p: Programa, figura: Figura | undefined): { src: string; pos: string } {
   const portada = portadaDe(p, figura);
-  if (portada) return { src: portada, pos: FOCO_PORTADA[portada.split('/').pop()!.replace('.webp', '')] ?? '50% 35%' };
+  if (portada) return { src: portada, pos: FOCO_PORTADA[portada.split('/').pop()!.replace('.webp', '')] ?? '50% 0%' };
   if (p.imagen === 'busto') return { src: busto, pos: '50% 20%' };
   return { src: estatuas(figura)[p.imagen], pos: foco(figura, p.imagen) };
 }

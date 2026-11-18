@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.15.2',
+    fecha: '2026-11-18',
+    cambios: ['Las carátulas de los programas se enfocan arriba: los personajes ya no salen con la cabeza cortada.'],
+  },
+  {
     version: '1.15.1',
     fecha: '2026-11-17',
     cambios: ['Carátulas propias para 8 programas, en versión legionario y legionaria según tu figura (Perfil → Apariencia).'],
