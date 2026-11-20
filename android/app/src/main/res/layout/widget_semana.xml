@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_fondo" android:gravity="center_vertical" android:orientation="horizontal"
+    android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="8dp" android:paddingBottom="8dp">
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:letterSpacing="0.14"
+            android:text="TU SEMANA" android:textColor="#FFF2C55C" android:textSize="10sp" android:textStyle="bold" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d0" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="L" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d1" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="M" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d2" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="M" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d3" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="J" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d4" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="V" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d5" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="S" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="30dp" android:layout_weight="1">
+            <TextView android:id="@+id/d6" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:background="@drawable/widget_dia_vacio" android:gravity="center" android:text="D" android:textColor="#FF9D917C" android:textSize="12sp" android:textStyle="bold" />
+        </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="12dp"
+        android:gravity="center_horizontal" android:orientation="vertical">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+            <TextView android:id="@+id/semana_cuenta" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:fontFamily="serif" android:text="3" android:textColor="#FFF7F1E7" android:textSize="28sp" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="serif"
+                android:text="/7" android:textColor="#FF9D917C" android:textSize="15sp" />
+        </LinearLayout>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="días"
+            android:textColor="#FF9D917C" android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

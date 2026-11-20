@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_fondo" android:orientation="vertical" android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <ImageView android:layout_width="34dp" android:layout_height="22dp" android:src="@drawable/widget_emblema"
+            android:scaleType="fitCenter" android:contentDescription="StoaGym" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp"
+            android:letterSpacing="0.14" android:text="TU PROGRAMA" android:textColor="#FFF2C55C" android:textSize="10sp" android:textStyle="bold" />
+        <TextView android:id="@+id/prog_porcentaje" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:fontFamily="serif" android:text="25 %" android:textColor="#FFF2C55C" android:textSize="14sp" android:textStyle="bold" />
+    </LinearLayout>
+    <TextView android:id="@+id/prog_nombre" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:ellipsize="end" android:fontFamily="serif" android:maxLines="1"
+        android:text="Más dominadas" android:textColor="#FFF7F1E7" android:textSize="21sp" android:textStyle="bold" />
+    <TextView android:id="@+id/prog_detalle" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="2" android:text="Sesión 4 de 12 · Tirón"
+        android:textColor="#FFC9BDA7" android:textSize="13sp" />
+    <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <ProgressBar android:id="@+id/prog_barra" style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent" android:layout_height="8dp" android:max="12" android:progress="3"
+        android:progressDrawable="@drawable/widget_barra" />
+</LinearLayout>

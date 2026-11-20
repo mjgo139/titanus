@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_fondo" android:gravity="center" android:orientation="vertical" android:padding="12dp">
+    <ImageView android:layout_width="56dp" android:layout_height="34dp" android:src="@drawable/widget_emblema"
+        android:scaleType="fitCenter" android:contentDescription="StoaGym" />
+    <TextView android:id="@+id/racha_numero" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" android:fontFamily="serif" android:text="VIII" android:textColor="#FFF2C55C"
+        android:textSize="34sp" android:textStyle="bold" android:maxLines="1" />
+    <TextView android:id="@+id/racha_texto" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="semanas seguidas" android:textColor="#FFF7F1E7" android:textSize="12sp" android:maxLines="1" />
+    <TextView android:id="@+id/racha_rango" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" android:letterSpacing="0.12" android:text="LEGIONARIO · NIVEL 5" android:textAllCaps="true"
+        android:textColor="#FF9D917C" android:textSize="9sp" android:textStyle="bold" android:maxLines="1" />
+</LinearLayout>

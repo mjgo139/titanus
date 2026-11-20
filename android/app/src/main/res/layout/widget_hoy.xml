@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_fondo" android:orientation="vertical" android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <ImageView android:layout_width="34dp" android:layout_height="22dp" android:src="@drawable/widget_emblema"
+            android:scaleType="fitCenter" android:contentDescription="StoaGym" />
+        <TextView android:id="@+id/hoy_etiqueta" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="8dp" android:letterSpacing="0.14" android:text="HOY TOCA" android:textColor="#FFF2C55C"
+            android:textSize="10sp" android:textStyle="bold" />
+        <TextView android:id="@+id/hoy_racha" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:fontFamily="serif" android:text="Racha · VIII" android:textColor="#FFC9BDA7" android:textSize="12sp" />
+    </LinearLayout>
+    <TextView android:id="@+id/hoy_nombre" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:ellipsize="end" android:fontFamily="serif" android:maxLines="1"
+        android:text="A · Full body" android:textColor="#FFF7F1E7" android:textSize="22sp" android:textStyle="bold" />
+    <TextView android:id="@+id/hoy_detalle" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="1" android:text="7 ejercicios · 50 min"
+        android:textColor="#FFC9BDA7" android:textSize="13sp" />
+    <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <TextView android:id="@+id/hoy_boton" android:layout_width="match_parent" android:layout_height="40dp"
+        android:background="@drawable/widget_boton" android:gravity="center" android:text="Entrenar"
+        android:textColor="#FF0B0B0B" android:textSize="15sp" android:textStyle="bold" />
+</LinearLayout>

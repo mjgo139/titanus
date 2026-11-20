@@ -4,4 +4,12 @@
     <string name="title_activity_main">StoaGym</string>
     <string name="package_name">py.titanus.app</string>
     <string name="custom_url_scheme">py.titanus.app</string>
+    <string name="widget_racha">Racha</string>
+    <string name="widget_racha_desc">Tu racha de semanas en números romanos</string>
+    <string name="widget_semana">Tu semana</string>
+    <string name="widget_semana_desc">Los días que entrenaste esta semana</string>
+    <string name="widget_hoy">Entrenamiento de hoy</string>
+    <string name="widget_hoy_desc">La rutina que te toca, con botón para empezar</string>
+    <string name="widget_programa">Programa</string>
+    <string name="widget_programa_desc">El avance de tu programa en curso</string>
 </resources>

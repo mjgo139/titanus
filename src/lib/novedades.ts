@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.19.0',
+    fecha: '2026-11-20',
+    cambios: [
+      'Widgets para Android: Racha (2×2), Tu semana (4×1), Entrenamiento de hoy (4×2, con botón Entrenar) y Programa (4×2).',
+      'Tocar un widget abre la pantalla que corresponde; "Entrenar" arranca directo la rutina del día.',
+    ],
+  },
+  {
     version: '1.18.0',
     fecha: '2026-11-20',
     cambios: [

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { escucharWidgets } from './lib/widget';
 import Acceso from './screens/Acceso';
 import Hoy from './screens/Hoy';
 import { useApp } from './ui/contexto';
@@ -34,6 +35,13 @@ const FichaCliente = lazy(() => import('./pro/FichaCliente'));
 const MiProfesional = lazy(() => import('./pro/MiProfesional'));
 const Admin = lazy(() => import('./pro/Admin'));
 
+/** Si la APK se abrió tocando un widget, lleva a la pantalla que corresponde */
+function PuenteWidgets() {
+  const nav = useNavigate();
+  useEffect(() => escucharWidgets((ruta) => nav(ruta)), [nav]);
+  return null;
+}
+
 export default function App() {
   const { usuario, perfil, cargando } = useApp();
   useEffect(() => { if (usuario) precargar(); }, [usuario]);
@@ -48,6 +56,8 @@ export default function App() {
             // Primera vez: la bienvenida "Conocerte" antes que nada
             <Routes><Route path="*" element={<Conocerte />} /></Routes>
           ) : (
+          <>
+          <PuenteWidgets />
           <Routes>
             <Route path="conocerte" element={<Conocerte />} />
             <Route element={<Marco />}>
@@ -71,6 +81,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
+          </>
           )}
         </Suspense>
       )}

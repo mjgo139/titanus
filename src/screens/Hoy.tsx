@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { actualizarWidgets, fechaCorta } from '../lib/widget';
+import { buscarPrograma, proximaSesion, totalSesiones } from '../lib/programas';
 import { leerBorrador } from '../lib/borrador';
 import { rachaSemanas, rango, romano, rutinaDeHoy, semanaActual } from '../lib/logica';
 import type { Rutina } from '../lib/tipos';
@@ -40,6 +42,34 @@ export default function Hoy() {
   const hora = new Date(ahora).getHours();
   const saludo = hora < 12 ? 'Buen día' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
   const hechos = semana.filter((d) => d.hecho).length;
+
+  // Widgets de Android: les pasamos lo que muestra Inicio (solo en la APK; si nada cambió no se manda)
+  useEffect(() => {
+    if (!rutinas) return;
+    const prog = perfil.programa ? buscarPrograma(perfil.programa.id) : undefined;
+    const sig = prog && perfil.programa ? proximaSesion(prog, perfil.programa.hechas) : null;
+    const rut = deHoy ?? proxima?.r;
+    actualizarWidgets({
+      racha, rango: `${r.nombre} · Nivel ${r.nivel}`,
+      fechas: dias.filter((d) => d > ahora - 15 * 86_400_000).map((d) => fechaCorta(d)).join(','),
+      entreno: rut?.nombre ?? '', esHoy: !!deHoy,
+      entrenoDetalle: rut ? (deHoy ? `${rut.ejercicios.length} ejercicios · ${minutosEstimados(rut)} min` : proxima!.k === 1 ? 'Mañana' : `En ${proxima!.k} días`) : '',
+      programa: prog?.nombre ?? '', programaId: prog?.id ?? '',
+      programaSiguiente: prog && sig ? prog.semanas[sig.semana].sesiones[sig.sesion].nombre : '',
+      programaHechas: perfil.programa?.hechas.length ?? 0, programaTotal: prog ? totalSesiones(prog) : 0,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rutinas, perfil, racha]);
+
+  // Desde el widget "Entrenamiento de hoy": /?empezar=hoy arranca la rutina del día
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('empezar') !== 'hoy' || !rutinas) return;
+    setParams({}, { replace: true });
+    if (deHoy && !enCurso) empezar.rutina(deHoy);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, rutinas]);
+
   const diaCorto = (f: string | number) => new Intl.DateTimeFormat('es-PY', { weekday: 'short' }).format(new Date(f)).replace('.', '').slice(0, 3);
   return (
     <div className="flex flex-col gap-4 pt-6 lg:gap-5">
