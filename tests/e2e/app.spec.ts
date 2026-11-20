@@ -490,3 +490,13 @@ test('programas: tarjetas, empezar uno, hacer una sesión y ver el avance', asyn
   await expect(page.getByTestId('programa').first()).toContainText('Más dominadas');
   await captura(page, '06d-programa-en-inicio');
 });
+
+test('pantalla de inicio: emblema sobre negro al abrir y después se desvanece', async ({ page }) => {
+  await page.goto('/');
+  const inicio = page.locator('#inicio');
+  await expect(inicio.locator('svg')).toBeVisible();
+  await expect(inicio).toHaveCSS('background-color', 'rgb(20, 18, 14)');
+  await page.screenshot({ path: `capturas/${test.info().project.name}/00-pantalla-inicio.png` });
+  await expect(inicio).toHaveCount(0, { timeout: 8000 });
+});
+

@@ -70,5 +70,17 @@ crearRepo().then((repo) => {
       <ProveedorApp repo={repo}><App /></ProveedorApp>
     </StrictMode>,
   );
+  quitarInicio();
   void registrarSW();
 });
+
+/** Desvanece la pantalla de inicio (emblema sobre negro) cuando la app ya se dibujó; dura al menos 0,8 s para que no parpadee */
+function quitarInicio() {
+  const el = document.getElementById('inicio');
+  if (!el) return;
+  const espera = Math.max(0, 800 - performance.now());
+  setTimeout(() => requestAnimationFrame(() => {
+    el.classList.add('fuera');
+    setTimeout(() => el.remove(), 400);
+  }), espera);
+}

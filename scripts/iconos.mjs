@@ -1,7 +1,7 @@
 // Genera los íconos de StoaGym (familia Stoica: laurel dorado + mancuerna marfil) para la web y Android.
 // Diseño del dueño (icono-mancuerna.svg). Uso: PW_CHROME=/usr/bin/google-chrome node scripts/iconos.mjs
 import { chromium } from 'playwright';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const hojas = [[13, 34, -25], [12, 54, -50], [17, 73, -65], [28, 89, -80], [119, 34, 25], [120, 54, 50], [115, 73, 65], [104, 89, 80]];
 const interiores = [[27, 41, 25], [28, 60, 8], [105, 41, -25], [104, 60, -8]];
@@ -34,5 +34,29 @@ for (const [d, t] of [['mdpi', 48], ['hdpi', 72], ['xhdpi', 96], ['xxhdpi', 144]
   await png('circulo', t, `android/app/src/main/res/mipmap-${d}/ic_launcher_round.png`);
 }
 writeFileSync('public/icono.svg', svg('cuadrado'));
+
+// ——— Pantalla de inicio (splash): fondo negro y el emblema al centro, sin el cuadrado ———
+const soloEmblema = (w, h, ancho) => {
+  // el emblema ocupa el recuadro 62..450 × 100..400 del lienzo de 512
+  const esc = ancho / 388;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<g transform="translate(${w / 2 - 256 * esc} ${h / 2 - 250 * esc}) scale(${esc})">${emblema}</g></svg>`;
+};
+async function splash(w, h, ruta, fondo = true) {
+  await pagina.setViewportSize({ width: w, height: h });
+  await pagina.setContent(`<html><body style="margin:0;background:${fondo ? '#14120E' : 'transparent'}">${soloEmblema(w, h, Math.round(Math.min(w, h) * (fondo ? 0.4 : 0.44)))}</body></html>`);
+  await pagina.screenshot({ path: ruta, omitBackground: !fondo });
+}
+// Android 12 en adelante: ícono del splash (transparente; el sistema muestra el centro)
+await splash(1024, 1024, 'android/app/src/main/res/drawable-nodpi/splash_icono.png', false);
+// Android anterior: imagen completa
+for (const [d, w, h] of [['', 480, 320], ['land-mdpi', 480, 320], ['land-hdpi', 800, 480], ['land-xhdpi', 1280, 720], ['land-xxhdpi', 1600, 960], ['land-xxxhdpi', 1920, 1280],
+  ['port-mdpi', 320, 480], ['port-hdpi', 480, 800], ['port-xhdpi', 720, 1280], ['port-xxhdpi', 960, 1600], ['port-xxxhdpi', 1280, 1920]]) {
+  await splash(w, h, `android/app/src/main/res/drawable${d ? '-' + d : ''}/splash.png`);
+}
+// Web: el mismo emblema dentro de index.html (se ve apenas abre, antes de que cargue la app)
+const html = readFileSync('index.html', 'utf8');
+const enLinea = `<svg viewBox="62 100 388 300" width="168" height="130" aria-hidden="true">${emblema}</svg>`;
+writeFileSync('index.html', html.replace(/<!--splash-->[\s\S]*?<!--\/splash-->/, `<!--splash-->${enLinea}<!--/splash-->`));
 await navegador.close();
 console.log('íconos listos');

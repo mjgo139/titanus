@@ -16,7 +16,11 @@
     </style>
 
 
+    <!-- Pantalla de inicio: fondo negro y el emblema (laurel + mancuerna) al centro -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
+        <item name="windowSplashScreenBackground">#14120E</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icono</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

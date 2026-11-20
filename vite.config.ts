@@ -32,8 +32,8 @@ export default defineConfig({
         short_name: 'StoaGym',
         description: 'Entrenamiento · Disciplina · Fuerza. Registrá cada serie como un legionario.',
         lang: 'es',
-        theme_color: '#090909',
-        background_color: '#090909',
+        theme_color: '#14120E',
+        background_color: '#14120E',
         display: 'standalone',
         start_url: '/',
         icons: [
