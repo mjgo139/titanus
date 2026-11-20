@@ -1,1 +1,17 @@
-{ "projects": { "default": "titanus-10398" } }
+{
+  "projects": {
+    "default": "titanus-10398"
+  },
+  "targets": {
+    "titanus-10398": {
+      "hosting": {
+        "principal": [
+          "stoagym"
+        ],
+        "anterior": [
+          "titanus-10398"
+        ]
+      }
+    }
+  }
+}

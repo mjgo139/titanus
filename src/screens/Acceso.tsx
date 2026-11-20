@@ -1,3 +1,4 @@
+import { AvisoMudanza } from '../ui/AvisoMudanza';
 import { useState, type FormEvent } from 'react';
 import busto from '../assets/busto.webp';
 import { mensajeError } from '../data/repo';
@@ -109,6 +110,7 @@ export default function Acceso() {
         role="img" aria-label="Estatua romana" style={{ backgroundImage: `url(${busto})`, backgroundPosition: 'center 30%' }} />
       <div className="contents lg:order-2 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:gap-12">
         <div className="entrar order-1">
+          <AvisoMudanza className="mb-5 flex" />
           <Logo grande />
           <div className="mt-2 text-[12px] tracking-[.14em] text-tx2">ENTRENAMIENTO · DISCIPLINA · FUERZA</div>
           <p className="mx-auto mt-6 hidden max-w-[380px] font-display text-[18px] italic text-tx2 lg:block">Registrá cada serie, superá tus marcas y forjá la disciplina de un legionario.</p>

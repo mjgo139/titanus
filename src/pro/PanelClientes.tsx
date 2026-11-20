@@ -1,3 +1,4 @@
+import { DIRECCION } from '../ui/AvisoMudanza';
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { rachaSemanas, semanaActual } from '../lib/logica';
@@ -22,7 +23,9 @@ export function textoUltimo(sin: number | undefined): string {
 
 /** Enlace para invitar: abre la app con el código ya cargado */
 export function enlaceInvitacion(codigo: string): string {
-  return `${location.origin}/?codigo=${encodeURIComponent(codigo)}`;
+  // Siempre la dirección nueva (aunque el entrenador abra la app desde la vieja o desde la APK)
+  const base = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? location.origin : DIRECCION;
+  return `${base}/?codigo=${encodeURIComponent(codigo)}`;
 }
 
 /** Panel del profesional: todos sus clientes, quién necesita atención y el código para sumar más */

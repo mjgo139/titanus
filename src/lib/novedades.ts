@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.18.0',
+    fecha: '2026-11-20',
+    cambios: [
+      'Dirección nueva: https://stoagym.web.app. La anterior sigue funcionando y avisa del cambio.',
+      'Los enlaces de invitación de entrenador usan la dirección nueva.',
+      'La APK nueva abre stoagym.web.app.',
+    ],
+  },
+  {
     version: '1.17.1',
     fecha: '2026-11-20',
     cambios: ['Pantalla de inicio: al abrir StoaGym se ve el emblema (laurel y mancuerna) sobre negro, y se desvanece suave cuando la app está lista.'],

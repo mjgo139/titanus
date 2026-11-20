@@ -7,8 +7,10 @@ const config: CapacitorConfig = {
   appName: 'StoaGym',
   webDir: 'dist',
   server: {
-    url: 'https://titanus-10398.web.app',
+    url: 'https://stoagym.web.app',
     errorPath: 'sin-conexion.html',
+    // La dirección vieja sigue funcionando (mismo proyecto): se permite para no abrir el navegador
+    allowNavigation: ['stoagym.web.app', 'titanus-10398.web.app'],
   },
   android: { backgroundColor: '#14120E' },
   plugins: {

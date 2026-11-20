@@ -1,6 +1,6 @@
 # StoaGym (antes TITANUS) · instrucciones para Claude
 
-> **v1.17.0 (decisión del dueño, 20/11/2026): la app se llama StoaGym.** El repositorio (`mjgo139/titanus`), el proyecto de Firebase (`titanus-10398`), la dirección web y el `appId` de Android siguen con el nombre viejo (cambiarlos es aparte). Donde este archivo dice TITANUS, entender StoaGym.
+> **v1.17.0 (decisión del dueño, 20/11/2026): la app se llama StoaGym.** El repositorio (`mjgo139/titanus`), el proyecto de Firebase (`titanus-10398`) y el `appId` de Android siguen con el nombre viejo. **v1.18.0: dirección principal https://stoagym.web.app** (segundo sitio de Hosting en el mismo proyecto, dominio ya autorizado en Auth por el dueño). Donde este archivo dice TITANUS, entender StoaGym.
 
 Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de cambiar algo.
 
@@ -12,8 +12,8 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 | Proyecto Firebase | `titanus-10398` (plan Spark, gratis) |
 | Firestore | modo nativo, edición Standard, región `southamerica-east1` (São Paulo) |
 | Auth | correo/contraseña, Google y anónimo ("Continuar como invitado") habilitados. Limpieza automática de anónimos: apagada |
-| Web | https://titanus-10398.web.app |
-| APK | se arma en cada push y se publica en el Release `apk-ultima`: https://github.com/mjgo139/titanus/releases/tag/apk-ultima (el plan Spark no permite `.apk` en Hosting). Desde v1.8.3 la APK carga `https://titanus-10398.web.app` (`server.url` en `capacitor.config.ts`) y usa el service worker: se actualiza sola; sin conexión la primera vez muestra `public/sin-conexion.html`. Instalar la APK de nuevo solo hace falta si cambia algo nativo (plugins, ícono, permisos). |
+| Web | **https://stoagym.web.app** (principal, target `principal`) y https://titanus-10398.web.app (target `anterior`, misma app + aviso `AvisoMudanza`; sin redirección para no perder sesiones ni romper APKs viejas). `firebase.json` tiene `hosting` como lista de dos targets y `.firebaserc` los mapea; `firebase deploy --only hosting` publica en las dos. Enlaces de invitación siempre con `DIRECCION` (`src/ui/AvisoMudanza.tsx`). |
+| APK | se arma en cada push y se publica en el Release `apk-ultima`: https://github.com/mjgo139/titanus/releases/tag/apk-ultima (el plan Spark no permite `.apk` en Hosting). Desde v1.8.3 la APK carga la web publicada (`server.url` en `capacitor.config.ts`; desde v1.18.0 `https://stoagym.web.app`, con `allowNavigation` para las dos direcciones) y usa el service worker: se actualiza sola; sin conexión la primera vez muestra `public/sin-conexion.html`. Instalar la APK de nuevo solo hace falta si cambia algo nativo (plugins, ícono, permisos). |
 | Admin | uids listados en el documento `config/admins` (`{ uids: [...] }`), cargado a mano en la consola. Nunca en el código. |
 | Secreto de deploy | `FIREBASE_SERVICE_ACCOUNT` en GitHub → Settings → Secrets → Actions (lo carga el dueño). La cuenta `firebase-adminsdk-fbsvc@…` necesita los roles Administrador de Firebase y Consumidor de Service Usage (ya asignados) |
 
@@ -22,7 +22,7 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 | Para qué | Comando |
 |---|---|
 | Probar en modo prueba (sin Firebase) | `npm run demo` → http://localhost:5173 (cuenta `marco@ejemplo.com` / `titanus`) |
-| Modo prueba en la web publicada | abrir `https://titanus-10398.web.app/?prueba=1` (`?prueba=0` para salir) |
+| Modo prueba en la web publicada | abrir `https://stoagym.web.app/?prueba=1` (`?prueba=0` para salir) |
 | Pruebas de lógica | `npm test` |
 | Pruebas de pantallas + capturas | `npm run test:e2e` (capturas en `capturas/celular` y `capturas/pc`). Fuera de GitHub, indicar Chrome con `PW_CHROME=/usr/bin/google-chrome` |
 | Pruebas de reglas | `npm run test:reglas` (necesita Java y descarga el emulador) |
