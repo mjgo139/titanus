@@ -17,7 +17,7 @@
     <TextView android:id="@+id/hoy_detalle" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="1" android:text="7 ejercicios · 50 min"
         android:textColor="#FFC9BDA7" android:textSize="13sp" />
-    <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
     <TextView android:id="@+id/hoy_boton" android:layout_width="match_parent" android:layout_height="40dp"
         android:background="@drawable/widget_boton" android:gravity="center" android:text="Entrenar"
         android:textColor="#FF0B0B0B" android:textSize="15sp" android:textStyle="bold" />

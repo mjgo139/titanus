@@ -16,7 +16,7 @@
     <TextView android:id="@+id/prog_detalle" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="2" android:text="Sesión 4 de 12 · Tirón"
         android:textColor="#FFC9BDA7" android:textSize="13sp" />
-    <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
     <ProgressBar android:id="@+id/prog_barra" style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent" android:layout_height="8dp" android:max="12" android:progress="3"
         android:progressDrawable="@drawable/widget_barra" />

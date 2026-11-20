@@ -4,6 +4,11 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.19.1',
+    fecha: '2026-11-20',
+    cambios: ['Arreglo: los widgets "Entrenamiento de hoy" y "Programa" ya se pueden agregar a la pantalla de inicio.'],
+  },
+  {
     version: '1.19.0',
     fecha: '2026-11-20',
     cambios: [
