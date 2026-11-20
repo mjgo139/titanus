@@ -4,7 +4,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // Si no hay conexión la primera vez, muestra public/sin-conexion.html (va dentro de la APK).
 const config: CapacitorConfig = {
   appId: 'py.titanus.app',
-  appName: 'Titanus',
+  appName: 'StoaGym',
   webDir: 'dist',
   server: {
     url: 'https://titanus-10398.web.app',

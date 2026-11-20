@@ -4,7 +4,7 @@ const DIA = 86_400_000;
 const LETRAS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sin 0/O ni 1/I para que no se confundan
 
 /** Código corto y fácil de dictar: TIT-4K9Q */
-export function codigoNuevo(prefijo = 'TIT', azar: () => number = Math.random): string {
+export function codigoNuevo(prefijo = 'STG', azar: () => number = Math.random): string {
   let s = '';
   for (let i = 0; i < 4; i++) s += LETRAS[Math.floor(azar() * LETRAS.length)];
   return `${prefijo}-${s}`;

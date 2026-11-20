@@ -51,7 +51,7 @@ export function Vincular({ alListo }: { alListo: (v: Vinculo) => void }) {
     <div className="tarjeta" data-testid="vincular">
       <label className="block">
         <span className="etiqueta">Código de {ESP.tuRol}</span>
-        <input className="campo mt-2 marca text-center text-[20px] tracking-[.14em] uppercase" placeholder="TIT-XXXX" value={codigo}
+        <input className="campo mt-2 marca text-center text-[20px] tracking-[.14em] uppercase" placeholder="STG-XXXX" value={codigo}
           onChange={(e) => setCodigo(e.target.value.toUpperCase())} aria-label={`Código de ${ESP.tuRol}`} maxLength={12} />
       </label>
       <div className="mt-4 text-[14px]">

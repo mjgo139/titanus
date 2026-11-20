@@ -14,7 +14,7 @@ import { Miniatura } from './Miniatura';
 type Medida = 'volumen' | 'reps' | 'duracion';
 
 /**
- * Ficha de una rutina (como en Hevy, con la estética de TITANUS): quién la creó, "Comenzar rutina",
+ * Ficha de una rutina (como en Hevy, con la estética de StoaGym): quién la creó, "Comenzar rutina",
  * cómo viene cada sesión (volumen, repeticiones o duración) y sus ejercicios serie por serie.
  * Lee solo las últimas 12 sesiones de esta rutina (índice rutinaId + inicio).
  */

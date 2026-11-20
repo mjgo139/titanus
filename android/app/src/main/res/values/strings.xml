@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Titanus</string>
-    <string name="title_activity_main">Titanus</string>
+    <string name="app_name">StoaGym</string>
+    <string name="title_activity_main">StoaGym</string>
     <string name="package_name">py.titanus.app</string>
     <string name="custom_url_scheme">py.titanus.app</string>
 </resources>

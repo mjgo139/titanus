@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.17.0',
+    fecha: '2026-11-20',
+    cambios: [
+      'TITANUS ahora se llama StoaGym.',
+      'Ícono nuevo: el laurel de la familia con una mancuerna, en el teléfono, en el navegador y dentro de la app.',
+      'Los códigos nuevos de entrenador empiezan con STG- (los TIT- que ya existen siguen funcionando).',
+    ],
+  },
+  {
     version: '1.16.1',
     fecha: '2026-11-18',
     cambios: ['Ícono con las mismas proporciones que el de Stoica: laurel abierto con hojitas interiores y la T al centro.'],

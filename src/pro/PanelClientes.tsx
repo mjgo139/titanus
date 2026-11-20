@@ -50,7 +50,7 @@ export default function PanelClientes() {
 
   const atencion = filas?.filter((f) => f.estado === 'atencion' || f.estado === 'inactivo').length ?? 0;
   const visibles = (filas ?? []).filter((f) => filtro === 'todos' || f.estado === filtro || (filtro === 'atencion' && f.estado === 'inactivo'));
-  const texto = `Sumate a TITANUS para que lleve tus entrenamientos. Abrí ${enlaceInvitacion(profesional.codigo)} o ingresá mi código ${profesional.codigo} en Perfil → ${ESP.rol}.`;
+  const texto = `Sumate a StoaGym para que lleve tus entrenamientos. Abrí ${enlaceInvitacion(profesional.codigo)} o ingresá mi código ${profesional.codigo} en Perfil → ${ESP.rol}.`;
 
   async function copiar() {
     try { await navigator.clipboard.writeText(texto); aviso('Invitación copiada'); } catch { aviso(profesional!.codigo); }

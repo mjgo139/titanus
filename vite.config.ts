@@ -28,8 +28,8 @@ export default defineConfig({
       injectRegister: null,
       includeAssets: ['icono.svg', 'icono-192.png', 'icono-512.png'],
       manifest: {
-        name: 'Titanus',
-        short_name: 'Titanus',
+        name: 'StoaGym',
+        short_name: 'StoaGym',
         description: 'Entrenamiento · Disciplina · Fuerza. Registrá cada serie como un legionario.',
         lang: 'es',
         theme_color: '#090909',

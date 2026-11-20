@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate, type NavigateFunction 
 import { leerBorrador } from '../lib/borrador';
 import { rango, reloj } from '../lib/logica';
 import { estatuas } from './estatuas';
+import { Emblema } from './familia';
 import { Icono } from './Icono';
 import { useApp } from './contexto';
 import { useEffect, useState } from 'react';
@@ -17,9 +18,9 @@ const PESTANAS_BASE = [
 export function Logo({ grande = false }: { grande?: boolean }) {
   return (
     <div className={`flex items-center gap-2 ${grande ? 'flex-col' : ''}`}>
-      <Icono n="corona" size={grande ? 64 : 22} className="oro" />
+      <Emblema size={grande ? 92 : 34} />
       <span className={`marca oro ${grande ? 'text-[46px] leading-none' : 'text-[21px]'}`}
-        style={grande ? { textShadow: '0 2px 3px #000, 0 0 20px rgba(182,122,42,.7)' } : undefined}>TITANUS</span>
+        style={grande ? { textShadow: '0 2px 3px #000, 0 0 20px rgba(182,122,42,.7)' } : undefined}>StoaGym</span>
     </div>
   );
 }
@@ -70,7 +71,7 @@ export function Marco() {
   const enEntreno = loc.pathname.startsWith('/entrenar');
   return (
     <div className="min-h-screen lg:pl-[248px]">
-      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-4 pt-7 pb-5 border-r border-ln2" style={{ background: 'var(--lateral)' }}>
+      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-4 pt-7 pb-5 border-r border-ln2" style={{ background: 'var(--lateral)', ['--marfil' as string]: '#F3EDDF' }}>
         <div className="px-2.5"><Logo /></div>
         <div className="divisor mt-6" />
         <nav className="mt-6 flex flex-col gap-1" aria-label="Menú">

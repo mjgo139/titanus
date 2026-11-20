@@ -30,7 +30,7 @@ export default function Perfil() {
   async function guardarRecordatorio(n: Recordatorio) {
     await cambiarPerfil({ recordatorio: n });
     const res = await programarRecordatorios(n);
-    if (res === 'sin-permiso') aviso('Activá las notificaciones de TITANUS en tu teléfono');
+    if (res === 'sin-permiso') aviso('Activá las notificaciones de StoaGym en tu teléfono');
   }
 
   async function exportar() {

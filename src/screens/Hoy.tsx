@@ -10,7 +10,7 @@ import { Cargando } from '../ui/piezas';
 import { useEmpezar } from './empezar';
 import { AvisoHoy } from '../pro/AvisoHoy';
 import { ProgramaEnCurso } from './Programas';
-import { Ficha, Grupo, Laurel } from '../ui/familia';
+import { Emblema, Ficha, Grupo, Laurel } from '../ui/familia';
 
 export function minutosEstimados(r: Rutina): number {
   return Math.max(10, Math.round(r.ejercicios.reduce((t, e) => t + e.series * (e.descanso + 40), 0) / 60 / 5) * 5);
@@ -43,7 +43,7 @@ export default function Hoy() {
   const diaCorto = (f: string | number) => new Intl.DateTimeFormat('es-PY', { weekday: 'short' }).format(new Date(f)).replace('.', '').slice(0, 3);
   return (
     <div className="flex flex-col gap-4 pt-6 lg:gap-5">
-      {/* Panel del día: igual que en Stoica (laurel de fondo, saludo y fichas), con la estatua de TITANUS */}
+      {/* Panel del día: igual que en Stoica (laurel de fondo, saludo y fichas), con la estatua de StoaGym */}
       <section className="panel-dia entrar" data-testid="panel-dia">
         <Laurel fondo size={300} />
         <div className="relative flex items-start gap-4">
@@ -53,7 +53,7 @@ export default function Hoy() {
             <h1 className="mt-1 font-display text-[26px] font-bold leading-tight lg:mt-2 lg:text-[40px] lg:leading-[44px]">{saludo}, {perfil.nombre.split(' ')[0]}</h1>
             <p className="oro mt-1 text-[14px] font-semibold" data-testid="rango">{r.nombre} · Nivel {r.nivel}</p>
           </div>
-          <Link to="/perfil" aria-label="Ir a mi perfil" className="toque flex items-center justify-center oro"><Icono n="corona" size={24} /></Link>
+          <Link to="/perfil" aria-label="Ir a mi perfil" className="toque flex items-center justify-center oro"><Emblema size={40} /></Link>
         </div>
         <div className="relative mt-4 flex flex-wrap gap-2 lg:mt-5">
           <Ficha><Icono n="calendario" size={15} className="oro" /><span className="first-letter:uppercase">{fechaLarga}</span></Ficha>

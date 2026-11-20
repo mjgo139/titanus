@@ -17,7 +17,7 @@ export interface Especialidad {
 
 export const ESPECIALIDADES: Record<TipoProfesional, Especialidad> = {
   entrenador: {
-    tipo: 'entrenador', rol: 'Entrenador', rolPlural: 'Entrenadores', tuRol: 'tu entrenador', prefijoCodigo: 'TIT',
+    tipo: 'entrenador', rol: 'Entrenador', rolPlural: 'Entrenadores', tuRol: 'tu entrenador', prefijoCodigo: 'STG',
     permisos: [
       'Ver tus entrenamientos, progreso, récords, peso y medidas.',
       'Asignarte rutinas (las vas a ver marcadas como "De tu entrenador").',

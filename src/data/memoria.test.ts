@@ -31,8 +31,9 @@ describe('modo prueba en memoria', () => {
     await r.ingresarComoInvitado();
     expect(uid).toMatch(/^inv-/);
     expect((await r.leerPerfil({ uid, email: '', nombre: '' })).resumen.total).toBeGreaterThan(20);
-    const h = await r.leerHistorial(uid, 1);
-    expect(h[0].ejercicios.some((e) => e.series.some((s) => s.tipo === 'fallo'))).toBe(true);
+    // En la semana de ejemplo hay series al fallo (no depende de qué día es hoy)
+    const h = await r.leerHistorial(uid, 3);
+    expect(h.some((w) => w.ejercicios.some((e) => e.series.some((s) => s.tipo === 'fallo')))).toBe(true);
   });
   it('borrar cuenta elimina los datos', async () => {
     const r = new RepoMemoria();
@@ -67,7 +68,7 @@ describe('modo prueba: entrenador y clientes', () => {
     const r = new RepoMemoria();
     await r.ingresar('carla@ejemplo.com', 'titanus');
     await expect(r.vincular({ uid: 'c-carla', nombre: 'Carla' }, 'TIT-NADA', 'entrenador')).rejects.toMatchObject({ code: 'pro/codigo' });
-    await expect(r.vincular({ uid: 'prueba', nombre: 'Marco' }, 'tit m4rc', 'entrenador')).rejects.toMatchObject({ code: 'pro/propio' });
+    await expect(r.vincular({ uid: 'prueba', nombre: 'Marco' }, 'stg m4rc', 'entrenador')).rejects.toMatchObject({ code: 'pro/propio' });
   });
 });
 

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /*
-  TITANUS · "Noche romana" (principal) y "Mármol" (claro).
-  La esencia viene del diseño propio de TITANUS (negro, oro y estatuas).
+  StoaGym · "Noche romana" (principal) y "Mármol" (claro).
+  La esencia viene del diseño propio de StoaGym (antes TITANUS) (negro, oro y estatuas).
   El modo Mármol usa la piedra y el bronce de Stoica: son apps hermanas.
 */
 :root, :root[data-theme='dark'] {
@@ -15,7 +15,7 @@
   --gold:#f2c55c; --goldh:#ffd67a; --gold2:#a66c16; --goldbg:#2a2113; --on:#0b0b0b;
   --oro-grad: linear-gradient(#ffe7a0, #e6b84e 55%, #b77c22);
   --panel-grad: linear-gradient(125deg, rgba(26,25,24,.92), rgba(9,9,9,.92));
-  --ok:#f2c55c; --okbg:#2b2210; --verde:#7dba70; --miss:#d9826f; --missbg:#331b16;
+  --ok:#f2c55c; --okbg:#2b2210; --verde:#7dba70; --marfil:#F3EDDF; --miss:#d9826f; --missbg:#331b16;
   --vena: rgba(154,113,55,.16);
   --sombra: 0 8px 25px rgba(0,0,0,.45);
   --lateral:#050505;
@@ -32,7 +32,7 @@
   --gold:#7e5d22; --goldh:#674b1a; --gold2:#a07a35; --goldbg:#eadbb8; --on:#fbf8f1;
   --oro-grad: linear-gradient(#9a7333, #7e5d22 60%, #664a19);
   --panel-grad: linear-gradient(125deg, #fbf8f2, #f4eee3);
-  --ok:#7e5d22; --okbg:#efe3c6; --verde:#3f6e38; --miss:#9c3f2e; --missbg:#f4ded6;
+  --ok:#7e5d22; --okbg:#efe3c6; --verde:#3f6e38; --marfil:#2b261e; --miss:#9c3f2e; --missbg:#f4ded6;
   --vena: rgba(126,93,34,.10);
   --sombra: 0 1px 2px rgba(60,45,20,.05), 0 6px 18px rgba(60,45,20,.08);
   --lateral:#16130e;

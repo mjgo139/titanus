@@ -30,7 +30,7 @@ test('entrenador: panel de clientes, ficha, comentar, asignar rutina y fijar obj
   await expect(page.getByTestId('aviso-atencion')).toContainText('Bruno');
   await ir(page, 'Clientes');
   await expect(page.getByRole('heading', { name: 'Tus clientes' })).toBeVisible();
-  await expect(page.getByTestId('codigo-invitacion')).toContainText('TIT-M4RC');
+  await expect(page.getByTestId('codigo-invitacion')).toContainText('STG-M4RC');
   const clientes = page.getByTestId('cliente');
   await expect(clientes).toHaveCount(3);
   // Primero el que necesita atención
@@ -126,7 +126,7 @@ test('cliente: ve a su entrenador, la rutina asignada sin poder cambiarla y resp
 
 test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo aprueba', async ({ page }) => {
   // Llega con el enlace de invitación y crea su cuenta
-  await page.goto('/?codigo=tit-m4rc');
+  await page.goto('/?codigo=stg-m4rc');
   await page.evaluate(() => sessionStorage.removeItem('titanus-prueba-datos'));
   await page.getByRole('button', { name: 'Crear cuenta' }).first().click();
   await page.getByLabel('Nombre').fill('Lucas Benítez');
@@ -134,9 +134,9 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   await page.getByLabel('Contraseña', { exact: true }).fill('secreta1');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
   await page.getByRole('button', { name: 'Omitir' }).click();
-  await expect(page.getByTestId('aviso-invitacion')).toContainText('TIT-M4RC');
+  await expect(page.getByTestId('aviso-invitacion')).toContainText('STG-M4RC');
   await page.getByTestId('aviso-invitacion').click();
-  await expect(page.getByLabel('Código de tu entrenador')).toHaveValue('TIT-M4RC');
+  await expect(page.getByLabel('Código de tu entrenador')).toHaveValue('STG-M4RC');
   await captura(page, '40-vincular');
   await page.getByRole('button', { name: 'Aceptar y vincular' }).click();
   await expect(page.getByRole('heading', { name: 'Marco' })).toBeVisible();
@@ -160,7 +160,7 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   await captura(page, '41-admin');
   await page.getByTestId('solicitud').filter({ hasText: 'Lucas' }).getByRole('button', { name: 'Aprobar' }).click();
   await expect(page.getByRole('status')).toContainText('Lucas Benítez ya es entrenador');
-  await expect(page.getByTestId('profesional').filter({ hasText: 'Lucas' })).toContainText('TIT-');
+  await expect(page.getByTestId('profesional').filter({ hasText: 'Lucas' })).toContainText('STG-');
   // Ahora Marco tiene 4 clientes (Lucas se sumó por el enlace)
   await expect(page.getByTestId('profesional').filter({ hasText: 'Marco' })).toContainText('4 clientes');
 

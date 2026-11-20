@@ -86,7 +86,7 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await page.getByRole('button', { name: 'Continuar' }).click();
   await expect(page.getByText('Recomendado para vos')).toBeVisible();
   await captura(page, '02d-conocerte-plan');
-  await page.getByRole('button', { name: 'Entrar a TITANUS' }).click();
+  await page.getByRole('button', { name: 'Entrar a StoaGym' }).click();
   await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches), Lucía/ })).toBeVisible();
   // Eligió mujer: ve las estatuas de legionaria y sus datos quedan en Perfil
   await expect(page.locator('img[src*="avatar-f"]:visible').first()).toBeVisible();

@@ -76,7 +76,7 @@ export function SeccionPro() {
         )}
       </div>
 
-      <Hoja abierta={pedir} alCerrar={() => setPedir(false)} etiqueta="Panel profesional" titulo={`Ser ${ESP.rol.toLowerCase()} en TITANUS`}>
+      <Hoja abierta={pedir} alCerrar={() => setPedir(false)} etiqueta="Panel profesional" titulo={`Ser ${ESP.rol.toLowerCase()} en StoaGym`}>
         <p className="text-[14px] text-mu">Vas a poder llevar clientes: ver su progreso, asignarles rutinas, comentar sus entrenamientos y fijarles objetivos. Lo aprueba el administrador.</p>
         <label className="mt-4 block"><span className="etiqueta">Nombre que van a ver tus clientes</span>
           <input className="campo mt-2" value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={80} aria-label="Nombre profesional" />

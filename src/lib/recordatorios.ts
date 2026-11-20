@@ -19,7 +19,7 @@ export async function programarRecordatorios(r: Recordatorio): Promise<'programa
   await LocalNotifications.schedule({
     notifications: r.dias.map((d) => ({
       id: 100 + d,
-      title: 'TITANUS',
+      title: 'StoaGym',
       body: 'Hoy toca entrenar. Una serie por vez.',
       // Capacitor usa 1 = domingo … 7 = sábado
       schedule: { on: { weekday: d + 1, hour: h, minute: m }, allowWhileIdle: true },

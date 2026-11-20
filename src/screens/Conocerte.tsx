@@ -9,7 +9,7 @@ import { Icono } from '../ui/Icono';
 import { Selector } from '../ui/piezas';
 
 /**
- * Bienvenida "Conocerte": seis preguntas cortas (como Hevy, con la estética de TITANUS).
+ * Bienvenida "Conocerte": seis preguntas cortas (como Hevy, con la estética de StoaGym).
  * Todo es opcional; se guarda una sola vez al final (1 escritura). También sirve para editar
  * los datos desde Perfil (/conocerte?editar=1).
  */
@@ -157,7 +157,7 @@ export default function Conocerte() {
         aviso('Plantilla cargada: tu primer entrenamiento te espera');
         nav('/entreno');
       } else {
-        aviso(editar ? 'Datos guardados' : `Bienvenido${figura === 'mujer' ? 'a' : ''} a TITANUS`);
+        aviso(editar ? 'Datos guardados' : `Bienvenido${figura === 'mujer' ? 'a' : ''} a StoaGym`);
         nav(editar ? '/perfil' : '/');
       }
     } finally { setGuardando(false); }
@@ -311,7 +311,7 @@ export default function Conocerte() {
           </>
         ) : (
           <button className={`${editar || nivel === 'principiante' || !nivel ? 'btn-sec' : 'btn'} mt-4 h-14 w-full text-[16px]`} disabled={guardando} onClick={() => terminar()}>
-            {editar ? 'Guardar' : 'Entrar a TITANUS'}
+            {editar ? 'Guardar' : 'Entrar a StoaGym'}
           </button>
         )}
       </div>

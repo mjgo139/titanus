@@ -1,6 +1,6 @@
 /**
  * Base reutilizable "encargado y sus clientes".
- * Sirve para entrenadores (TITANUS) y, más adelante, nutricionistas u otros profesionales.
+ * Sirve para entrenadores (StoaGym) y, más adelante, nutricionistas u otros profesionales.
  * Nada de este archivo sabe de pesas ni de comidas: lo propio de cada especialidad va en su carpeta.
  */
 export type TipoProfesional = 'entrenador' | 'nutricionista';

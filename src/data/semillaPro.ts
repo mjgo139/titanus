@@ -29,7 +29,7 @@ export function cargarEquipoDePrueba(ahora: number, h: {
   datos: (uid: string) => DatosUsuario;
   comun: { profesionales: Map<string, Profesional>; solicitudes: Map<string, Solicitud>; codigos: Map<string, Codigo>; vinculos: Map<string, Vinculo> };
 }) {
-  const marco: Profesional = { uid: USUARIO_PRUEBA.uid, tipo: 'entrenador', nombre: 'Marco', codigo: 'TIT-M4RC', activo: true, alta: ahora - 70 * DIA };
+  const marco: Profesional = { uid: USUARIO_PRUEBA.uid, tipo: 'entrenador', nombre: 'Marco', codigo: 'STG-M4RC', activo: true, alta: ahora - 70 * DIA };
   h.comun.profesionales.set(marco.uid, marco);
   h.comun.codigos.set(marco.codigo, { codigo: marco.codigo, profesionalId: marco.uid, tipo: 'entrenador', nombre: marco.nombre });
   h.comun.solicitudes.set('u-diego', {
