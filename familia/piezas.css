@@ -186,3 +186,28 @@ a.lateral-persona:hover { background: var(--lat-activo); }
   margin: 12px auto 0; max-width: 360px; border: 1px solid var(--ln2); border-radius: 9999px; padding: 4px 16px; text-align: center;
   font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--mu2);
 }
+
+/* ——— Foto y tarjeta de perfil (v1.6.0) ——— */
+.avatar-foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar-inicial {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  background: var(--goldbg); color: var(--gold); font-family: var(--f-display); font-weight: 700; font-size: 26px; line-height: 1;
+}
+@media (min-width: 1024px) { .panel-dia-avatar .avatar-inicial { font-size: 36px; } }
+.lateral-avatar .avatar-inicial { font-size: 15px; background: transparent; color: var(--lat-oro); }
+.tarjeta-perfil { text-align: center; padding-top: 28px; padding-bottom: 28px; }
+.tarjeta-perfil-laurel { position: relative; width: 112px; height: 104px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+.tarjeta-perfil-laurel > svg { position: absolute; inset: 0; margin: auto; }
+.tarjeta-perfil-avatar { position: relative; width: 64px; height: 64px; margin-top: -6px; border-radius: 9999px; overflow: hidden; display: inline-flex; }
+.tarjeta-perfil-avatar .avatar-inicial { font-size: 28px; }
+.tarjeta-perfil-nombre { margin: 10px 0 0; font-family: var(--f-display); font-size: 26px; font-weight: 700; color: var(--tx); }
+.tarjeta-perfil-correo { margin-top: 4px; font-weight: 500; color: var(--mu); overflow-wrap: anywhere; }
+.tarjeta-perfil-detalle { margin-top: 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--mu2); }
+.tarjeta-perfil-acciones { margin-top: 18px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+/* Botón con borde dorado y texto en mayúsculas (el "Cambiar nombre" de StoaHabit) */
+.btn-borde {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 9999px;
+  border: 1px solid var(--gold2); background: transparent; color: var(--gold); cursor: pointer;
+  font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; transition: border-color .15s, background .15s;
+}
+.btn-borde:hover { border-color: var(--gold); background: var(--goldbg); }

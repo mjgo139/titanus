@@ -239,3 +239,70 @@ export function ElegirTema({ valor, cambiar }: { valor: Tema; cambiar: (t: Tema)
 export function AvisoPrueba() {
   return <div className="aviso-prueba">Modo prueba · datos inventados</div>;
 }
+
+/* ——————————————————— v1.6.0: foto de perfil y tarjeta de perfil ——————————————————— */
+
+/**
+ * Avatar de la persona, igual en las 4 apps: su foto si la subió; si no, el `respaldo` propio de la app
+ * (por ejemplo la estatua de StoaGym) y, si no hay, sus iniciales en Playfair dorado.
+ * Va dentro de un contenedor redondo (.panel-dia-avatar, .lateral-avatar, .tarjeta-perfil-avatar).
+ */
+export function Avatar({ foto, nombre, respaldo }: { foto?: string | null; nombre: string; respaldo?: ReactNode }) {
+  if (foto) return <img src={foto} alt="" className="avatar-foto" data-testid="foto-perfil" />;
+  if (respaldo) return <>{respaldo}</>;
+  return <span className="avatar-inicial">{iniciales(nombre)}</span>;
+}
+
+/**
+ * Achica la foto elegida a 256×256 (recorte cuadrado desde el centro) y la devuelve como texto
+ * (data URL WebP, o JPEG si el navegador no sabe WebP): pesa 10–40 KB y se guarda en el perfil, sin Storage.
+ */
+export async function prepararFoto(archivo: File, lado = 256): Promise<string> {
+  const url = URL.createObjectURL(archivo);
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, mal) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => mal(new Error('No se pudo abrir la imagen')); i.src = url; });
+    const corte = Math.min(img.naturalWidth, img.naturalHeight);
+    const c = document.createElement('canvas'); c.width = lado; c.height = lado;
+    c.getContext('2d')!.drawImage(img, (img.naturalWidth - corte) / 2, (img.naturalHeight - corte) / 2, corte, corte, 0, 0, lado, lado);
+    const webp = c.toDataURL('image/webp', 0.82);
+    return webp.startsWith('data:image/webp') ? webp : c.toDataURL('image/jpeg', 0.85);
+  } finally { URL.revokeObjectURL(url); }
+}
+
+/** Botón que abre la galería y entrega la foto ya preparada (sin `capture`: en Android la cámara del sistema cierra la app) */
+export function BotonFoto({ alElegir, alFallar, children, className = 'btn-borde' }: {
+  alElegir: (foto: string) => void; alFallar?: (e: unknown) => void; children: ReactNode; className?: string;
+}) {
+  return (
+    <label className={className} style={{ cursor: 'pointer' }}>
+      {children}
+      <input type="file" accept="image/*" hidden aria-label="Elegir foto de perfil"
+        onChange={async (e) => {
+          const f = e.target.files?.[0]; e.target.value = '';
+          if (!f) return;
+          try { alElegir(await prepararFoto(f)); } catch (err) { alFallar?.(err); }
+        }} />
+    </label>
+  );
+}
+
+/**
+ * Tarjeta de Perfil, igual en las 4 apps (modelo: StoaHabit): avatar dentro del laurel, nombre, correo,
+ * cómo entra (CORREO · ADMIN) y los botones (Cambiar foto, Cambiar nombre…).
+ */
+export function TarjetaPerfil({ avatar, nombre, correo, detalle, acciones, testId = 'tarjeta-perfil' }: {
+  avatar: ReactNode; nombre: string; correo?: string; detalle?: ReactNode; acciones?: ReactNode; testId?: string;
+}) {
+  return (
+    <section className="tarjeta tarjeta-perfil" data-testid={testId}>
+      <div className="tarjeta-perfil-laurel">
+        <Laurel size={112} />
+        <span className="tarjeta-perfil-avatar">{avatar}</span>
+      </div>
+      <h2 className="tarjeta-perfil-nombre">{nombre}</h2>
+      {correo && <div className="tarjeta-perfil-correo">{correo}</div>}
+      {detalle && <div className="tarjeta-perfil-detalle">{detalle}</div>}
+      {acciones && <div className="tarjeta-perfil-acciones">{acciones}</div>}
+    </section>
+  );
+}

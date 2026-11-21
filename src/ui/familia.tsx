@@ -5,7 +5,8 @@ import { Emblema as EmblemaFamilia } from '../../familia/react';
  * Acá solo se agrega lo propio de StoaGym: la mancuerna del emblema.
  */
 export { Laurel, Grupo, Ficha, CabeceraPagina, BarraLateral, Pestanas, iniciales,
-  PanelDia, TuSemana, ElegirTema, AvisoPrueba, aplicarTema, saludoDeHora, fechaLarga, TEMAS, TEMA_PREDETERMINADO } from '../../familia/react';
+  PanelDia, TuSemana, ElegirTema, AvisoPrueba, aplicarTema, saludoDeHora, fechaLarga, TEMAS, TEMA_PREDETERMINADO,
+  Avatar, BotonFoto, TarjetaPerfil, prepararFoto } from '../../familia/react';
 
 /** Mancuerna de StoaGym (lienzo 512, centro 256,245) */
 const MANCUERNA = (

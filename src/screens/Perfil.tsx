@@ -12,7 +12,7 @@ import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Hoja, Seccion, Selector } from '../ui/piezas';
-import { TEMAS } from '../ui/familia';
+import { Avatar, BotonFoto, TarjetaPerfil, TEMAS } from '../ui/familia';
 import { SeccionPro } from '../pro/SeccionPerfil';
 
 export default function Perfil() {
@@ -23,6 +23,7 @@ export default function Perfil() {
   const [error, setError] = useState('');
   const [novedades, setNovedades] = useState(false);
   const [crear, setCrear] = useState(false);
+  const [editarNombre, setEditarNombre] = useState(false);
   const r = perfil.recordatorio;
   const rg = rango(perfil.resumen.total);
   const sc = perfil.sobrecarga ?? SOBRECARGA_POR_DEFECTO;
@@ -59,18 +60,14 @@ export default function Perfil() {
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-10">
       <div className="lg:sticky lg:top-6">
       <div className="mt-6 mb-5"><CabeceraPagina etiqueta="Tu cuenta" titulo="Perfil" linea="Datos, apariencia y ajustes." /></div>
-      <div className="text-center">
-        <img src={estatuas(perfil.figura).avatar} alt="" className="mx-auto h-[100px] w-[100px] rounded-full border-2 border-gold object-cover" />
-        <h2 className="mt-3 font-display text-[26px] font-semibold">{perfil.nombre}</h2>
-        <p className="oro mt-1">{rg.nombre} · Nivel {rg.nivel}</p>
-        {rg.siguiente && (
-          <div className="mx-auto mt-3 max-w-[260px]">
-            <div className="h-1.5 overflow-hidden rounded-full bg-ln2"><div className="h-full" style={{ width: `${Math.round(rg.progreso * 100)}%`, background: 'var(--oro-grad)' }} /></div>
-            <p className="mt-1 text-[12.5px] text-mu">Faltan {rg.faltan} entrenamientos para {rg.siguiente}</p>
-          </div>
-        )}
-        {!usuario.invitado && usuario.email && <p className="mt-1 text-[13.5px] text-mu2">{usuario.email}</p>}
-      </div>
+      <TarjetaPerfil nombre={perfil.nombre} correo={usuario.invitado ? undefined : usuario.email}
+        avatar={<Avatar foto={perfil.foto} nombre={perfil.nombre} respaldo={<img src={estatuas(perfil.figura).avatar} alt="" className="avatar-foto" />} />}
+        detalle={<>{usuario.invitado ? 'Cuenta de invitado' : repo.modo === 'prueba' ? 'Cuenta de prueba' : 'Entra con correo'}{admin ? ' · Admin' : ''}</>}
+        acciones={<>
+          <BotonFoto alElegir={async (foto) => { await cambiarPerfil({ foto }); aviso('Foto guardada'); }} alFallar={() => aviso('No se pudo abrir esa imagen')}>Cambiar foto</BotonFoto>
+          {perfil.foto && <button type="button" className="btn-borde" onClick={async () => { await cambiarPerfil({ foto: null }); aviso('Foto quitada'); }}>Quitar foto</button>}
+          <button type="button" className="btn-borde" onClick={() => { setNombre(perfil.nombre); setEditarNombre(true); }}>Cambiar nombre</button>
+        </>} />
 
       <div className="tarjeta mt-6 py-1">
         <div className="flex justify-between border-b border-ln2 py-[13px]"><span>Entrenamientos completados</span><strong className="num" data-testid="completados">{perfil.resumen.total}</strong></div>
@@ -88,15 +85,7 @@ export default function Perfil() {
 
       </div>
       <div className="lg:pt-16">
-      <Seccion n={1} titulo="Nombre">
-        <div className="flex gap-2">
-          <input className="campo" value={nombre} onChange={(e) => setNombre(e.target.value)} aria-label="Nombre" />
-          <button className="btn-sec h-[46px] shrink-0" disabled={!nombre.trim() || nombre === perfil.nombre}
-            onClick={async () => { await cambiarPerfil({ nombre: nombre.trim() }); aviso('Nombre guardado'); }}>Guardar</button>
-        </div>
-      </Seccion>
-
-      <Seccion n={2} titulo="Apariencia">
+      <Seccion n={1} titulo="Apariencia">
         <Selector<Tema> nombre="Apariencia" valor={perfil.tema} alCambiar={(t) => cambiarPerfil({ tema: t })}
           opciones={TEMAS} />
         <div className="mt-3">
@@ -105,12 +94,12 @@ export default function Perfil() {
         </div>
       </Seccion>
 
-      <Seccion n={3} titulo="Unidades">
+      <Seccion n={2} titulo="Unidades">
         <Selector<Unidad> nombre="Unidades" valor={perfil.unidad} alCambiar={(u) => cambiarPerfil({ unidad: u })}
           opciones={[{ v: 'kg', t: 'Kilos (kg)' }, { v: 'lb', t: 'Libras (lb)' }]} />
       </Seccion>
 
-      <Seccion n={4} titulo="Sobrecarga progresiva">
+      <Seccion n={3} titulo="Sobrecarga progresiva">
         <div className="tarjeta">
           <Selector<ModoSobrecarga> nombre="Sobrecarga progresiva" valor={sc.modo}
             alCambiar={(m) => cambiarPerfil({ sobrecarga: { ...sc, modo: m } })}
@@ -138,7 +127,7 @@ export default function Perfil() {
         </div>
       </Seccion>
 
-      <Seccion n={5} titulo="Recordatorios">
+      <Seccion n={4} titulo="Recordatorios">
         <div className="tarjeta">
           <label className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-3 font-semibold"><Icono n="campana" className="oro" />Avisarme para entrenar</span>
@@ -170,9 +159,9 @@ export default function Perfil() {
         </div>
       </Seccion>
 
-      <SeccionPro n={6} />
+      <SeccionPro n={5} />
 
-      <Seccion n={7} titulo="Tus datos">
+      <Seccion n={6} titulo="Tus datos">
         <div className="tarjeta py-1">
           <Link to="/conocerte?editar=1" className="fila w-full text-left" data-testid="datos-personales">
             <Icono n="perfil" className="oro" />
@@ -206,7 +195,7 @@ export default function Perfil() {
       </Seccion>
 
       {admin && (
-        <Seccion n={8} titulo="Versión (solo admin)">
+        <Seccion n={7} titulo="Versión (solo admin)">
           <button className="tarjeta w-full text-left" onClick={() => setNovedades(true)} data-testid="version">
             <div className="flex items-center justify-between">
               <span className="num text-[20px]">v{VERSION}</span>
@@ -223,6 +212,11 @@ export default function Perfil() {
       <p className="mt-6 text-[11px] text-mu2">Fotos de ejercicios: free-exercise-db (dominio público).</p>
       </div>
       </div>
+      <Hoja abierta={editarNombre} alCerrar={() => setEditarNombre(false)} etiqueta="Tu cuenta" titulo="Cambiar nombre">
+        <input className="campo" value={nombre} onChange={(e) => setNombre(e.target.value)} aria-label="Nombre" maxLength={80} />
+        <button className="btn mt-4 w-full" disabled={!nombre.trim() || nombre.trim() === perfil.nombre}
+          onClick={async () => { await cambiarPerfil({ nombre: nombre.trim() }); setEditarNombre(false); aviso('Nombre guardado'); }}>Guardar</button>
+      </Hoja>
       <Hoja abierta={crear} alCerrar={() => setCrear(false)} titulo="Crear cuenta">
         <FormAcceso inicial="registrar" alTerminar={() => { setCrear(false); aviso('¡Cuenta creada! Tu progreso quedó guardado'); }} />
       </Hoja>

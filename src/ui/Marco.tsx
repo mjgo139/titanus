@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate, type NavigateFunction } from 'react-r
 import { leerBorrador } from '../lib/borrador';
 import { reloj } from '../lib/logica';
 import { estatuas } from './estatuas';
-import { AvisoPrueba, BarraLateral, Emblema, Pestanas } from './familia';
+import { AvisoPrueba, Avatar, BarraLateral, Emblema, Pestanas } from './familia';
 import { AvisoMudanza } from './AvisoMudanza';
 import { Icono } from './Icono';
 import { useApp } from './contexto';
@@ -80,7 +80,7 @@ export function Marco() {
   return (
     <div className="con-lateral min-h-screen">
       <BarraLateral emblema={<Emblema size={40} />} nombreApp="StoaGym" secciones={secciones} ir={ir}
-        persona={perfil ? { avatar: <img src={estatuas(perfil.figura).avatar} alt="" />, nombre: perfil.nombre.split(' ')[0], detalle: usuario?.invitado ? 'Modo invitado' : usuario?.email ?? '', href: '/perfil' } : undefined}
+        persona={perfil ? { avatar: <Avatar foto={perfil.foto} nombre={perfil.nombre} respaldo={<img src={estatuas(perfil.figura).avatar} alt="" className="avatar-foto" />} />, nombre: perfil.nombre.split(' ')[0], detalle: usuario?.invitado ? 'Modo invitado' : usuario?.email ?? '', href: '/perfil' } : undefined}
         nota={repo.modo === 'prueba' ? 'Modo prueba' : 'Entrenamiento · Disciplina · Fuerza'} />
 
       <main className="mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:max-w-[1480px] lg:px-12 lg:pt-5 lg:pb-16">

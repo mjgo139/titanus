@@ -12,7 +12,7 @@ import { Cargando } from '../ui/piezas';
 import { useEmpezar } from './empezar';
 import { AvisoHoy } from '../pro/AvisoHoy';
 import { ProgramaEnCurso } from './Programas';
-import { Grupo, PanelDia, TuSemana } from '../ui/familia';
+import { Avatar, Grupo, PanelDia, TuSemana } from '../ui/familia';
 import { fraseDelDia } from '../lib/frases';
 
 export function minutosEstimados(r: Rutina): number {
@@ -86,7 +86,7 @@ export default function Hoy() {
       {/* Panel del día de la familia, con la estatua de StoaGym */}
       <div className="entrar">
         <PanelDia nombre={perfil.nombre.split(' ')[0]} ahora={ahora}
-          avatar={<img src={estatuas(perfil.figura).avatar} alt="" />}
+          avatar={<Avatar foto={perfil.foto} nombre={perfil.nombre} respaldo={<img src={estatuas(perfil.figura).avatar} alt="" className="avatar-foto" />} />}
           frase={fraseDelDia(ahora)}
           fichas={<>
             <Link to="/progreso" className="ficha">

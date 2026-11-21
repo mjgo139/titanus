@@ -144,6 +144,8 @@ export interface Perfil {
   altura?: number;
   objetivo?: Objetivo;
   nivel?: Nivel;
+  /** Foto de perfil (data URL WebP/JPEG 256×256, v1.26.0); null = sin foto */
+  foto?: string | null;
   /** Ya pasó (o salteó) la bienvenida */
   conocido?: boolean;
   /** Programa en curso (formato viejo, hasta v1.19; se lee con programasActivos) */

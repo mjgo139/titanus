@@ -535,3 +535,21 @@ test('programas: hasta 3 a la vez; con el cuarto elijo cuál dejar', async ({ pa
   await expect(page.getByText('Abdomen de acero')).toHaveCount(0);
 });
 
+
+// Familia v1.6.0: tarjeta de perfil igual en las apps, cambiar foto y nombre; la foto aparece en el Panel del día
+const PNG_1PX = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+test('perfil: tarjeta, cambiar foto y nombre', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Perfil');
+  const tarjeta = page.getByTestId('tarjeta-perfil');
+  await expect(tarjeta).toContainText('Marco');
+  await tarjeta.getByLabel('Elegir foto de perfil').setInputFiles({ name: 'yo.png', mimeType: 'image/png', buffer: PNG_1PX });
+  await expect(tarjeta.getByTestId('foto-perfil')).toBeVisible();
+  await tarjeta.getByRole('button', { name: 'Cambiar nombre' }).click();
+  await page.getByRole('dialog').getByLabel('Nombre').fill('Marco Aurelio');
+  await page.getByRole('dialog').getByRole('button', { name: 'Guardar' }).click();
+  await expect(tarjeta).toContainText('Marco Aurelio');
+  await captura(page, '21b-perfil-foto');
+  await ir(page, 'Inicio');
+  await expect(page.getByTestId('panel-dia').getByTestId('foto-perfil')).toBeVisible();
+});

@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.26.0',
+    fecha: '21/11/2026',
+    cambios: [
+      'Ahora podés poner tu foto de perfil (Perfil → Cambiar foto). Se ve en el Panel del día, en la barra lateral y en Perfil; sin foto sigue la estatua.',
+      'La tarjeta de Perfil es igual en todas las apps de la familia: tu foto en el laurel, nombre, correo y los botones Cambiar foto y Cambiar nombre.',
+    ],
+  },
+  {
     version: '1.25.0',
     fecha: '21/11/2026',
     cambios: [
