@@ -31,7 +31,3 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 .barra-entreno { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold2), transparent) 1; }
 
 
-/* Fundido entre pantallas (el resto está en familia/movimiento.css): la barra de pestañas queda quieta */
-.pestanas-fijas { view-transition-name: pestanas; }
-.lateral-fija { view-transition-name: lateral; }
-::view-transition-group(pestanas), ::view-transition-group(lateral) { animation: none; }

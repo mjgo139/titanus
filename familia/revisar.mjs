@@ -6,7 +6,8 @@
 //   1. algún archivo de familia/ fue cambiado dentro de la app (se cambia en el repo familia-estoica);
 //   2. hay un color escrito a mano (#abc, #aabbcc, rgb(), rgba(), hsl()…) fuera de familia/;
 //   3. hay un tamaño de letra fuera de la escala de la familia (text-[14px], font-size: 14px, text-sm…);
-//   4. un <Icono> usa un tamaño que no es 16, 20, 22, 23, 32 o 44.
+//   4. un <Icono> usa un tamaño que no es 16, 20, 22, 23, 32 o 44;
+//   5. la app arma su propia barra lateral (ancho 248) en vez de usar BarraLateral de la familia.
 // Excepción puntual: poner el comentario  familia-ok  en esa misma línea (por ejemplo, los colores del logo de Google).
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -52,6 +53,7 @@ function revisar(ruta) {
     const donde = `${relative(raiz, ruta)}:${i + 1}`;
     if (m) errores.push(`${donde}: color escrito a mano "${m[0]}". Usá una variable de familia/tokens.css (por ejemplo var(--gold)).`);
     for (const r of LETRA) for (const x of linea.matchAll(r)) if (!ESCALA.has(x[1])) errores.push(`${donde}: tamaño de letra ${x[1]} fuera de la escala (11 · 11,5 · 12,5 · 13,5 · 15 · 16 · 18 · 20 · 26 · 28 · 36 · 40 · 48 · 64).`);
+    if (/(?:w|pl|left)-\[248px\]/.test(linea)) errores.push(`${donde}: barra lateral propia (248 px). Usá <BarraLateral> y <Pestanas> de familia/react.tsx, y la clase .con-lateral.`);
     const tw = linea.match(TW);
     if (tw && /className|class=/.test(linea)) errores.push(`${donde}: "${tw[0]}" usa la escala de Tailwind; usá la de la familia (text-texto, text-sec… o text-[15px]).`);
     for (const x of linea.matchAll(ICONO)) if (!ICONOS.has(x[1])) errores.push(`${donde}: ícono de ${x[1]} px; solo 16 (con texto), 20 (botones y filas), 22–23 (navegación), 32 o 44 (decorativos).`);

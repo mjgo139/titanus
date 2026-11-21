@@ -54,6 +54,7 @@
   /* Barra lateral de PC: siempre oscura */
   --lat-tx:#c9bda7; --lat-tx-on:#f7f1e7; --lat-activo:#1d180f;
   --lat-oro:#f2c55c; --lat-mu:#7d7462; --lat-borde:#a66c16; --lat-marfil:#F3EDDF;
+  --lat-linea: rgba(255,255,255,.08);
   /* Texto sobre botones de color fuerte */
   --sobre-verde:#0b0a08; --sobre-miss:#ffffff;
   /* Textos sobre fotos y la marca grande */

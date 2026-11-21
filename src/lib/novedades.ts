@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.23.0',
+    fecha: '21/11/2026',
+    cambios: [
+      'La barra lateral de la PC y las pestañas del celular ahora son las mismas en todas las apps de la familia: marca más grande con brillo, línea fina sobre tu nombre y pestañas con la activa en oro.',
+    ],
+  },
+  {
     version: '1.22.0',
     fecha: '21/11/2026',
     cambios: [

@@ -4,7 +4,7 @@ import { Emblema as EmblemaFamilia } from '../../familia/react';
  * Piezas de la familia estoica: vienen de la carpeta familia/ (copia del repo mjgo139/familia-estoica).
  * Acá solo se agrega lo propio de StoaGym: la mancuerna del emblema.
  */
-export { Laurel, Grupo, Ficha, CabeceraPagina } from '../../familia/react';
+export { Laurel, Grupo, Ficha, CabeceraPagina, BarraLateral, Pestanas, iniciales } from '../../familia/react';
 
 /** Mancuerna de StoaGym (lienzo 512, centro 256,245) */
 const MANCUERNA = (

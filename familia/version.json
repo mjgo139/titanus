@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "fecha": "2026-11-21",
   "archivos": {
     "LEEME.md": "76bebe2fcef8d50a21902685d2087a90ee0821b8801e503cfde143e8c8a07cd9",
@@ -7,11 +7,11 @@
     "emblema.mjs": "c428ee891819feb90fe5f4cb019c931adfe6accccb21ba211b98c1a331c8cbb2",
     "familia.css": "3bdd3836557d6348ae79cb3385b1f8a2869864ef76066bfea7561f37dabd351b",
     "iconos.tsx": "9b4ae738370d31c857ea90cb0eb2b6ac58f3d3b0d424d7b86cc27e2164b47db6",
-    "movimiento.css": "46f2ae1b261c900721a5c08cb3f066a26f3423e958cd1aacd527997265c08831",
-    "piezas.css": "22010b398da681a3c23595328659f7b8daeb841a7c46367c2f5c38d4c916af2e",
-    "react.tsx": "0972254154cf8193bd251060b29c4aaef06161621296fb03eed5829bc3106dca",
-    "revisar.mjs": "e4285e7cec8057d216b9e2340272ea0f762cf2c07c881f791817ff702a81e235",
+    "movimiento.css": "b451666a3fbbcd60083398c65bd5acda9bd30ae1ec758809d834a57bbf425395",
+    "piezas.css": "a0a8736248260ff4e03a3325d3695caa0de95ee6dcca4b79f20c00df17f6fff4",
+    "react.tsx": "f6a14f41799fb1948df1d0040d253ca68b36c4872daeb941f88420c176c16426",
+    "revisar.mjs": "b963f21a96eb8332796dffd2e1d29a83268de6c88b68f25f70190809b3be3688",
     "tailwind-preset.js": "bf10ae8fcfaf348c90f352bf1c2a6e974068d9dcdf5701b4b9f00a90638dddf0",
-    "tokens.css": "c15fcd2b12df65d9f7f1e0f0508ed57e93f7ff07507ec9c900fcdfb1d9b0480f"
+    "tokens.css": "5a1f69715a49b8b81fc22177eca7ec340fe4fdf3d5aa0977b1d2bae833fada2a"
   }
 }

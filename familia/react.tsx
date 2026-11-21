@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
+import { Icono } from './iconos';
 
 /**
  * Familia estoica · piezas de React iguales en las 4 apps.
@@ -80,3 +81,61 @@ export function Emblema({ size = 28, figura, className = '', testId = 'emblema' 
     </svg>
   );
 }
+
+/** Una sección de la navegación (sirve igual para la barra lateral y las pestañas) */
+export type Seccion = { href: string; icono: string; texto: string; activa: boolean };
+
+/**
+ * Barra lateral de PC, igual en las 4 apps: marca (emblema + nombre con brillo), línea dorada,
+ * secciones de 46 px con ícono de 22 y, al pie, la persona (avatar de 40 + nombre + detalle).
+ * No depende del router: `ir` recibe el clic y la app navega (por ejemplo con preventDefault + navigate).
+ */
+export function BarraLateral({ emblema, nombreApp, secciones, ir, persona, nota, inicio = '/' }: {
+  emblema: ReactNode; nombreApp: string; secciones: Seccion[];
+  ir?: (e: MouseEvent<HTMLAnchorElement>, href: string) => void;
+  persona?: { avatar: ReactNode; nombre: string; detalle?: string; href?: string; testId?: string };
+  nota?: ReactNode; inicio?: string;
+}) {
+  return (
+    <aside className="lateral" aria-label="Menú">
+      <a href={inicio} className="lateral-marca" data-testid="marca-lateral" onClick={(e) => ir?.(e, inicio)}>{emblema}<span className="marca">{nombreApp}</span></a>
+      <div className="divisor" aria-hidden />
+      <nav className="lateral-nav">
+        {secciones.map((s) => (
+          <a key={s.href} href={s.href} className="lateral-item" aria-current={s.activa ? 'page' : undefined} onClick={(e) => ir?.(e, s.href)}>
+            <Icono n={s.icono} size={22} />{s.texto}
+          </a>
+        ))}
+      </nav>
+      <div className="lateral-pie">
+        {persona && (() => {
+          const dentro = <><span className="lateral-avatar">{persona.avatar}</span>
+            <span style={{ minWidth: 0 }}><span className="lateral-nombre">{persona.nombre}</span>{persona.detalle && <span className="lateral-detalle">{persona.detalle}</span>}</span></>;
+          const id = persona.testId ?? 'persona-lateral';
+          return persona.href
+            ? <a href={persona.href} className="lateral-persona" data-testid={id} onClick={(e) => ir?.(e, persona.href!)}>{dentro}</a>
+            : <div className="lateral-persona" data-testid={id}>{dentro}</div>;
+        })()}
+        {nota && <div className="lateral-nota">{nota}</div>}
+      </div>
+    </aside>
+  );
+}
+
+/** Pestañas de abajo en el celular, iguales en las 4 apps (alto 60, ícono 23, texto 11; la activa en oro y negrita) */
+export function Pestanas({ secciones, ir }: { secciones: Seccion[]; ir?: (e: MouseEvent<HTMLAnchorElement>, href: string) => void }) {
+  return (
+    <nav className="pestanas" aria-label="Pestañas">
+      <div className="pestanas-fila">
+        {secciones.map((s) => (
+          <a key={s.href} href={s.href} className="pestana" aria-current={s.activa ? 'page' : undefined} onClick={(e) => ir?.(e, s.href)}>
+            <Icono n={s.icono} size={23} />{s.texto}
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+/** Iniciales para el avatar cuando no hay foto: "Lucas Pérez" → "LP" */
+export const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '').join('') || '·';

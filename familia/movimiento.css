@@ -24,7 +24,10 @@
 /* Cambio de pantalla: aparece suave y sube apenas */
 .pagina { animation: pagina .38s cubic-bezier(.2,.8,.2,1) backwards; }
 
-/* Fundido cruzado entre pantallas (View Transitions) */
+/* Fundido cruzado entre pantallas (View Transitions); la barra lateral y las pestañas quedan quietas */
+.lateral { view-transition-name: lateral; }
+.pestanas { view-transition-name: pestanas; }
+::view-transition-group(lateral), ::view-transition-group(pestanas) { animation: none; }
 ::view-transition-old(root) { animation: .22s ease both desaparecer; }
 ::view-transition-new(root) { animation: .32s cubic-bezier(.2,.8,.2,1) both pagina; }
 

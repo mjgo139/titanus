@@ -431,7 +431,7 @@ export default function Entrenar() {
       </div>
 
       {descanso && vista === 'lista' && (
-        <div className="fixed inset-x-0 bottom-0 z-40 lg:pl-[248px]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="con-lateral fixed inset-x-0 bottom-0 z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="mx-auto max-w-[480px] px-3 pb-3">
             <div role="timer" aria-label="Descanso" className="entrar overflow-hidden rounded-[14px] border border-gold2 bg-sf" style={{ boxShadow: 'var(--sombra)' }}>
               <div className="h-1 bg-ln2"><div className="h-full" style={{ width: `${(restante / descanso.total) * 100}%`, background: 'var(--oro-grad)' }} /></div>

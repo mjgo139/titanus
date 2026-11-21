@@ -74,6 +74,7 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 - **Prohibido escribir colores a mano** (#…, rgb(), hsl(), `bg-[#…]`). Solo `var(--…)` de `familia/tokens.css` o clases del preset (`bg-sf`, `text-gold`, `text-lat-tx`, `accent-familia`…). Si falta un color, se agrega en familia-estoica. Excepción puntual con el comentario `familia-ok` en la línea (logo de Google, máscaras).
 - `familia/familia.css` se importa en `main.tsx` antes de `index.css`; `index.css` solo tiene lo propio de StoaGym. `tailwind.config.js` usa `familia/tailwind-preset.js`. Piezas React: `familia/react.tsx`, reexportadas en `src/ui/familia.tsx` (que agrega la mancuerna al `Emblema`). Íconos: `scripts/iconos.mjs` usa `familia/emblema.mjs`.
 - **Escala única (familia v1.1.0, StoaGym v1.22.0):** letras solo 11 · 11,5 · 12,5 · 13,5 · 15 · 16 · 18 · 20 · 26 · 28 · 36 · 40 · 48 · 64 (`text-[15px]` o `text-texto`, `text-sec`…; nunca `text-sm`/`text-lg`). Íconos solo 16 (con texto) · 20 (botones y filas) · 22–23 (navegación) · 32/44 (decorativos). `src/ui/Icono.tsx` reexporta `familia/iconos.tsx`: un ícono nuevo se agrega en familia-estoica.
+- **Barra lateral y pestañas (familia v1.2.0, StoaGym v1.23.0):** `Marco.tsx` usa `BarraLateral` y `Pestanas` de la familia (no armar unas propias; el contenedor lleva `.con-lateral`). Persona al pie = estatua-avatar + nombre + rango.
 - `npm test` corre primero `node familia/revisar.mjs` (falla si `familia/` cambió, si hay colores sueltos o tamaños fuera de la escala).
 
 ## Reglas de trabajo
