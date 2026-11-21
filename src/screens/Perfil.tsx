@@ -60,15 +60,15 @@ export default function Perfil() {
       <div className="mt-6 mb-5"><CabeceraPagina etiqueta="Tu cuenta" titulo="Perfil" linea="Datos, apariencia y ajustes." /></div>
       <div className="text-center">
         <img src={estatuas(perfil.figura).avatar} alt="" className="mx-auto h-[100px] w-[100px] rounded-full border-2 border-gold object-cover" />
-        <h2 className="mt-3 font-display text-[25px] font-semibold">{perfil.nombre}</h2>
+        <h2 className="mt-3 font-display text-[26px] font-semibold">{perfil.nombre}</h2>
         <p className="oro mt-1">{rg.nombre} · Nivel {rg.nivel}</p>
         {rg.siguiente && (
           <div className="mx-auto mt-3 max-w-[260px]">
             <div className="h-1.5 overflow-hidden rounded-full bg-ln2"><div className="h-full" style={{ width: `${Math.round(rg.progreso * 100)}%`, background: 'var(--oro-grad)' }} /></div>
-            <p className="mt-1 text-[12px] text-mu">Faltan {rg.faltan} entrenamientos para {rg.siguiente}</p>
+            <p className="mt-1 text-[12.5px] text-mu">Faltan {rg.faltan} entrenamientos para {rg.siguiente}</p>
           </div>
         )}
-        {!usuario.invitado && usuario.email && <p className="mt-1 text-[13px] text-mu2">{usuario.email}</p>}
+        {!usuario.invitado && usuario.email && <p className="mt-1 text-[13.5px] text-mu2">{usuario.email}</p>}
       </div>
 
       <div className="tarjeta mt-6 py-1">
@@ -80,7 +80,7 @@ export default function Perfil() {
       {usuario.invitado && (
         <div className="hero mt-4 text-left">
           <div className="etiqueta oro">Modo invitado</div>
-          <p className="mt-2 text-[14px] text-tx2">Creá tu cuenta para guardar tu progreso y usarlo en cualquier dispositivo. No perdés nada de lo registrado.</p>
+          <p className="mt-2 text-[15px] text-tx2">Creá tu cuenta para guardar tu progreso y usarlo en cualquier dispositivo. No perdés nada de lo registrado.</p>
           <button className="btn mt-4 w-full" onClick={() => setCrear(true)}>Crear mi cuenta</button>
         </div>
       )}
@@ -114,7 +114,7 @@ export default function Perfil() {
           <Selector<ModoSobrecarga> nombre="Sobrecarga progresiva" valor={sc.modo}
             alCambiar={(m) => cambiarPerfil({ sobrecarga: { ...sc, modo: m } })}
             opciones={[{ v: 'auto', t: 'Automática' }, { v: 'manual', t: 'Manual' }, { v: 'apagada', t: 'Apagada' }]} />
-          <p className="mt-3 text-[13px] text-mu">
+          <p className="mt-3 text-[13.5px] text-mu">
             {sc.modo === 'auto' ? 'Cuando cumplís todas las repeticiones, la próxima vez la rutina ya arranca con más peso.'
               : sc.modo === 'manual' ? 'Te sugiere cuándo subir y vos decidís si aplicarlo con un toque.'
                 : 'No se sugieren cambios de peso.'}
@@ -155,14 +155,14 @@ export default function Perfil() {
                   const on = r.dias.includes(d);
                   return (
                     <button key={d} aria-pressed={on} onClick={() => guardarRecordatorio({ ...r, dias: on ? r.dias.filter((x) => x !== d) : [...r.dias, d] })}
-                      className={`chip h-10 flex-1 px-0 text-[12px] ${on ? 'chip-on' : ''}`}>
+                      className={`chip h-10 flex-1 px-0 text-[12.5px] ${on ? 'chip-on' : ''}`}>
                       {NOMBRES_DIA[d]}
                     </button>
                   );
                 })}
               </div>
               {!esNativo() && r.activo && (
-                <p className="mt-3 text-[13px] text-mu">Los avisos llegan en la app de Android. En la web quedan guardados para cuando la instales.</p>
+                <p className="mt-3 text-[13.5px] text-mu">Los avisos llegan en la app de Android. En la web quedan guardados para cuando la instales.</p>
               )}
             </>
           )}
@@ -176,13 +176,13 @@ export default function Perfil() {
           <Link to="/conocerte?editar=1" className="fila w-full text-left" data-testid="datos-personales">
             <Icono n="perfil" className="oro" />
             <span className="flex-1"><b>Datos personales</b>
-              <span className="block text-[12px] text-mu">{[
+              <span className="block text-[12.5px] text-mu">{[
                 perfil.nacimiento ? `${new Date().getFullYear() - Number(perfil.nacimiento.slice(0, 4))} años` : '',
                 perfil.altura ? `${perfil.altura} cm` : '',
                 perfil.objetivo ? { musculo: 'Ganar músculo', fuerza: 'Ganar fuerza', grasa: 'Perder grasa' }[perfil.objetivo] : '',
                 perfil.nivel ? perfil.nivel[0].toUpperCase() + perfil.nivel.slice(1) : '',
               ].filter(Boolean).join(' · ') || 'Género, edad, peso, altura, objetivo y experiencia'}</span></span>
-            <Icono n="atras" size={18} className="rotate-180 text-mu" />
+            <Icono n="atras" size={20} className="rotate-180 text-mu" />
           </Link>
           <button className="fila w-full text-left" onClick={exportar}>
             <Icono n="descargar" className="oro" /><span className="flex-1 font-semibold">Exportar mis datos</span>
@@ -192,7 +192,7 @@ export default function Perfil() {
               try { sessionStorage.removeItem('titanus-prueba-datos'); } catch { /* nada */ }
               location.assign('/');
             }}>
-              <Icono n="repetir" className="oro" /><span className="flex-1"><b>Volver a los datos de ejemplo</b><span className="block text-[12px] text-mu">Borra lo que probaste en esta pestaña</span></span>
+              <Icono n="repetir" className="oro" /><span className="flex-1"><b>Volver a los datos de ejemplo</b><span className="block text-[12.5px] text-mu">Borra lo que probaste en esta pestaña</span></span>
             </button>
           )}
           <button className="fila w-full text-left" onClick={() => repo.salir()}>
@@ -208,13 +208,13 @@ export default function Perfil() {
         <Seccion titulo="Versión (solo admin)">
           <button className="tarjeta w-full text-left" onClick={() => setNovedades(true)} data-testid="version">
             <div className="flex items-center justify-between">
-              <span className="num text-[22px]">v{VERSION}</span>
+              <span className="num text-[20px]">v{VERSION}</span>
               <span className="chip chip-on">Novedades</span>
             </div>
-            <div className="mt-2 text-[13px] text-mu">
+            <div className="mt-2 text-[13.5px] text-mu">
               Armado {new Date(FECHA_ARMADO).toLocaleString('es-PY')} · commit <span className="font-mono">{COMMIT}</span>
             </div>
-            <div className="mt-1 text-[13px] text-mu">Modo: {repo.modo === 'prueba' ? 'prueba (sin Firebase)' : 'Firebase'}</div>
+            <div className="mt-1 text-[13.5px] text-mu">Modo: {repo.modo === 'prueba' ? 'prueba (sin Firebase)' : 'Firebase'}</div>
           </button>
         </Seccion>
       )}
@@ -230,7 +230,7 @@ export default function Perfil() {
         {NOVEDADES.map((n) => (
           <div key={n.version} className="mb-5">
             <div className="etiqueta">v{n.version} · {n.fecha}</div>
-            <ul className="mt-2 list-disc pl-5 text-[14px] text-tx2 space-y-1">{n.cambios.map((c) => <li key={c}>{c}</li>)}</ul>
+            <ul className="mt-2 list-disc pl-5 text-[15px] text-tx2 space-y-1">{n.cambios.map((c) => <li key={c}>{c}</li>)}</ul>
           </div>
         ))}
       </Hoja>
@@ -241,7 +241,7 @@ export default function Perfil() {
           <span className="etiqueta">Escribí BORRAR para confirmar</span>
           <input className="campo mt-2" value={confirmacion} onChange={(e) => setConfirmacion(e.target.value)} />
         </label>
-        {error && <p role="alert" className="mt-3 rounded-xl bg-missbg text-miss px-4 py-3 text-[14px]">{error}</p>}
+        {error && <p role="alert" className="mt-3 rounded-xl bg-missbg text-miss px-4 py-3 text-[15px]">{error}</p>}
         <div className="mt-5 flex flex-col gap-3">
           <button className="btn btn-peligro" disabled={confirmacion.trim().toUpperCase() !== 'BORRAR'} onClick={borrarCuenta}>Borrar mi cuenta</button>
           <button className="btn-sec" onClick={() => setBorrar(false)}>Cancelar</button>

@@ -87,9 +87,9 @@ function ResumenProgreso() {
         <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="mascara-izq absolute -right-4 top-0 h-full w-[48%] object-cover" />
         <div className="relative z-[1]">
           <h3 className="font-display text-[20px] font-semibold">Tu evolución</h3>
-          <p className="text-[12px] text-mu">Últimas 4 semanas</p>
+          <p className="text-[12.5px] text-mu">Últimas 4 semanas</p>
           {filas.map(([t, v, c]) => (
-            <p key={t} className="mt-3 text-[13px]">
+            <p key={t} className="mt-3 text-[13.5px]">
               <b className="num text-[18px]">{v}</b>{' '}
               {c !== null && <span className={c >= 0 ? 'oro' : 'text-miss'}>{c >= 0 ? '↑' : '↓'} {Math.abs(c)} %</span>}
               <br /><span className="text-mu">{t}</span>
@@ -101,7 +101,7 @@ function ResumenProgreso() {
       <div className="tarjeta mt-3 p-[9px]">
         <Selector nombre="Período" valor={tiempo} alCambiar={setTiempo}
           opciones={(Object.keys(RANGOS_TIEMPO) as (keyof typeof RANGOS_TIEMPO)[]).map((k) => ({ v: k, t: k }))} />
-        <div className="mt-3 flex gap-3 px-1 text-[13px]">
+        <div className="mt-3 flex gap-3 px-1 text-[13.5px]">
           {([['v', 'Volumen'], ['n', 'Entrenos'], ['m', 'Minutos']] as const).map(([k, t]) => (
             <button key={k} onClick={() => setMedida(k)} className={medida === k ? 'oro font-semibold underline underline-offset-4' : 'text-mu'}>{t}</button>
           ))}
@@ -143,7 +143,7 @@ function ResumenProgreso() {
       <div>
       <Calendario dias={perfil.resumen.dias} />
 
-      <Grupo className="mt-6" extra={<Link to="/progreso?v=records" className="oro text-[14px] font-semibold">Ver récords</Link>}>Logros</Grupo>
+      <Grupo className="mt-6" extra={<Link to="/progreso?v=records" className="oro text-[15px] font-semibold">Ver récords</Link>}>Logros</Grupo>
       <div className="mt-3 grid grid-cols-3 gap-2">
         {[
           { i: 'fuego', v: romano(racha) === '—' ? '0' : romano(racha), t: 'Racha', s: racha === 1 ? 'semana' : 'semanas' },
@@ -151,9 +151,9 @@ function ResumenProgreso() {
           { i: 'trofeo', v: String(perfil.resumen.total), t: 'Constancia', s: 'entrenos' },
         ].map((x) => (
           <div key={x.t} className="tarjeta min-h-[110px] px-1 text-center">
-            <Icono n={x.i} size={28} className="oro mx-auto" />
-            <div className="num mt-1 text-[22px]">{x.v}</div>
-            <p className="text-[12px] text-mu">{x.t}<br />{x.s}</p>
+            <Icono n={x.i} size={32} className="oro mx-auto" />
+            <div className="num mt-1 text-[20px]">{x.v}</div>
+            <p className="text-[12.5px] text-mu">{x.t}<br />{x.s}</p>
           </div>
         ))}
       </div>
@@ -177,15 +177,15 @@ function Calendario({ dias }: { dias: number[] }) {
       <div className="flex items-center justify-between">
         <button aria-label="Mes anterior" className="toque -ml-3 flex items-center justify-center oro" onClick={() => mover(-1)}><Icono n="atras" /></button>
         <div className="text-center">
-          <div className="font-display text-[17px] font-semibold first-letter:uppercase">{new Intl.DateTimeFormat('es-PY', { month: 'long', year: 'numeric' }).format(mes)}</div>
-          <div className="text-[12px] text-mu">{enMes} {enMes === 1 ? 'día entrenado' : 'días entrenados'}</div>
+          <div className="font-display text-[18px] font-semibold first-letter:uppercase">{new Intl.DateTimeFormat('es-PY', { month: 'long', year: 'numeric' }).format(mes)}</div>
+          <div className="text-[12.5px] text-mu">{enMes} {enMes === 1 ? 'día entrenado' : 'días entrenados'}</div>
         </div>
         <button aria-label="Mes siguiente" className="toque -mr-3 flex rotate-180 items-center justify-center oro" onClick={() => mover(1)}><Icono n="atras" /></button>
       </div>
       <div className="mt-2 grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-mu2">
         {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((l, i) => <span key={i}>{l}</span>)}
         {celdas.map((c, i) => (
-          <span key={i} className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-medium ${c && set.has(c) ? '' : c === hoy ? 'border border-gold oro' : 'text-tx2'}`}
+          <span key={i} className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[12.5px] font-medium ${c && set.has(c) ? '' : c === hoy ? 'border border-gold oro' : 'text-tx2'}`}
             style={c && set.has(c) ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>
             {c ? new Date(c).getDate() : ''}
           </span>
@@ -226,24 +226,24 @@ function Historial() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <h3 className="titulo-tarjeta">{e.nombre}</h3>
-                  <p className="text-[13px] text-mu first-letter:uppercase">{fechaLarga(e.inicio)}</p>
+                  <p className="text-[13.5px] text-mu first-letter:uppercase">{fechaLarga(e.inicio)}</p>
                 </div>
-                {e.records.length > 0 && <span className="chip h-7 gap-1 border-gold2 oro"><Icono n="medalla" size={14} />{e.records.length}</span>}
+                {e.records.length > 0 && <span className="chip h-7 gap-1 border-gold2 oro"><Icono n="medalla" size={16} />{e.records.length}</span>}
               </div>
-              <div className="mt-3 grid grid-cols-3 text-[13px]">
+              <div className="mt-3 grid grid-cols-3 text-[13.5px]">
                 <div><div className="text-mu">Duración</div><div className="font-semibold">{duracion(e.fin - e.inicio)}</div></div>
                 <div><div className="text-mu">Volumen</div><div className="font-semibold">{formatoPeso(e.volumen, u, 0)}</div></div>
                 <div><div className="text-mu">Series</div><div className="font-semibold">{contarSeries(e.ejercicios)}</div></div>
               </div>
               <div className="divisor my-3 opacity-40" />
-              <ul className="flex flex-col gap-1.5 text-[14px]">
+              <ul className="flex flex-col gap-1.5 text-[15px]">
                 {e.ejercicios.slice(0, 3).map((x) => (
                   <li key={x.ejercicioId} className="flex items-center gap-2">
                     <Miniatura musculo={buscarEjercicio(x.ejercicioId, propios)?.musculo} id={x.ejercicioId} tam={28} />
                     <span className="flex-1 truncate">{x.series.length} series · {buscarEjercicio(x.ejercicioId, propios)?.nombre}</span>
                   </li>
                 ))}
-                {e.ejercicios.length > 3 && <li className="text-[13px] text-mu">Ver {e.ejercicios.length - 3} {e.ejercicios.length - 3 === 1 ? 'ejercicio' : 'ejercicios'} más</li>}
+                {e.ejercicios.length > 3 && <li className="text-[13.5px] text-mu">Ver {e.ejercicios.length - 3} {e.ejercicios.length - 3 === 1 ? 'ejercicio' : 'ejercicios'} más</li>}
               </ul>
             </button>
           </li>
@@ -260,13 +260,13 @@ function Historial() {
               return (
                 <div key={x.ejercicioId} className="border-b border-ln2 py-3 last:border-0">
                   <div className="font-semibold oro">{buscarEjercicio(x.ejercicioId, propios)?.nombre}</div>
-                  {x.nota && <p className="text-[13px] italic text-mu">{x.nota}</p>}
-                  <ol className="mt-1 text-[14px] num">
+                  {x.nota && <p className="text-[13.5px] italic text-mu">{x.nota}</p>}
+                  <ol className="mt-1 text-[15px] num">
                     {x.series.map((s, j) => (
                       <li key={j} className="flex gap-3">
                         <span className="w-5 text-mu">{s.tipo === 'calentamiento' ? 'C' : s.tipo === 'fallo' ? 'F' : s.tipo === 'drop' ? 'D' : j + 1}</span>
                         <span>{formatoNumero(redondear(aUnidad(s.peso, u)))} {u} × {s.reps}</span>
-                        {m === s && <span className="oro text-[12px]">mejor</span>}
+                        {m === s && <span className="oro text-[12.5px]">mejor</span>}
                       </li>
                     ))}
                   </ol>
@@ -274,7 +274,7 @@ function Historial() {
               );
             })}
             <button className="btn mt-5 w-full" onClick={() => { const e = abierto; setAbierto(null); empezar.repetir(e); }}>
-              <Icono n="repetir" size={18} />Repetir entrenamiento
+              <Icono n="repetir" size={20} />Repetir entrenamiento
             </button>
           </>
         )}
@@ -303,7 +303,7 @@ function Records() {
               <Miniatura musculo={ej?.musculo} id={s.ejercicioId} tam={48} />
               <span className="flex-1">
                 <span className="block font-semibold">{ej?.nombre ?? s.ejercicioId}</span>
-                <span className="text-[12px] text-mu">{s.puntos.length} sesiones{s.mejor1RM ? ` · 1RM ${formatoPeso(s.mejor1RM, u)}` : ''}</span>
+                <span className="text-[12.5px] text-mu">{s.puntos.length} sesiones{s.mejor1RM ? ` · 1RM ${formatoPeso(s.mejor1RM, u)}` : ''}</span>
               </span>
               <span className="num oro text-[20px]">{formatoPeso(s.mejorPeso, u)}</span>
             </Link>
@@ -354,7 +354,7 @@ function Medidas() {
     <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
       <div className="tarjeta">
         <div className="etiqueta">Peso corporal</div>
-        <div className="num oro mt-1 text-[38px]">{val('peso') ? formatoPeso(val('peso')!, u) : '—'}</div>
+        <div className="num oro mt-1 text-[40px]">{val('peso') ? formatoPeso(val('peso')!, u) : '—'}</div>
         <div className="mt-2">
           <GraficoLinea puntos={pesos} etiqueta="Peso corporal en el tiempo" formato={(n) => `${formatoNumero(redondear(n))} ${u}`} />
         </div>
@@ -364,7 +364,7 @@ function Medidas() {
         {MEDIDAS.slice(1).map((m) => (
           <div key={m.k} className="tarjeta">
             <div className="etiqueta">{m.t}</div>
-            <div className="num mt-1 text-[24px]">{val(m.k) ? `${formatoNumero(redondear(val(m.k)!))} cm` : '—'}</div>
+            <div className="num mt-1 text-[26px]">{val(m.k) ? `${formatoNumero(redondear(val(m.k)!))} cm` : '—'}</div>
           </div>
         ))}
       </div>
@@ -372,7 +372,7 @@ function Medidas() {
       </div>
 
       <Hoja abierta={form} alCerrar={() => setForm(false)} etiqueta="Medidas" titulo="Registro de hoy">
-        <p className="mb-3 text-[13px] text-mu">Un registro personal, sin objetivos obligatorios.</p>
+        <p className="mb-3 text-[13.5px] text-mu">Un registro personal, sin objetivos obligatorios.</p>
         <div className="grid grid-cols-2 gap-4">
           {MEDIDAS.map((m) => (
             <label key={m.k}>

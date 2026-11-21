@@ -54,14 +54,14 @@ export function Vincular({ alListo }: { alListo: (v: Vinculo) => void }) {
         <input className="campo mt-2 marca text-center text-[20px] tracking-[.14em] uppercase" placeholder="STG-XXXX" value={codigo}
           onChange={(e) => setCodigo(e.target.value.toUpperCase())} aria-label={`Código de ${ESP.tuRol}`} maxLength={12} />
       </label>
-      <div className="mt-4 text-[14px]">
+      <div className="mt-4 text-[15px]">
         <div className="font-semibold">Al vincularte, {ESP.tuRol} va a poder:</div>
         <ul className="mt-1 flex flex-col gap-1 text-mu">
           {ESP.permisos.map((p) => <li key={p} className="flex gap-2"><Icono n="check" size={16} className="oro mt-0.5 shrink-0" />{p}</li>)}
         </ul>
-        <p className="mt-2 text-[13px] text-mu2">No ve tu correo ni tu contraseña. Podés cortar el vínculo cuando quieras.</p>
+        <p className="mt-2 text-[13.5px] text-mu2">No ve tu correo ni tu contraseña. Podés cortar el vínculo cuando quieras.</p>
       </div>
-      {error && <p className="mt-3 text-[14px] text-miss" role="alert">{error}</p>}
+      {error && <p className="mt-3 text-[15px] text-miss" role="alert">{error}</p>}
       <button className="btn mt-4 w-full" disabled={normalizarCodigo(codigo).length < 6 || enviando} onClick={vincular}>
         {enviando ? 'Vinculando…' : 'Aceptar y vincular'}
       </button>
@@ -119,8 +119,8 @@ export default function MiProfesional() {
           <div className="tarjeta flex items-center gap-3">
             <Medallon nombre={v.nombreProfesional} tam={52} />
             <div className="min-w-0 flex-1">
-              <div className="font-display text-[19px] font-semibold">{v.nombreProfesional}</div>
-              <div className="text-[13px] text-mu">Ve tus entrenamientos y progreso · te asigna rutinas</div>
+              <div className="font-display text-[20px] font-semibold">{v.nombreProfesional}</div>
+              <div className="text-[13.5px] text-mu">Ve tus entrenamientos y progreso · te asigna rutinas</div>
             </div>
           </div>
           <h2 className="etiqueta mb-2 mt-6">Tus objetivos</h2>
@@ -135,8 +135,8 @@ export default function MiProfesional() {
             <ul className="mb-3 flex flex-col gap-2">
               {comentarios.filter((k) => k.sobre && k.autorId !== usuario.uid).slice(0, 5).map((k) => (
                 <li key={k.id} className={`tarjeta py-3 ${nuevos.includes(k) ? 'border-gold' : ''}`} data-testid="comentario-entreno">
-                  <div className="text-[12px] text-mu">Sobre <b className="oro">{k.sobre?.titulo}</b> · {fechaHora(k.fecha)}</div>
-                  <p className="mt-1 text-[14px]">{k.texto}</p>
+                  <div className="text-[12.5px] text-mu">Sobre <b className="oro">{k.sobre?.titulo}</b> · {fechaHora(k.fecha)}</div>
+                  <p className="mt-1 text-[15px]">{k.texto}</p>
                 </li>
               ))}
             </ul>
@@ -149,7 +149,7 @@ export default function MiProfesional() {
         </section>
       </div>
 
-      <button className="mt-10 flex w-full items-center justify-center gap-2 p-2 text-[14px] font-semibold text-miss" onClick={() => setCortar(true)}>
+      <button className="mt-10 flex w-full items-center justify-center gap-2 p-2 text-[15px] font-semibold text-miss" onClick={() => setCortar(true)}>
         <Icono n="salir" size={16} />Dejar de compartir mis datos
       </button>
       <Hoja abierta={cortar} alCerrar={() => setCortar(false)} etiqueta="Confirmar" titulo={`¿Dejar a ${v.nombreProfesional}?`}>

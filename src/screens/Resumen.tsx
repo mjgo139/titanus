@@ -43,7 +43,7 @@ export default function Resumen() {
       <div className="relative -mx-[17px] h-[190px] overflow-hidden lg:mx-0 lg:h-[240px] lg:rounded-[14px] lg:border lg:border-ln">
         <img src={estatuas(perfil.figura).capa} alt="" style={{ objectPosition: foco(perfil.figura, 'capa') }} className="mascara-izq absolute right-0 top-0 h-full w-[52%] object-cover lg:w-[40%]" />
         <div className="absolute bottom-3 left-[18px] max-w-[62%]" style={{ textShadow: 'var(--sombra-texto)' }}>
-          <Icono n="corona" size={34} className="oro rebote" />
+          <Icono n="corona" size={32} className="oro rebote" />
           <div className="etiqueta oro mt-1">Entrenamiento N.º {romano(e.numero ?? perfil.resumen.total)}</div>
           <h1 className="mt-1 font-display text-[26px] font-semibold leading-tight">¡Bien hecho, {perfil.nombre.split(' ')[0]}!</h1>
         </div>
@@ -61,9 +61,9 @@ export default function Resumen() {
       <div className="tarjeta mt-3 flex items-center justify-between">
         <div>
           <div className="etiqueta">Racha · {r.nombre} nivel {r.nivel}</div>
-          <div className="mt-1 text-[14px] text-mu">{racha} {racha === 1 ? 'semana' : 'semanas'} sin aflojar{r.siguiente ? ` · faltan ${r.faltan} para ${r.siguiente}` : ''}</div>
+          <div className="mt-1 text-[13.5px] text-mu">{racha} {racha === 1 ? 'semana' : 'semanas'} sin aflojar{r.siguiente ? ` · faltan ${r.faltan} para ${r.siguiente}` : ''}</div>
         </div>
-        <div className="num oro text-[38px]">{romano(racha)}</div>
+        <div className="num oro text-[40px]">{romano(racha)}</div>
       </div>
 
       {e.records.length > 0 && (
@@ -75,7 +75,7 @@ export default function Resumen() {
                 <Icono n="medalla" className="oro" />
                 <span className="flex-1">
                   <span className="block font-semibold">{buscarEjercicio(x.ejercicioId, propios)?.nombre}</span>
-                  <span className="text-[13px] oro">{textoRecord(x, u)}</span>
+                  <span className="text-[13.5px] oro">{textoRecord(x, u)}</span>
                 </span>
               </li>
             ))}
@@ -94,7 +94,7 @@ export default function Resumen() {
               <li key={x.ejercicioId} className="fila last:border-0">
                 <span className="flex-1">
                   <span className="block font-semibold">{x.series.length} × {buscarEjercicio(x.ejercicioId, propios)?.nombre}</span>
-                  {m && <span className="text-[13px] text-mu">Mejor serie: {formatoPeso(m.peso, u)} × {m.reps}</span>}
+                  {m && <span className="text-[13.5px] text-mu">Mejor serie: {formatoPeso(m.peso, u)} × {m.reps}</span>}
                 </span>
               </li>
             );
@@ -104,7 +104,7 @@ export default function Resumen() {
 
       <div className="mt-7 flex flex-col gap-3">
         {!e.rutinaId && !guardada && (
-          <button className="btn-sec h-[52px]" onClick={guardarRutina}><Icono n="guardar" size={18} />Guardar como rutina</button>
+          <button className="btn-sec h-[52px]" onClick={guardarRutina}><Icono n="guardar" size={20} />Guardar como rutina</button>
         )}
         <button className="btn w-full" onClick={() => nav('/', { replace: true })}>Volver al inicio</button>
       </div>

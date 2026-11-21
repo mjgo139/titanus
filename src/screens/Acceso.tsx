@@ -70,18 +70,18 @@ export function FormAcceso({ inicial, alTerminar }: { inicial: VistaAcceso; alTe
             </button>
           </div>
         )}
-        {error && <p role="alert" className="rounded-[10px] bg-missbg text-miss px-4 py-3 text-[14px] font-medium">{error}</p>}
-        {info && <p role="status" className="rounded-[10px] bg-okbg oro px-4 py-3 text-[14px] font-medium">{info}</p>}
+        {error && <p role="alert" className="rounded-[10px] bg-missbg text-miss px-4 py-3 text-[15px] font-medium">{error}</p>}
+        {info && <p role="status" className="rounded-[10px] bg-okbg oro px-4 py-3 text-[15px] font-medium">{info}</p>}
         <button className="btn w-full mt-1" disabled={ocupado}>
           {vista === 'ingresar' ? 'Entrar' : vista === 'registrar' ? 'Crear cuenta' : 'Enviar enlace'}
         </button>
       </form>
       {vista !== 'recuperar' && repo.permiteGoogle && (
         <button onClick={google} disabled={ocupado} className="btn-sec w-full mt-3">
-          <Icono n="google" size={18} /> Continuar con Google
+          <Icono n="google" size={20} /> Continuar con Google
         </button>
       )}
-      <div className="mt-5 flex flex-col items-center gap-3 text-[14px] font-semibold oro">
+      <div className="mt-5 flex flex-col items-center gap-3 text-[15px] font-semibold oro">
         {vista === 'ingresar' && <>
           <button onClick={() => setVista('recuperar')}>Olvidé mi contraseña</button>
           <button onClick={() => setVista('registrar')}>¿No tenés cuenta? Creala</button>
@@ -112,15 +112,15 @@ export default function Acceso() {
         <div className="entrar order-1">
           <AvisoMudanza className="mb-5 flex" />
           <Logo grande />
-          <div className="mt-2 text-[12px] tracking-[.14em] text-tx2">ENTRENAMIENTO · DISCIPLINA · FUERZA</div>
+          <div className="mt-2 text-[12.5px] tracking-[.14em] text-tx2">ENTRENAMIENTO · DISCIPLINA · FUERZA</div>
           <p className="mx-auto mt-6 hidden max-w-[380px] font-display text-[18px] italic text-tx2 lg:block">Registrá cada serie, superá tus marcas y forjá la disciplina de un legionario.</p>
         </div>
         <div className="order-3 grid gap-3 lg:mx-auto lg:w-full lg:max-w-[380px]">
-          <button className="btn w-full" onClick={() => setModal('ingresar')}><Icono n="corona" size={18} />Iniciar sesión</button>
+          <button className="btn w-full" onClick={() => setModal('ingresar')}><Icono n="corona" size={20} />Iniciar sesión</button>
           <button className="btn-sec w-full h-[52px] text-[16px]" onClick={() => setModal('registrar')}>Crear cuenta</button>
           <button className="p-2 text-[15px] text-tx2" onClick={invitado}>Continuar como invitado</button>
-          {error && <p role="alert" className="text-miss text-[14px]">{error}</p>}
-          {repo.modo === 'prueba' && <p className="text-[12px] text-mu2">Modo prueba: la cuenta de ejemplo ya está cargada en "Iniciar sesión".</p>}
+          {error && <p role="alert" className="text-miss text-[15px]">{error}</p>}
+          {repo.modo === 'prueba' && <p className="text-[12.5px] text-mu2">Modo prueba: la cuenta de ejemplo ya está cargada en "Iniciar sesión".</p>}
         </div>
       </div>
 

@@ -17,6 +17,10 @@ export default {
         lat: { tx: 'var(--lat-tx)', on: 'var(--lat-tx-on)', activo: 'var(--lat-activo)', oro: 'var(--lat-oro)', mu: 'var(--lat-mu)', borde: 'var(--lat-borde)' },
       },
       fontFamily: { display: 'var(--f-display)', body: 'var(--f-body)', marca: 'var(--f-marca)' },
+      fontSize: {
+        micro: '11px', etiqueta: '11.5px', ficha: '12.5px', sec: '13.5px', texto: '15px', boton: '16px',
+        num: '18px', tarjeta: '20px', saludo: '26px', titulo: '28px', 'titulo-pc': '36px', 'saludo-pc': '40px', grande: '48px', gigante: '64px',
+      },
       borderRadius: { card: '16px', hero: '20px' },
       accentColor: { familia: 'var(--acento)' },
     },

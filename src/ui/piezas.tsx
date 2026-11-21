@@ -100,7 +100,7 @@ export function Celebracion({ visible, titulo, linea, icono = 'medalla', alCerra
           <Icono n={icono} size={44} />
         </div>
         <div className="etiqueta mt-5 text-gold">Récord personal</div>
-        <div className="titulo-tarjeta mt-2 text-[24px]">{titulo}</div>
+        <div className="titulo-tarjeta mt-2 text-[26px]">{titulo}</div>
         {linea && <p className="mt-2 text-mu">{linea}</p>}
       </div>
     </div>
@@ -175,7 +175,7 @@ export function GraficoLinea({ puntos, etiqueta, formato }: {
   puntos: { x: number; y: number }[]; etiqueta: string; formato: (n: number) => string;
 }) {
   if (puntos.length < 2) {
-    return <p className="text-mu text-[14px] py-6 text-center">Hacen falta al menos dos registros para dibujar el gráfico.</p>;
+    return <p className="text-mu text-[13.5px] py-6 text-center">Hacen falta al menos dos registros para dibujar el gráfico.</p>;
   }
   const W = 330, H = 160, px = 10, py = 16;
   const xs = puntos.map((p) => p.x), ys = puntos.map((p) => p.y);
@@ -201,7 +201,7 @@ export function GraficoLinea({ puntos, etiqueta, formato }: {
         <path d={d} fill="none" stroke="var(--gold)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {puntos.length <= 24 && puntos.map((p, i) => <circle key={i} cx={rx(p.x)} cy={ry(p.y)} r={3.2} fill="var(--gold)" />)}
       </svg>
-      <figcaption className="mt-1 flex justify-between text-[12px] text-mu">
+      <figcaption className="mt-1 flex justify-between text-[12.5px] text-mu">
         <span>Mín. {formato(y0)}</span><span>Máx. {formato(y1)}</span>
       </figcaption>
     </figure>
@@ -262,8 +262,8 @@ export function GraficoBarras({ datos, etiqueta, formato, formatoCorto, detalle,
           );
         })}
       </svg>
-      {detalle && <figcaption className="mt-2 rounded-[10px] border border-ln2 px-3 py-2 text-[13px]" data-testid="detalle-semana">{detalle(elegido)}</figcaption>}
-      {!detalle && <figcaption className="mt-1 text-right text-[12px] text-mu">{mejor}: {formato(max)}</figcaption>}
+      {detalle && <figcaption className="mt-2 rounded-[10px] border border-ln2 px-3 py-2 text-[13.5px]" data-testid="detalle-semana">{detalle(elegido)}</figcaption>}
+      {!detalle && <figcaption className="mt-1 text-right text-[12.5px] text-mu">{mejor}: {formato(max)}</figcaption>}
     </figure>
   );
 }

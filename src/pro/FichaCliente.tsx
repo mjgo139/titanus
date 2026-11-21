@@ -67,9 +67,9 @@ export default function FichaCliente() {
       <div>
         <Encabezado atras="/clientes" etiqueta="Cliente" titulo={vinculo?.nombreCliente ?? 'Cliente'} />
         <div className="tarjeta py-8 text-center" role="alert" data-testid="error-cliente">
-          <Icono n="alerta" size={30} className="oro mx-auto" />
+          <Icono n="alerta" size={32} className="oro mx-auto" />
           <p className="mt-3 font-semibold">No se pudieron cargar los datos de este cliente.</p>
-          <p className="mt-1 text-[14px] text-mu">Revisá tu conexión y probá de nuevo. Si sigue igual, puede que haya cortado el vínculo.</p>
+          <p className="mt-1 text-[13.5px] text-mu">Revisá tu conexión y probá de nuevo. Si sigue igual, puede que haya cortado el vínculo.</p>
           <button className="btn-sec mt-4" onClick={() => location.reload()}>Reintentar</button>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function FichaCliente() {
         <div className="flex min-w-max gap-1">
           {secciones.map((s) => (
             <button key={s.id} role="tab" aria-selected={s.id === actual} onClick={() => ctx.irA(s.id)}
-              className={`h-11 border-b-2 px-3 text-[14px] font-semibold transition-colors ${s.id === actual ? 'border-gold oro' : 'border-transparent text-mu hover:text-tx'}`}>
+              className={`h-11 border-b-2 px-3 text-[13.5px] font-semibold transition-colors ${s.id === actual ? 'border-gold oro' : 'border-transparent text-mu hover:text-tx'}`}>
               {s.titulo}
             </button>
           ))}
@@ -109,7 +109,7 @@ export default function FichaCliente() {
 
       <div key={actual} className="pagina"><S {...ctx} /></div>
 
-      <button className="mt-10 flex w-full items-center justify-center gap-2 p-2 text-[14px] font-semibold text-miss" onClick={() => setCortar(true)}>
+      <button className="mt-10 flex w-full items-center justify-center gap-2 p-2 text-[15px] font-semibold text-miss" onClick={() => setCortar(true)}>
         <Icono n="salir" size={16} />Dejar de llevar a {perfil.nombre.split(' ')[0]}
       </button>
 

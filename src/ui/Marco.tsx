@@ -20,7 +20,7 @@ export function Logo({ grande = false }: { grande?: boolean }) {
   return (
     <div className={`flex items-center gap-2 ${grande ? 'flex-col' : ''}`}>
       <Emblema size={grande ? 92 : 34} />
-      <span className={`marca oro ${grande ? 'text-[46px] leading-none' : 'text-[21px]'}`}
+      <span className={`marca oro ${grande ? 'text-[48px] leading-none' : 'text-[20px]'}`}
         style={grande ? { textShadow: 'var(--brillo-marca)' } : undefined}>StoaGym</span>
     </div>
   );
@@ -78,7 +78,7 @@ export function Marco() {
         <nav className="mt-6 flex flex-col gap-1" aria-label="Menú">
           {PESTANAS.map((p) => (
             <NavLink key={p.a} to={p.a} end={p.a === '/'} onClick={(e) => navegarSuave(e, nav, p.a)}
-              className={({ isActive }) => `flex items-center gap-[14px] rounded-[10px] px-[14px] h-[46px] text-[14.5px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-lat-activo text-lat-oro' : 'text-lat-tx hover:text-lat-on'}`}>
+              className={({ isActive }) => `flex items-center gap-[14px] rounded-[10px] px-[14px] h-[46px] text-[15px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-lat-activo text-lat-oro' : 'text-lat-tx hover:text-lat-on'}`}>
               <Icono n={p.n} size={22} />{p.t}
             </NavLink>
           ))}
@@ -87,7 +87,7 @@ export function Marco() {
         <div className="mt-auto">
           {perfil && (
             <Link to="/perfil" onClick={(e) => navegarSuave(e, nav, '/perfil')} data-testid="persona-lateral"
-              className="flex items-center gap-3 rounded-xl px-2 py-2 text-[14px] font-semibold text-lat-tx transition-colors hover:bg-lat-activo hover:text-lat-on">
+              className="flex items-center gap-3 rounded-xl px-2 py-2 text-[15px] font-semibold text-lat-tx transition-colors hover:bg-lat-activo hover:text-lat-on">
               <img src={estatuas(perfil.figura).avatar} alt="" className="h-9 w-9 rounded-full border border-lat-borde object-cover" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate">{perfil.nombre.split(' ')[0]}</span>
@@ -95,7 +95,7 @@ export function Marco() {
               </span>
             </Link>
           )}
-          <div className="mt-3 px-2 text-[10.5px] uppercase tracking-[.14em] text-lat-mu">
+          <div className="mt-3 px-2 text-[11px] uppercase tracking-[.14em] text-lat-mu">
             {repo.modo === 'prueba' ? 'Modo prueba' : 'Entrenamiento · Disciplina · Fuerza'}
           </div>
         </div>
@@ -119,8 +119,8 @@ export function Marco() {
           <div className="mx-auto flex max-w-[480px] pt-2">
             {PESTANAS.map((p) => (
               <NavLink key={p.a} to={p.a} end={p.a === '/'} onClick={(e) => navegarSuave(e, nav, p.a)}
-                className={({ isActive }) => `flex-1 flex flex-col items-center justify-center gap-1 h-[54px] transition-colors duration-300 ${PESTANAS.length > 4 ? 'text-[11px]' : 'text-[12px]'} ${activa(p.a, isActive, loc.pathname) ? 'oro font-semibold' : 'text-tx2'}`}>
-                <Icono n={p.n} size={PESTANAS.length > 4 ? 23 : 25} />{p.t}
+                className={({ isActive }) => `flex-1 flex flex-col items-center justify-center gap-1 h-[54px] transition-colors duration-300 ${PESTANAS.length > 4 ? 'text-[11px]' : 'text-[12.5px]'} ${activa(p.a, isActive, loc.pathname) ? 'oro font-semibold' : 'text-tx2'}`}>
+                <Icono n={p.n} size={23} />{p.t}
               </NavLink>
             ))}
           </div>
@@ -128,7 +128,7 @@ export function Marco() {
       )}
 
       {mensaje && (
-        <div role="status" className="entrar fixed left-1/2 -translate-x-1/2 bottom-28 lg:bottom-8 z-[70] rounded-[12px] px-5 py-3 text-[14px] font-semibold shadow-lg"
+        <div role="status" className="entrar fixed left-1/2 -translate-x-1/2 bottom-28 lg:bottom-8 z-[70] rounded-[12px] px-5 py-3 text-[15px] font-semibold shadow-lg"
           style={{ background: 'var(--oro-grad)', color: 'var(--on)' }}>
           {mensaje}
         </div>

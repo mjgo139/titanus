@@ -61,7 +61,7 @@ export default function VerRutina() {
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
         <section>
-          <button className="btn h-14 w-full text-[17px]" disabled={!r.ejercicios.length} onClick={() => empezar.rutina(r)}>
+          <button className="btn h-14 w-full text-[18px]" disabled={!r.ejercicios.length} onClick={() => empezar.rutina(r)}>
             <Icono n="play" size={16} />Comenzar rutina
           </button>
           <div className="tarjeta mt-4" data-testid="grafico-rutina">
@@ -71,7 +71,7 @@ export default function VerRutina() {
                 datos={sesiones.map((w) => ({ fecha: w.inicio, y: valor(w) }))} formato={formato} formatoCorto={corto} />
             ) : (
               <div className="flex flex-col items-center py-8 text-mu">
-                <Icono n="progreso" size={40} className="text-mu2" />
+                <Icono n="progreso" size={44} className="text-mu2" />
                 <p className="mt-2">Aún no hay datos: hacé la rutina y acá ves tu evolución.</p>
               </div>
             )}
@@ -84,8 +84,8 @@ export default function VerRutina() {
 
         <section>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="font-display text-[22px] font-semibold">Ejercicios</h2>
-            {!r.asignadaPor && <Link to={`/rutinas/${r.id}`} className="flex items-center gap-1 text-[14px] font-semibold oro"><Icono n="editar" size={16} />Editar rutina</Link>}
+            <h2 className="font-display text-[20px] font-semibold">Ejercicios</h2>
+            {!r.asignadaPor && <Link to={`/rutinas/${r.id}`} className="flex items-center gap-1 text-[15px] font-semibold oro"><Icono n="editar" size={16} />Editar rutina</Link>}
           </div>
           <ul className="flex flex-col gap-3">
             {r.ejercicios.map((e, i) => {
@@ -98,7 +98,7 @@ export default function VerRutina() {
                     <Miniatura id={e.ejercicioId} musculo={ej?.musculo} tam={44} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold oro">{ej?.nombre ?? 'Ejercicio'}</span>
-                      <span className="text-[12px] text-mu">{textoObjetivo(e)}{e.nota ? ` · ${e.nota}` : ''}</span>
+                      <span className="text-[12.5px] text-mu">{textoObjetivo(e)}{e.nota ? ` · ${e.nota}` : ''}</span>
                     </span>
                   </Link>
                   <div className="mt-3 grid grid-cols-[48px_1fr_1fr] text-[11px] font-bold uppercase tracking-[.08em] text-mu2">

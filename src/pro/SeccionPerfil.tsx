@@ -43,41 +43,41 @@ export function SeccionPro() {
         {profesional && (
           <Link to="/clientes" className={fila}>
             <Icono n="clientes" className="oro" />
-            <span className="flex-1"><b>Panel de clientes</b><span className="block text-[12px] text-mu">Tu código: <span className="marca oro">{profesional.codigo}</span></span></span>
-            <Icono n="atras" size={18} className="rotate-180 text-mu" />
+            <span className="flex-1"><b>Panel de clientes</b><span className="block text-[12.5px] text-mu">Tu código: <span className="marca oro">{profesional.codigo}</span></span></span>
+            <Icono n="atras" size={20} className="rotate-180 text-mu" />
           </Link>
         )}
         <Link to="/mi-entrenador" className={fila}>
           <Icono n="escudo" className="oro" />
           <span className="flex-1">
-            {vinculo ? <><b>{ESP.tuRol.replace(/^./, (c) => c.toUpperCase())}: {vinculo.nombreProfesional}</b><span className="block text-[12px] text-mu">Objetivos, mensajes y rutinas</span></>
-              : <><b>Tengo un código de {ESP.rol.toLowerCase()}</b><span className="block text-[12px] text-mu">Para que siga tu entrenamiento</span></>}
+            {vinculo ? <><b>{ESP.tuRol.replace(/^./, (c) => c.toUpperCase())}: {vinculo.nombreProfesional}</b><span className="block text-[12.5px] text-mu">Objetivos, mensajes y rutinas</span></>
+              : <><b>Tengo un código de {ESP.rol.toLowerCase()}</b><span className="block text-[12.5px] text-mu">Para que siga tu entrenamiento</span></>}
           </span>
-          <Icono n="atras" size={18} className="rotate-180 text-mu" />
+          <Icono n="atras" size={20} className="rotate-180 text-mu" />
         </Link>
         {!profesional && !usuario.invitado && (
           solicitud?.estado === 'pendiente' ? (
             <div className={`${fila} ${admin ? '' : 'border-0'}`} data-testid="solicitud-pendiente">
-              <Icono n="reloj" className="text-mu" /><span className="flex-1"><b>Pediste ser {ESP.rol.toLowerCase()}</b><span className="block text-[12px] text-mu">Te avisamos acá cuando se apruebe.</span></span>
+              <Icono n="reloj" className="text-mu" /><span className="flex-1"><b>Pediste ser {ESP.rol.toLowerCase()}</b><span className="block text-[12.5px] text-mu">Te avisamos acá cuando se apruebe.</span></span>
             </div>
           ) : (
             <button className={`${fila} ${admin ? '' : 'border-0'}`} onClick={() => setPedir(true)}>
               <Icono n="clientes" className="text-mu" />
               <span className="flex-1"><b>Soy {ESP.rol.toLowerCase()}: quiero llevar clientes</b>
-                <span className="block text-[12px] text-mu">{solicitud?.estado === 'rechazada' ? 'Tu pedido anterior no se aprobó. Podés volver a pedir.' : 'Pedí acceso al panel profesional.'}</span></span>
+                <span className="block text-[12.5px] text-mu">{solicitud?.estado === 'rechazada' ? 'Tu pedido anterior no se aprobó. Podés volver a pedir.' : 'Pedí acceso al panel profesional.'}</span></span>
             </button>
           )
         )}
         {admin && (
           <Link to="/admin" className={`${fila} border-0`}>
-            <Icono n="corona" className="oro" /><span className="flex-1"><b>Administrar profesionales</b><span className="block text-[12px] text-mu">Solicitudes, altas y bajas</span></span>
-            <Icono n="atras" size={18} className="rotate-180 text-mu" />
+            <Icono n="corona" className="oro" /><span className="flex-1"><b>Administrar profesionales</b><span className="block text-[12.5px] text-mu">Solicitudes, altas y bajas</span></span>
+            <Icono n="atras" size={20} className="rotate-180 text-mu" />
           </Link>
         )}
       </div>
 
       <Hoja abierta={pedir} alCerrar={() => setPedir(false)} etiqueta="Panel profesional" titulo={`Ser ${ESP.rol.toLowerCase()} en StoaGym`}>
-        <p className="text-[14px] text-mu">Vas a poder llevar clientes: ver su progreso, asignarles rutinas, comentar sus entrenamientos y fijarles objetivos. Lo aprueba el administrador.</p>
+        <p className="text-[13.5px] text-mu">Vas a poder llevar clientes: ver su progreso, asignarles rutinas, comentar sus entrenamientos y fijarles objetivos. Lo aprueba el administrador.</p>
         <label className="mt-4 block"><span className="etiqueta">Nombre que van a ver tus clientes</span>
           <input className="campo mt-2" value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={80} aria-label="Nombre profesional" />
         </label>
@@ -85,7 +85,7 @@ export function SeccionPro() {
           <textarea className="campo mt-2 h-24 py-2" value={mensaje} onChange={(e) => setMensaje(e.target.value)} maxLength={500}
             placeholder="Dónde trabajás, cuántos alumnos tenés…" aria-label="Mensaje para el administrador" />
         </label>
-        {error && <p className="mt-2 text-[14px] text-miss" role="alert">{error}</p>}
+        {error && <p className="mt-2 text-[15px] text-miss" role="alert">{error}</p>}
         <button className="btn mt-4 w-full" onClick={enviar}>Enviar solicitud</button>
       </Hoja>
     </Seccion>

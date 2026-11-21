@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.22.0',
+    fecha: '21/11/2026',
+    cambios: [
+      'Una sola escala de letras para las 4 apps de la familia: 11 · 12,5 · 13,5 · 15 · 16 · 18 · 20 · 26 · 28 (antes había 28 tamaños sueltos).',
+      'Íconos en tres tamaños parejos (16 con texto, 20 en botones y filas, 23 en la barra de abajo), del mismo juego que usan las otras apps.',
+    ],
+  },
+  {
     version: '1.21.0',
     fecha: '21/11/2026',
     cambios: [

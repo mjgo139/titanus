@@ -65,6 +65,21 @@
   --f-marca:'Cinzel', Georgia, serif;
   --f-display:'Playfair Display', Georgia, serif;
   --f-body:Inter, system-ui, sans-serif;
+  /* Escala única de letras (no se inventan otros tamaños; la revisa revisar.mjs) */
+  --t-micro:11px;      /* pestañas, textos mínimos */
+  --t-etiqueta:11.5px; /* ETIQUETAS en mayúsculas */
+  --t-ficha:12.5px;    /* fichas, notas */
+  --t-sec:13.5px;      /* texto secundario, chips */
+  --t-texto:15px;      /* texto normal, botón secundario */
+  --t-boton:16px;      /* botón principal */
+  --t-num:18px;        /* números */
+  --t-tarjeta:20px;    /* títulos de tarjeta, números grandes */
+  --t-saludo:26px;     /* saludo (40 en PC) */
+  --t-titulo:28px;     /* título de página (36 en PC) */
+  --t-titulo-pc:36px; --t-saludo-pc:40px;
+  --t-grande:48px; --t-gigante:64px; /* solo números decorativos */
+  /* Tamaños de íconos */
+  --i-linea:16px; --i-boton:20px; --i-nav:23px; --i-grande:32px; --i-gigante:44px;
   /* Medidas */
   --radio-tarjeta:16px; --radio-panel:20px; --radio-boton:12px; --radio-campo:9px;
   --alto-boton:52px; --alto-boton-sec:44px; --alto-campo:46px; --alto-ficha:32px;

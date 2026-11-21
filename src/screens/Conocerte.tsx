@@ -39,7 +39,7 @@ function Regla({ valor, min, max, paso, etiqueta, sufijo, alCambiar, formato }: 
             value={valor}
             onChange={(e) => { const n = Number(e.target.value); if (n >= min && n <= max) alCambiar(n); }}
             className={`num w-[170px] bg-transparent text-center text-[64px] leading-none oro outline-none ${formato ? 'hidden' : ''}`} />
-          {formato && <span className="num text-[56px] leading-none oro">{formato(valor)}</span>}
+          {formato && <span className="num text-[48px] leading-none oro">{formato(valor)}</span>}
           <span className="text-[18px] font-semibold text-mu">{sufijo}</span>
         </label>
         <button aria-label={`Más ${etiqueta}`} className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-ln3 text-[20px] oro"
@@ -72,13 +72,13 @@ function Regla({ valor, min, max, paso, etiqueta, sufijo, alCambiar, formato }: 
             return (
               <span key={k} className="absolute bottom-0" style={{ left: k * PX }}>
                 <span className={`absolute bottom-0 left-0 w-px ${grande ? 'h-8 bg-tx2' : 'h-4 bg-ln3'}`} />
-                {grande && <span className="absolute bottom-10 left-0 -translate-x-1/2 whitespace-nowrap text-[12px] text-mu">{formatoNumero(redondear(v, 1))}</span>}
+                {grande && <span className="absolute bottom-10 left-0 -translate-x-1/2 whitespace-nowrap text-[12.5px] text-mu">{formatoNumero(redondear(v, 1))}</span>}
               </span>
             );
           })}
         </div>
       </div>
-      <p className="mt-2 text-center text-[12px] text-mu">Arrastrá la regla o usá las flechas</p>
+      <p className="mt-2 text-center text-[12.5px] text-mu">Arrastrá la regla o usá las flechas</p>
     </div>
   );
 }
@@ -89,8 +89,8 @@ function Opcion({ activo, alElegir, titulo, linea, icono }: { activo: boolean; a
       className={`tarjeta flex w-full items-center gap-4 text-left transition-colors ${activo ? 'border-gold' : 'hover:border-gold2'}`}>
       {icono}
       <span className="min-w-0 flex-1">
-        <span className="block font-display text-[19px] font-semibold">{titulo}</span>
-        {linea && <span className="block text-[13px] text-mu">{linea}</span>}
+        <span className="block font-display text-[20px] font-semibold">{titulo}</span>
+        {linea && <span className="block text-[13.5px] text-mu">{linea}</span>}
       </span>
       <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${activo ? 'border-gold' : 'border-ln3'}`}>
         {activo && <span className="h-3 w-3 rounded-full" style={{ background: 'var(--oro-grad)' }} />}
@@ -186,13 +186,13 @@ export default function Conocerte() {
           ))}
         </div>
         {paso !== 'plan' && !editar && (
-          <button className="text-[14px] font-semibold text-mu hover:text-tx" onClick={() => terminar()} disabled={guardando}>Omitir</button>
+          <button className="text-[13.5px] font-semibold text-mu hover:text-tx" onClick={() => terminar()} disabled={guardando}>Omitir</button>
         )}
       </div>
 
       <div key={paso} className="pagina mt-6 flex flex-1 flex-col">
         <div className="etiqueta oro">{paso === 'plan' ? 'Listo' : editar ? 'Tus datos' : 'Conocerte'}</div>
-        <h1 className="marca mt-1 text-[30px] leading-tight">{titulo[paso]}</h1>
+        <h1 className="marca mt-1 text-[28px] leading-tight">{titulo[paso]}</h1>
 
         <div className="mt-6 flex-1">
           {paso === 'genero' && (
@@ -231,7 +231,7 @@ export default function Conocerte() {
                     {anios.map((a) => <option key={a} value={a}>{a}</option>)}
                   </select></label>
               </div>
-              {tocoNac && <p className="mt-6 text-center text-mu">Tenés <b className="num text-[22px] oro">{edad}</b> años</p>}
+              {tocoNac && <p className="mt-6 text-center text-mu">Tenés <b className="num text-[20px] oro">{edad}</b> años</p>}
             </div>
           )}
 
@@ -259,22 +259,22 @@ export default function Conocerte() {
           {paso === 'objetivo' && (
             <div role="radiogroup" aria-label="Objetivo" className="flex flex-col gap-3">
               <Opcion activo={objetivo === 'musculo'} titulo="Ganar músculo" linea="Hipertrofia: más volumen, 8–12 reps" alElegir={() => setObjetivo('musculo')}
-                icono={<Icono n="pesa" size={28} className="oro" />} />
+                icono={<Icono n="pesa" size={32} className="oro" />} />
               <Opcion activo={objetivo === 'fuerza'} titulo="Ganar fuerza" linea="Pesos altos, 3–6 reps" alElegir={() => setObjetivo('fuerza')}
-                icono={<Icono n="medalla" size={28} className="oro" />} />
+                icono={<Icono n="medalla" size={32} className="oro" />} />
               <Opcion activo={objetivo === 'grasa'} titulo="Perder grasa" linea="Constancia y más movimiento" alElegir={() => setObjetivo('grasa')}
-                icono={<Icono n="fuego" size={28} className="oro" />} />
+                icono={<Icono n="fuego" size={32} className="oro" />} />
             </div>
           )}
 
           {paso === 'nivel' && (
             <div role="radiogroup" aria-label="Experiencia" className="flex flex-col gap-3">
               <Opcion activo={nivel === 'principiante'} titulo="Principiante" linea="Menos de 1 año" alElegir={() => setNivel('principiante')}
-                icono={<span className="marca w-8 text-center text-[22px] oro">I</span>} />
+                icono={<span className="marca w-8 text-center text-[20px] oro">I</span>} />
               <Opcion activo={nivel === 'intermedio'} titulo="Intermedio" linea="De 1 a 3 años" alElegir={() => setNivel('intermedio')}
-                icono={<span className="marca w-8 text-center text-[22px] oro">II</span>} />
+                icono={<span className="marca w-8 text-center text-[20px] oro">II</span>} />
               <Opcion activo={nivel === 'avanzado'} titulo="Avanzado" linea="Más de 3 años" alElegir={() => setNivel('avanzado')}
-                icono={<span className="marca w-8 text-center text-[22px] oro">III</span>} />
+                icono={<span className="marca w-8 text-center text-[20px] oro">III</span>} />
             </div>
           )}
 
@@ -284,7 +284,7 @@ export default function Conocerte() {
                 <img src={est.legionario} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" style={{ objectPosition: '50% 15%' }} />
                 <div className="relative">
                   <div className="etiqueta oro">{perfil.nombre}</div>
-                  <p className="font-display text-[22px] font-semibold">
+                  <p className="font-display text-[20px] font-semibold">
                     {objetivo === 'fuerza' ? 'La fuerza se forja serie a serie.' : objetivo === 'grasa' ? 'Cada día que entrenás, sumás.' : 'El músculo se construye con constancia.'}
                   </p>
                 </div>
@@ -293,21 +293,21 @@ export default function Conocerte() {
                 <div className="tarjeta">
                   <div className="etiqueta oro">Recomendado para vos</div>
                   <div className="mt-1 font-display text-[20px] font-semibold">{PLANTILLAS[0].nombre}</div>
-                  <p className="mt-1 text-[14px] text-mu">3 días por semana (lunes, miércoles y viernes), con los ejercicios básicos y sobrecarga progresiva.</p>
+                  <p className="mt-1 text-[13.5px] text-mu">3 días por semana (lunes, miércoles y viernes), con los ejercicios básicos y sobrecarga progresiva.</p>
                   <button className="btn mt-4 w-full" disabled={guardando} onClick={() => terminar(true)}><Icono n="play" size={16} />Cargar y empezar</button>
                 </div>
               ) : !editar ? (
-                <p className="tarjeta text-[14px] text-mu">Armá tus rutinas en Entreno o cargá una plantilla. La sobrecarga progresiva te va a sugerir cuándo subir peso.</p>
+                <p className="tarjeta text-[13.5px] text-mu">Armá tus rutinas en Entreno o cargá una plantilla. La sobrecarga progresiva te va a sugerir cuándo subir peso.</p>
               ) : null}
-              <p className="text-center text-[13px] text-mu2">Tus datos son privados: solo los ves vos (y tu entrenador, si lo aceptás).</p>
+              <p className="text-center text-[13.5px] text-mu2">Tus datos son privados: solo los ves vos (y tu entrenador, si lo aceptás).</p>
             </div>
           )}
         </div>
 
         {paso !== 'plan' ? (
           <>
-            <p className="mb-3 text-center text-[13px] text-mu2">Tus datos son privados y podés cambiarlos en Perfil.</p>
-            <button className="btn h-14 w-full text-[17px]" onClick={siguiente}>Continuar</button>
+            <p className="mb-3 text-center text-[13.5px] text-mu2">Tus datos son privados y podés cambiarlos en Perfil.</p>
+            <button className="btn h-14 w-full text-[18px]" onClick={siguiente}>Continuar</button>
           </>
         ) : (
           <button className={`${editar || nivel === 'principiante' || !nivel ? 'btn-sec' : 'btn'} mt-4 h-14 w-full text-[16px]`} disabled={guardando} onClick={() => terminar()}>

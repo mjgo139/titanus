@@ -40,7 +40,7 @@ function imagenDe(p: Programa, figura: Figura | undefined): { src: string; pos: 
 /** Sello de acceso: hoy todos dicen "Gratis"; mañana algunos podrán decir "Pro" */
 function Sello({ p }: { p: Programa }) {
   return (
-    <span className={`inline-flex h-6 items-center rounded-full border px-2.5 text-[10px] font-bold uppercase tracking-[.14em] ${p.acceso === 'pro' ? 'border-gold oro' : 'border-ln3 text-tx2'}`}
+    <span className={`inline-flex h-6 items-center rounded-full border px-2.5 text-[11px] font-bold uppercase tracking-[.14em] ${p.acceso === 'pro' ? 'border-gold oro' : 'border-ln3 text-tx2'}`}
       data-testid="acceso-programa">{textoAcceso[p.acceso]}</span>
   );
 }
@@ -48,7 +48,7 @@ function Sello({ p }: { p: Programa }) {
 function Avance({ hechas, total }: { hechas: number; total: number }) {
   return (
     <div>
-      <div className="flex justify-between text-[12px] text-mu"><span>Sesión {Math.min(hechas + 1, total)} de {total}</span><span className="num oro">{Math.round((hechas / total) * 100)} %</span></div>
+      <div className="flex justify-between text-[12.5px] text-mu"><span>Sesión {Math.min(hechas + 1, total)} de {total}</span><span className="num oro">{Math.round((hechas / total) * 100)} %</span></div>
       <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ln2">
         <div className="h-full rounded-full" style={{ width: `${(hechas / total) * 100}%`, background: 'var(--oro-grad)' }} />
       </div>
@@ -66,11 +66,11 @@ export function TarjetaPrograma({ p }: { p: Programa }) {
       <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[52%] object-cover opacity-90" style={{ objectPosition: img.pos }} />
       <div className="relative flex w-[66%] flex-1 flex-col">
         <div className="flex items-center gap-2">
-          <span className="etiqueta oro inline-flex items-center gap-1" data-testid="lugar-programa"><Icono n={iconoLugar[p.lugar]} size={13} />{nombreLugar(p.lugar)}</span><Sello p={p} />
+          <span className="etiqueta oro inline-flex items-center gap-1" data-testid="lugar-programa"><Icono n={iconoLugar[p.lugar]} size={16} />{nombreLugar(p.lugar)}</span><Sello p={p} />
         </div>
         <h3 className="marca mt-2 line-clamp-2 text-[20px] leading-tight">{p.nombre}</h3>
-        <p className="mt-1 line-clamp-2 text-[14px] text-tx2">{p.lema}</p>
-        <div className="mt-auto pt-3 text-[12px] text-mu">{p.categoria} · {p.semanas.length} semanas · {p.semanas[0].sesiones.length} días</div>
+        <p className="mt-1 line-clamp-2 text-[15px] text-tx2">{p.lema}</p>
+        <div className="mt-auto pt-3 text-[12.5px] text-mu">{p.categoria} · {p.semanas.length} semanas · {p.semanas[0].sesiones.length} días</div>
       </div>
       {activo && <div className="relative mt-2"><Avance hechas={activo.hechas.length} total={totalSesiones(p)} /></div>}
     </Link>
@@ -80,7 +80,7 @@ export function TarjetaPrograma({ p }: { p: Programa }) {
 /** Selector de arriba en Entreno y Programas: dos páginas hermanas */
 export function NavEntreno() {
   const cls = ({ isActive }: { isActive: boolean }) =>
-    `flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${isActive ? '' : 'text-mu hover:text-tx'}`;
+    `flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[15px] font-semibold transition-colors ${isActive ? '' : 'text-mu hover:text-tx'}`;
   const oro = { background: 'var(--oro-grad)', color: 'var(--on)' };
   return (
     <nav aria-label="Secciones de entrenamiento" className="mx-auto mt-3 flex w-full max-w-[360px] rounded-full border border-ln2 p-[3px] lg:mx-0">
@@ -106,15 +106,15 @@ export function PaginaProgramas() {
         <button className={chip(filtro === 'todos')} aria-pressed={filtro === 'todos'} onClick={() => setFiltro('todos')}>Todos</button>
         {LUGARES.map((l) => (
           <button key={l.id} className={chip(filtro === l.id)} aria-pressed={filtro === l.id} onClick={() => setFiltro(l.id)}>
-            <Icono n={iconoLugar[l.id]} size={15} />{l.nombre}
-            <span className="num text-[13px] text-mu">{PROGRAMAS.filter((p) => p.lugar === l.id).length}</span>
+            <Icono n={iconoLugar[l.id]} size={16} />{l.nombre}
+            <span className="num text-[13.5px] text-mu">{PROGRAMAS.filter((p) => p.lugar === l.id).length}</span>
           </button>
         ))}
       </div>
       {lugares.map((l, i) => (
         <section key={l.id} className="mt-6" data-testid={`seccion-${l.id}`}>
           <Grupo n={i + 1}>{l.nombre}</Grupo>
-          <p className="mt-2 text-[14px] text-mu">{l.linea}</p>
+          <p className="mt-2 text-[13.5px] text-mu">{l.linea}</p>
           <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {ordenar(PROGRAMAS.filter((p) => p.lugar === l.id)).map((p) => <li key={p.id}><TarjetaPrograma p={p} /></li>)}
           </ul>
@@ -146,12 +146,12 @@ function TarjetaEnCurso({ p, hechas, varios }: { p: Programa; hechas: string[]; 
         <div className="min-w-0 flex-1">
           <div className="etiqueta oro">{varios ? 'Programa en curso' : 'Tu programa'}</div>
           <Link to={`/programas/${p.id}`} className="block truncate font-display text-[18px] font-semibold">{p.nombre}</Link>
-          <p className="truncate text-[13px] text-mu">{sig ? `Semana ${sig.semana + 1} · ${p.semanas[sig.semana].sesiones[sig.sesion].nombre}` : '¡Programa completo!'}</p>
+          <p className="truncate text-[13.5px] text-mu">{sig ? `Semana ${sig.semana + 1} · ${p.semanas[sig.semana].sesiones[sig.sesion].nombre}` : '¡Programa completo!'}</p>
         </div>
       </div>
       <div className="mt-3"><Avance hechas={hechas.length} total={totalSesiones(p)} /></div>
       <div className="flex-1" />
-      {sig && <button className="btn mt-3 h-11 w-full text-[15px]" onClick={() => empezar.rutina(rutinaDeSesion(p, sig.semana, sig.sesion))}><Icono n="play" size={14} />Empezar sesión</button>}
+      {sig && <button className="btn mt-3 h-11 w-full text-[15px]" onClick={() => empezar.rutina(rutinaDeSesion(p, sig.semana, sig.sesion))}><Icono n="play" size={16} />Empezar sesión</button>}
     </div>
   );
 }
@@ -193,13 +193,13 @@ export default function VerPrograma() {
             <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[60%] object-cover" style={{ objectPosition: img.pos }} />
             <div className="relative w-[60%]">
               <Sello p={p} />
-              <div className="mt-3 flex flex-col gap-1 text-[14px] text-tx2">
+              <div className="mt-3 flex flex-col gap-1 text-[15px] text-tx2">
                 <span><b className="num oro text-[20px]">{p.semanas.length}</b> semanas</span>
                 <span><b className="num oro text-[20px]">{p.semanas[0].sesiones.length}</b> sesiones por semana</span>
                 <span>{p.nivel}</span>
-                <span className="inline-flex items-center gap-1.5 oro"><Icono n={iconoLugar[p.lugar]} size={14} />{nombreLugar(p.lugar)}</span>
-                <span className="text-[12px] text-mu">Equipo: {p.equipo}</span>
-                <span className="text-[12px] text-mu">Sugerido: {p.dias.map((d) => NOMBRES_DIA[d]).join(' · ')}</span>
+                <span className="inline-flex items-center gap-1.5 oro"><Icono n={iconoLugar[p.lugar]} size={16} />{nombreLugar(p.lugar)}</span>
+                <span className="text-[12.5px] text-mu">Equipo: {p.equipo}</span>
+                <span className="text-[12.5px] text-mu">Sugerido: {p.dias.map((d) => NOMBRES_DIA[d]).join(' · ')}</span>
               </div>
             </div>
           </div>
@@ -212,21 +212,21 @@ export default function VerPrograma() {
                   <Icono n="play" size={16} />Empezar: semana {sig.semana + 1} · {p.semanas[sig.semana].sesiones[sig.sesion].nombre}
                 </button>
               ) : <p className="mt-3 text-center font-display text-[18px] oro">¡Completaste el programa!</p>}
-              <button className="mt-3 w-full p-2 text-[13px] font-semibold text-miss"
+              <button className="mt-3 w-full p-2 text-[13.5px] font-semibold text-miss"
                 onClick={async () => { await cambiarPerfil({ programas: quitarPrograma(lista, p.id), programa: null }); aviso('Dejaste el programa'); }}>Dejar el programa</button>
             </div>
           ) : (
-            <button className="btn h-14 w-full text-[17px]" onClick={() => (lleno ? setCambiar(true) : comenzar())}>
-              <Icono n="corona" size={18} />Empezar programa
+            <button className="btn h-14 w-full text-[18px]" onClick={() => (lleno ? setCambiar(true) : comenzar())}>
+              <Icono n="corona" size={20} />Empezar programa
             </button>
           )}
 
           <div className="tarjeta">
             <div className="etiqueta oro">Qué vas a lograr</div>
             <ul className="mt-2 flex flex-col gap-2">
-              {p.logros.map((l) => <li key={l} className="flex gap-2 text-[15px]"><Icono n="check" size={18} className="oro mt-0.5 shrink-0" />{l}</li>)}
+              {p.logros.map((l) => <li key={l} className="flex gap-2 text-[15px]"><Icono n="check" size={20} className="oro mt-0.5 shrink-0" />{l}</li>)}
             </ul>
-            <p className="mt-3 text-[14px] text-mu">{p.descripcion}</p>
+            <p className="mt-3 text-[13.5px] text-mu">{p.descripcion}</p>
           </div>
         </section>
 
@@ -242,10 +242,10 @@ export default function VerPrograma() {
                     <span className="num w-9 shrink-0 text-center text-[20px] oro">{['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][i] ?? i + 1}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold">{w.titulo}</span>
-                      <span className="text-[12px] text-mu">{listas}/{w.sesiones.length} sesiones{w.nota ? ` · ${w.nota}` : ''}</span>
+                      <span className="text-[12.5px] text-mu">{listas}/{w.sesiones.length} sesiones{w.nota ? ` · ${w.nota}` : ''}</span>
                     </span>
-                    {listas === w.sesiones.length && <span className="shrink-0" style={{ color: 'var(--verde)' }}><Icono n="check" size={18} /></span>}
-                    <Icono n={ab ? 'arriba' : 'abajo'} size={18} className="shrink-0 text-mu" />
+                    {listas === w.sesiones.length && <span className="shrink-0" style={{ color: 'var(--verde)' }}><Icono n="check" size={20} /></span>}
+                    <Icono n={ab ? 'arriba' : 'abajo'} size={20} className="shrink-0 text-mu" />
                   </button>
                   {ab && (
                     <ul className="mt-3 flex flex-col gap-2">
@@ -256,9 +256,9 @@ export default function VerPrograma() {
                           <li key={k} className={`rounded-[12px] border p-3 ${toca ? 'border-gold' : hecha ? 'serie-hecha border-transparent' : 'border-ln2'}`}>
                             <div className="flex items-center justify-between gap-2">
                               <b className={hecha ? '' : 'oro'}>Sesión {k + 1} · {s.nombre}</b>
-                              {hecha ? <span className="text-[12px]" style={{ color: 'var(--verde)' }}>Hecha</span> : null}
+                              {hecha ? <span className="text-[12.5px]" style={{ color: 'var(--verde)' }}>Hecha</span> : null}
                             </div>
-                            <ul className="mt-2 flex flex-col gap-1.5 text-[13px] text-mu">
+                            <ul className="mt-2 flex flex-col gap-1.5 text-[13.5px] text-mu">
                               {s.ejercicios.map((e, x) => {
                                 const ej = buscarEjercicio(e.ejercicioId, []);
                                 return (
@@ -266,15 +266,15 @@ export default function VerPrograma() {
                                     {imagenesEjercicio(e.ejercicioId)
                                       ? <Animacion id={e.ejercicioId} nombre={ej?.nombre} className="h-[40px] w-[56px] shrink-0 rounded-[8px] border border-ln2 bg-sf" />
                                       : <Miniatura musculo={ej?.musculo} tam={40} />}
-                                    <span className="min-w-0 flex-1 truncate text-[14px] text-tx2">{ej?.nombre}</span>
+                                    <span className="min-w-0 flex-1 truncate text-[15px] text-tx2">{ej?.nombre}</span>
                                     <span className="num shrink-0 text-right text-tx2">{textoObjetivo(e)}{e.nota ? <span className="block text-[11px] text-mu">{e.nota}</span> : null}</span>
                                   </li>
                                 );
                               })}
                             </ul>
                             {activo && !hecha && (
-                              <button className="btn-sec mt-2 h-9 w-full text-[13px]" onClick={() => empezar.rutina(rutinaDeSesion(p, i, k))}>
-                                <Icono n="play" size={13} />Hacer esta sesión
+                              <button className="btn-sec mt-2 h-9 w-full text-[13.5px]" onClick={() => empezar.rutina(rutinaDeSesion(p, i, k))}>
+                                <Icono n="play" size={16} />Hacer esta sesión
                               </button>
                             )}
                           </li>
@@ -298,8 +298,8 @@ export default function VerPrograma() {
               <li key={a.id}>
                 <button className="btn-sec h-auto w-full justify-between py-3 text-left" onClick={() => comenzar(a.id)}>
                   <span className="min-w-0"><span className="block truncate font-semibold">Dejar «{q?.nombre ?? a.id}»</span>
-                    <span className="text-[12px] text-mu">{a.hechas.length} de {q ? totalSesiones(q) : '?'} sesiones hechas</span></span>
-                  <Icono n="cerrar" size={18} className="shrink-0 text-miss" />
+                    <span className="text-[12.5px] text-mu">{a.hechas.length} de {q ? totalSesiones(q) : '?'} sesiones hechas</span></span>
+                  <Icono n="cerrar" size={20} className="shrink-0 text-miss" />
                 </button>
               </li>
             );

@@ -74,16 +74,16 @@ export default function PanelClientes() {
         <div className="hero flex items-center gap-3 px-4 py-3 text-left" data-testid="codigo-invitacion">
           <div className="min-w-0 flex-1">
             <div className="etiqueta">Tu código de invitación</div>
-            <div className="marca mt-1 text-[24px] tracking-[.12em] oro">{profesional.codigo}</div>
+            <div className="marca mt-1 text-[26px] tracking-[.12em] oro">{profesional.codigo}</div>
           </div>
-          <button className="btn-sec h-10 w-10 shrink-0 px-0" aria-label="Copiar invitación" onClick={copiar}><Icono n="copiar" size={18} /></button>
-          <a className="btn h-10 shrink-0 px-3 text-[13px]" target="_blank" rel="noreferrer"
+          <button className="btn-sec h-10 w-10 shrink-0 px-0" aria-label="Copiar invitación" onClick={copiar}><Icono n="copiar" size={20} /></button>
+          <a className="btn h-10 shrink-0 px-3 text-[13.5px]" target="_blank" rel="noreferrer"
             href={`https://wa.me/?text=${encodeURIComponent(texto)}`}><Icono n="enlace" size={16} />Invitar</a>
         </div>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-[22px] font-semibold">Clientes</h2>
+        <h2 className="font-display text-[20px] font-semibold">Clientes</h2>
         <div className="w-full sm:w-auto">
           <Selector nombre="Filtrar clientes" valor={filtro} alCambiar={setFiltro}
             opciones={[{ v: 'todos', t: 'Todos' }, { v: 'atencion', t: 'Atención' }, { v: 'al-dia', t: 'Al día' }, { v: 'nuevo', t: 'Nuevos' }]} />
@@ -107,18 +107,18 @@ export default function PanelClientes() {
                     <Medallon nombre={f.vinculo.nombreCliente} />
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-display text-[18px] font-semibold">{f.perfil?.nombre || f.vinculo.nombreCliente}</div>
-                      <div className={`text-[13px] ${f.estado === 'inactivo' ? 'text-miss' : 'text-mu'}`}>{textoUltimo(f.sin)}</div>
+                      <div className={`text-[13.5px] ${f.estado === 'inactivo' ? 'text-miss' : 'text-mu'}`}>{textoUltimo(f.sin)}</div>
                     </div>
                     <ChipEstado estado={f.estado} />
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <div className="flex gap-1" aria-label="Esta semana">
                       {semanaActual(dias, ahora).map((d, i) => (
-                        <span key={i} className={`flex h-6 w-6 items-center justify-center rounded-full border text-[10px] font-bold ${d.hecho ? 'border-goldh' : d.hoy ? 'border-gold oro' : 'border-ln2 text-mu2'}`}
+                        <span key={i} className={`flex h-6 w-6 items-center justify-center rounded-full border text-[11px] font-bold ${d.hecho ? 'border-goldh' : d.hoy ? 'border-gold oro' : 'border-ln2 text-mu2'}`}
                           style={d.hecho ? { background: 'var(--oro-grad)', color: 'var(--on)' } : undefined}>{d.letra}</span>
                       ))}
                     </div>
-                    <div className="text-right text-[12px] text-mu">
+                    <div className="text-right text-[12.5px] text-mu">
                       <span className="num oro text-[15px]">{f.perfil?.resumen.total ?? 0}</span> entrenos · racha <span className="num oro text-[15px]">{rachaSemanas(dias, ahora)}</span>
                     </div>
                   </div>

@@ -34,7 +34,7 @@ export function AvisoHoy() {
       {!vinculo && invitacion && (
         <Link to="/mi-entrenador" className="tarjeta entrar flex items-center gap-3 border-gold" data-testid="aviso-invitacion">
           <Icono n="enlace" className="oro shrink-0" />
-          <span className="flex-1 text-[14px]">Tenés una invitación de {ESP.rol.toLowerCase()} (<b className="marca oro">{invitacion}</b>). <b className="oro">Revisala y aceptá</b>.</span>
+          <span className="flex-1 text-[15px]">Tenés una invitación de {ESP.rol.toLowerCase()} (<b className="marca oro">{invitacion}</b>). <b className="oro">Revisala y aceptá</b>.</span>
         </Link>
       )}
       {vinculo && (
@@ -42,15 +42,15 @@ export function AvisoHoy() {
           <Medallon nombre={vinculo.nombreProfesional} tam={40} />
           <span className="min-w-0 flex-1">
             <span className="etiqueta oro">{ESP.tuRol.replace(/^./, (c) => c.toUpperCase())} · {vinculo.nombreProfesional}</span>
-            <span className="block truncate text-[14px]">{nuevos.length ? `“${nuevos[0].texto}”` : 'Objetivos y mensajes'}</span>
+            <span className="block truncate text-[15px]">{nuevos.length ? `“${nuevos[0].texto}”` : 'Objetivos y mensajes'}</span>
           </span>
-          {nuevos.length > 0 && <span className="chip chip-on h-7 shrink-0 px-2 text-[12px]">{nuevos.length} nuevo{nuevos.length > 1 ? 's' : ''}</span>}
+          {nuevos.length > 0 && <span className="chip chip-on h-7 shrink-0 px-2 text-[12.5px]">{nuevos.length} nuevo{nuevos.length > 1 ? 's' : ''}</span>}
         </Link>
       )}
       {profesional && atencion.length > 0 && (
         <Link to="/clientes" className="tarjeta entrar flex items-center gap-3" data-testid="aviso-atencion">
           <Icono n="alerta" className="oro shrink-0" />
-          <span className="flex-1 text-[14px]"><b>{atencion.length === 1 ? `${atencion[0]} necesita` : `${atencion.length} clientes necesitan`} atención</b>
+          <span className="flex-1 text-[15px]"><b>{atencion.length === 1 ? `${atencion[0]} necesita` : `${atencion.length} clientes necesitan`} atención</b>
             <span className="block text-mu">{atencion.slice(0, 3).join(', ')}{atencion.length > 3 ? '…' : ''} hace días que no entrena{atencion.length > 1 ? 'n' : ''}.</span></span>
         </Link>
       )}

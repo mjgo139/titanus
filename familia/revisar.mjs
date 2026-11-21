@@ -4,7 +4,9 @@
 //   node familia/revisar.mjs src otra   → revisa esas carpetas
 // Falla (código 1) si:
 //   1. algún archivo de familia/ fue cambiado dentro de la app (se cambia en el repo familia-estoica);
-//   2. hay un color escrito a mano (#abc, #aabbcc, rgb(), rgba(), hsl()…) fuera de familia/.
+//   2. hay un color escrito a mano (#abc, #aabbcc, rgb(), rgba(), hsl()…) fuera de familia/;
+//   3. hay un tamaño de letra fuera de la escala de la familia (text-[14px], font-size: 14px, text-sm…);
+//   4. un <Icono> usa un tamaño que no es 16, 20, 22, 23, 32 o 44.
 // Excepción puntual: poner el comentario  familia-ok  en esa misma línea (por ejemplo, los colores del logo de Google).
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -27,6 +29,11 @@ for (const [nombre, esperado] of Object.entries(version.archivos)) {
 const EXT = /\.(css|scss|ts|tsx|js|jsx|mjs|vue|svelte|html)$/;
 const PRUEBA = /\.(test|spec)\.|\/(tests?|e2e|__tests__)\//;
 const COLOR = [/(?<![&\w])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b(?![-\w])/, /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(/];
+const ESCALA = new Set(['11', '11.5', '12.5', '13.5', '15', '16', '18', '20', '26', '28', '36', '40', '48', '64']);
+const ICONOS = new Set(['16', '20', '22', '23', '32', '44']);
+const LETRA = [/text-\[([0-9.]+)px\]/g, /font-size:\s*([0-9.]+)px/g, /fontSize:\s*'?([0-9.]+)(?:px)?'?/g];
+const TW = /(?<![-\w[])text-(xs|sm|base|lg|[2-9]?xl)(?![-\w])/;
+const ICONO = /<Icono\b[^>]*?\bsize=\{([0-9.]+)\}/g;
 const raiz = process.cwd();
 const carpetas = process.argv.slice(2).length ? process.argv.slice(2) : ['src'];
 
@@ -42,7 +49,12 @@ function revisar(ruta) {
   readFileSync(ruta, 'utf8').split('\n').forEach((linea, i) => {
     if (linea.includes('familia-ok')) return;
     const m = COLOR.map((r) => linea.match(r)).find(Boolean);
-    if (m) errores.push(`${relative(raiz, ruta)}:${i + 1}: color escrito a mano "${m[0]}". Usá una variable de familia/tokens.css (por ejemplo var(--gold)).`);
+    const donde = `${relative(raiz, ruta)}:${i + 1}`;
+    if (m) errores.push(`${donde}: color escrito a mano "${m[0]}". Usá una variable de familia/tokens.css (por ejemplo var(--gold)).`);
+    for (const r of LETRA) for (const x of linea.matchAll(r)) if (!ESCALA.has(x[1])) errores.push(`${donde}: tamaño de letra ${x[1]} fuera de la escala (11 · 11,5 · 12,5 · 13,5 · 15 · 16 · 18 · 20 · 26 · 28 · 36 · 40 · 48 · 64).`);
+    const tw = linea.match(TW);
+    if (tw && /className|class=/.test(linea)) errores.push(`${donde}: "${tw[0]}" usa la escala de Tailwind; usá la de la familia (text-texto, text-sec… o text-[15px]).`);
+    for (const x of linea.matchAll(ICONO)) if (!ICONOS.has(x[1])) errores.push(`${donde}: ícono de ${x[1]} px; solo 16 (con texto), 20 (botones y filas), 22–23 (navegación), 32 o 44 (decorativos).`);
   });
 }
 for (const c of carpetas) if (existsSync(join(raiz, c))) recorrer(join(raiz, c));
@@ -51,4 +63,4 @@ if (errores.length) {
   console.error(`✗ Familia estoica v${version.version}: ${errores.length} problema(s)\n  ` + errores.join('\n  '));
   process.exit(1);
 }
-console.log(`✓ Familia estoica v${version.version}: copia intacta y sin colores sueltos.`);
+console.log(`✓ Familia estoica v${version.version}: copia intacta, sin colores sueltos y con la escala de letras e íconos.`);

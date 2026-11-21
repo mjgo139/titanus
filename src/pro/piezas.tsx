@@ -45,7 +45,7 @@ export function Dato({ etiqueta, valor, alerta }: { etiqueta: string; valor: Rea
   return (
     <div className="tarjeta py-3 text-center">
       <div className="etiqueta truncate">{etiqueta}</div>
-      <div className={`num mt-1 text-[22px] ${alerta ? 'text-miss' : 'oro'}`}>{valor}</div>
+      <div className={`num mt-1 text-[20px] ${alerta ? 'text-miss' : 'oro'}`}>{valor}</div>
     </div>
   );
 }
@@ -78,7 +78,7 @@ export function HiloComentarios({ comentarios, yo, sobre, alEnviar, placeholder 
           {lista.map((c) => {
             const mio = c.autorId === yo.uid;
             return (
-              <li key={c.id} className={`max-w-[88%] rounded-[12px] border px-3 py-2 text-[14px] ${mio ? 'self-end border-gold2' : 'self-start border-ln2 bg-sf2'}`} data-testid="comentario">
+              <li key={c.id} className={`max-w-[88%] rounded-[12px] border px-3 py-2 text-[15px] ${mio ? 'self-end border-gold2' : 'self-start border-ln2 bg-sf2'}`} data-testid="comentario">
                 <div className="flex items-baseline justify-between gap-3 text-[11px] text-mu">
                   <b className={mio ? 'oro' : 'text-tx2'}>{mio ? 'Vos' : c.autorNombre}</b><span>{fechaHora(c.fecha)}</span>
                 </div>
@@ -90,9 +90,9 @@ export function HiloComentarios({ comentarios, yo, sobre, alEnviar, placeholder 
       )}
       <div className="mt-2 flex items-end gap-2">
         <textarea aria-label={placeholder} value={texto} onChange={(e) => setTexto(e.target.value)} rows={1} placeholder={placeholder} maxLength={1000}
-          className="min-h-[44px] flex-1 resize-none rounded-[12px] border border-ln2 bg-transparent px-3 py-2.5 text-[14px] outline-none focus:border-gold" />
+          className="min-h-[44px] flex-1 resize-none rounded-[12px] border border-ln2 bg-transparent px-3 py-2.5 text-[15px] outline-none focus:border-gold" />
         <button className="btn h-11 w-11 shrink-0 px-0" aria-label="Enviar comentario" disabled={!texto.trim() || enviando} onClick={enviar}>
-          <Icono n="mensaje" size={18} />
+          <Icono n="mensaje" size={20} />
         </button>
       </div>
     </div>
@@ -108,7 +108,7 @@ export function ListaObjetivos({ objetivos, medir, alBorrar, alCumplir }: {
   alBorrar?: (o: Objetivo) => void;
   alCumplir?: (o: Objetivo) => void;
 }) {
-  if (!objetivos.length) return <p className="tarjeta py-6 text-center text-[14px] text-mu">Todavía no hay objetivos.</p>;
+  if (!objetivos.length) return <p className="tarjeta py-6 text-center text-[13.5px] text-mu">Todavía no hay objetivos.</p>;
   return (
     <ul className="grid gap-3 lg:grid-cols-2">
       {objetivos.map((o) => {
@@ -119,11 +119,11 @@ export function ListaObjetivos({ objetivos, medir, alBorrar, alCumplir }: {
               <Icono n={m.avance >= 1 ? 'medalla' : 'objetivo'} size={22} className="oro shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="font-semibold">{o.titulo}</div>
-                <div className="mt-0.5 text-[13px] text-mu">{m.texto}{o.hasta ? ` · hasta el ${fecha(o.hasta)}` : ''}</div>
+                <div className="mt-0.5 text-[13.5px] text-mu">{m.texto}{o.hasta ? ` · hasta el ${fecha(o.hasta)}` : ''}</div>
               </div>
               {alCumplir && o.tipo === 'libre' && (
-                <button className={`chip h-8 shrink-0 px-2.5 text-[12px] ${o.cumplido ? 'chip-on' : ''}`} onClick={() => alCumplir(o)} aria-pressed={!!o.cumplido}>
-                  <Icono n="check" size={14} />{o.cumplido ? 'Cumplido' : 'Marcar'}
+                <button className={`chip h-8 shrink-0 px-2.5 text-[12.5px] ${o.cumplido ? 'chip-on' : ''}`} onClick={() => alCumplir(o)} aria-pressed={!!o.cumplido}>
+                  <Icono n="check" size={16} />{o.cumplido ? 'Cumplido' : 'Marcar'}
                 </button>
               )}
               {alBorrar && (

@@ -46,7 +46,7 @@ export default function Admin() {
       {!solicitudes ? <Cargando /> : (
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           <Seccion titulo={`Solicitudes pendientes · ${pendientes.length}`}>
-            {!pendientes.length && <p className="tarjeta py-6 text-center text-[14px] text-mu">No hay solicitudes nuevas.</p>}
+            {!pendientes.length && <p className="tarjeta py-6 text-center text-[13.5px] text-mu">No hay solicitudes nuevas.</p>}
             <ul className="flex flex-col gap-3">
               {pendientes.map((s) => (
                 <li key={s.uid} className="tarjeta" data-testid="solicitud">
@@ -54,13 +54,13 @@ export default function Admin() {
                     <Medallon nombre={s.nombre} />
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold">{s.nombre}</div>
-                      <div className="truncate text-[13px] text-mu">{ESPECIALIDADES[s.tipo].rol} · {s.email} · {fechaPro(s.fecha)}</div>
+                      <div className="truncate text-[13.5px] text-mu">{ESPECIALIDADES[s.tipo].rol} · {s.email} · {fechaPro(s.fecha)}</div>
                     </div>
                   </div>
-                  {s.mensaje && <p className="mt-2 text-[14px] italic text-tx2">“{s.mensaje}”</p>}
+                  {s.mensaje && <p className="mt-2 text-[15px] italic text-tx2">“{s.mensaje}”</p>}
                   <div className="mt-3 flex gap-2">
-                    <button className="btn h-10 flex-1 text-[14px]" onClick={() => aprobar(s)}><Icono n="check" size={16} />Aprobar</button>
-                    <button className="btn-sec h-10 flex-1 text-[14px]" onClick={async () => { await repo.rechazarSolicitud(s.uid); aviso('Solicitud rechazada'); await recargar(); }}>Rechazar</button>
+                    <button className="btn h-10 flex-1 text-[15px]" onClick={() => aprobar(s)}><Icono n="check" size={16} />Aprobar</button>
+                    <button className="btn-sec h-10 flex-1 text-[15px]" onClick={async () => { await repo.rechazarSolicitud(s.uid); aviso('Solicitud rechazada'); await recargar(); }}>Rechazar</button>
                   </div>
                 </li>
               ))}
@@ -68,7 +68,7 @@ export default function Admin() {
           </Seccion>
 
           <Seccion titulo={`Profesionales · ${pros.length}`}>
-            {!pros.length && <p className="tarjeta py-6 text-center text-[14px] text-mu">Todavía no hay profesionales.</p>}
+            {!pros.length && <p className="tarjeta py-6 text-center text-[13.5px] text-mu">Todavía no hay profesionales.</p>}
             <ul className="flex flex-col gap-3">
               {pros.map((p) => (
                 <li key={p.uid} className={`tarjeta ${p.activo ? '' : 'opacity-60'}`} data-testid="profesional">
@@ -76,9 +76,9 @@ export default function Admin() {
                     <Medallon nombre={p.nombre} />
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold">{p.nombre}</div>
-                      <div className="text-[13px] text-mu">{ESPECIALIDADES[p.tipo].rol} · <span className="marca oro">{p.codigo}</span> · {clientes[p.uid] ?? '…'} clientes</div>
+                      <div className="text-[13.5px] text-mu">{ESPECIALIDADES[p.tipo].rol} · <span className="marca oro">{p.codigo}</span> · {clientes[p.uid] ?? '…'} clientes</div>
                     </div>
-                    <button className={`chip h-9 shrink-0 px-3 text-[12px] ${p.activo ? 'chip-on' : ''}`} aria-pressed={p.activo}
+                    <button className={`chip h-9 shrink-0 px-3 text-[12.5px] ${p.activo ? 'chip-on' : ''}`} aria-pressed={p.activo}
                       onClick={async () => {
                         await repo.cambiarEstadoProfesional(p.uid, !p.activo);
                         aviso(p.activo ? `${p.nombre} dado de baja` : `${p.nombre} activo de nuevo`);
@@ -91,7 +91,7 @@ export default function Admin() {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-[13px] text-mu2">Dar de baja corta el acceso a los datos de sus clientes al instante, sin borrar nada.</p>
+            <p className="mt-3 text-[13.5px] text-mu2">Dar de baja corta el acceso a los datos de sus clientes al instante, sin borrar nada.</p>
           </Seccion>
         </div>
       )}

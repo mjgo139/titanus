@@ -44,16 +44,16 @@ export default function EditarRutina() {
       <div className="lg:mx-auto lg:max-w-[760px]">
         <Encabezado atras="/entreno" etiqueta={`De tu entrenador · ${r.nombreAsignador ?? ''}`} titulo={r.nombre}
           linea="La cambia tu entrenador. Al entrenar podés ajustar el peso y las reps de cada serie." />
-        <div className="tarjeta flex items-center gap-2 text-[14px] text-mu" data-testid="rutina-solo-lectura">
-          <Icono n="escudo" size={18} className="oro shrink-0" />{r.dias.length ? r.dias.map((d) => NOMBRES_DIA[d]).join(' · ') : 'Sin día fijo'}
+        <div className="tarjeta flex items-center gap-2 text-[13.5px] text-mu" data-testid="rutina-solo-lectura">
+          <Icono n="escudo" size={20} className="oro shrink-0" />{r.dias.length ? r.dias.map((d) => NOMBRES_DIA[d]).join(' · ') : 'Sin día fijo'}
         </div>
         <ul className="mt-4 flex flex-col gap-2">
           {r.ejercicios.map((e, i) => (
             <li key={i} className="tarjeta flex items-center gap-3 py-3">
               <Miniatura musculo={buscarEjercicio(e.ejercicioId, propios)?.musculo} id={e.ejercicioId} tam={40} />
               <span className="min-w-0 flex-1"><b className="block truncate oro">{buscarEjercicio(e.ejercicioId, propios)?.nombre ?? 'Ejercicio'}</b>
-                {e.nota && <span className="text-[12px] text-mu">{e.nota}</span>}</span>
-              <span className="num shrink-0 text-right text-tx2">{textoObjetivo(e)}{e.peso ? <span className="block text-[12px] oro">{formatoPeso(e.peso, perfil.unidad)}</span> : null}</span>
+                {e.nota && <span className="text-[12.5px] text-mu">{e.nota}</span>}</span>
+              <span className="num shrink-0 text-right text-tx2">{textoObjetivo(e)}{e.peso ? <span className="block text-[12.5px] oro">{formatoPeso(e.peso, perfil.unidad)}</span> : null}</span>
             </li>
           ))}
         </ul>
@@ -106,7 +106,7 @@ export default function EditarRutina() {
             const on = r.dias.includes(d);
             return (
               <button key={d} aria-pressed={on} onClick={() => setR({ ...r, dias: on ? r.dias.filter((x) => x !== d) : [...r.dias, d].sort() })}
-                className={`chip h-11 flex-1 px-0 text-[13px] ${on ? 'chip-on' : ''}`}>
+                className={`chip h-11 flex-1 px-0 text-[13.5px] ${on ? 'chip-on' : ''}`}>
                 {NOMBRES_DIA[d]}
               </button>
             );
@@ -125,10 +125,10 @@ export default function EditarRutina() {
               alEliminar={() => setR({ ...r, ejercicios: r.ejercicios.filter((_, j) => j !== i) })}
               extra={(
                 <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-                  <input className="h-10 w-full min-w-0 rounded-[8px] border border-ln2 bg-transparent px-3 text-[14px] outline-none focus:border-gold"
+                  <input className="h-10 w-full min-w-0 rounded-[8px] border border-ln2 bg-transparent px-3 text-[15px] outline-none focus:border-gold"
                     placeholder="Alternativa o nota (opcional)" aria-label="Alternativa" value={e.nota ?? ''}
                     onChange={(ev) => cambiarEj(i, { nota: ev.target.value })} />
-                  <label className="flex items-center gap-1 text-[12px] text-mu" title="Rango de repeticiones para la sobrecarga progresiva">
+                  <label className="flex items-center gap-1 text-[12.5px] text-mu" title="Rango de repeticiones para la sobrecarga progresiva">
                     hasta
                     <input type="number" inputMode="numeric" min={0} aria-label="Reps máximas del rango" placeholder="—"
                       className="num h-10 w-12 rounded-[8px] border border-ln2 bg-transparent text-center text-[15px] outline-none focus:border-gold"

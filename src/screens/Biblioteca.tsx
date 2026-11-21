@@ -68,20 +68,20 @@ export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alC
     <Hoja abierta={abierta} alCerrar={alCerrar} etiqueta="Ejercicios" titulo="Elegí qué entrenar">
       {info ? (
         <div data-testid="info-ejercicio">
-          <button className="mb-3 flex items-center gap-1 text-[14px] font-semibold oro" onClick={() => setInfo(null)}><Icono n="atras" size={16} />Volver a la lista</button>
+          <button className="mb-3 flex items-center gap-1 text-[15px] font-semibold oro" onClick={() => setInfo(null)}><Icono n="atras" size={16} />Volver a la lista</button>
           {CON_IMAGEN.has(info.id) ? (
             <div className="relative h-[220px] overflow-hidden rounded-[14px] border border-ln bg-sf">
               <Animacion id={info.id} nombre={info.nombre} completa className="h-full w-full" />
             </div>
           ) : <div className="flex h-[120px] items-center justify-center rounded-[14px] border border-ln"><Miniatura musculo={info.musculo} id={info.id} tam={72} /></div>}
-          <h3 className="mt-3 font-display text-[22px] font-semibold">{info.nombre}</h3>
+          <h3 className="mt-3 font-display text-[20px] font-semibold">{info.nombre}</h3>
           <div className="mt-1 flex flex-wrap gap-2">
-            <span className="chip h-7 px-3 text-[12px]">{info.musculo}</span>
-            {info.equipo && <span className="chip h-7 px-3 text-[12px]">{info.equipo}</span>}
+            <span className="chip h-7 px-3 text-[12.5px]">{info.musculo}</span>
+            {info.equipo && <span className="chip h-7 px-3 text-[12.5px]">{info.equipo}</span>}
           </div>
           {(() => {
             const x = estados.get(info.id);
-            if (!x?.ultima) return <p className="mt-4 text-[14px] text-mu">Todavía no lo hiciste. Empezá con un peso cómodo y buena técnica.</p>;
+            if (!x?.ultima) return <p className="mt-4 text-[13.5px] text-mu">Todavía no lo hiciste. Empezá con un peso cómodo y buena técnica.</p>;
             return (
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div className="tarjeta py-2"><div className="etiqueta">Mejor</div><div className="num oro text-[18px]">{formatoPeso(x.mejorPeso, perfil.unidad)}</div></div>
@@ -114,7 +114,7 @@ export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alC
       ) : (
         <>
           <div className="relative">
-            <Icono n="buscar" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-mu" />
+            <Icono n="buscar" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-mu" />
             <input className="campo pl-10" placeholder="Buscar ejercicio" value={texto} onChange={(e) => setTexto(e.target.value)} aria-label="Buscar ejercicio" />
           </div>
           <div className="mt-3 -mx-5 px-5 flex gap-2 overflow-x-auto pb-1" aria-label="Filtrar por músculo">
@@ -124,7 +124,7 @@ export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alC
           </div>
           <div className="mt-2 -mx-5 px-5 flex gap-2 overflow-x-auto pb-1" aria-label="Filtrar por equipo">
             {['Todos', ...EQUIPOS].map((q) => (
-              <button key={q} onClick={() => setEquipo(q)} className={`chip shrink-0 h-8 text-[12px] ${equipo === q ? 'chip-on' : ''}`}>{q === 'Todos' ? 'Todo el equipo' : q}</button>
+              <button key={q} onClick={() => setEquipo(q)} className={`chip shrink-0 h-8 text-[12.5px] ${equipo === q ? 'chip-on' : ''}`}>{q === 'Todos' ? 'Todo el equipo' : q}</button>
             ))}
           </div>
           <button onClick={() => setCreando(true)} className="btn-sec w-full mt-4"><Icono n="mas" size={16} />Crear ejercicio propio</button>
@@ -140,9 +140,9 @@ export function Biblioteca({ abierta, alCerrar, propios, elegidos, alElegir, alC
                         <Miniatura musculo={e.musculo} id={e.id} tam={42} />
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-semibold text-tx">{e.nombre}</span>
-                          <span className="text-[12px] text-mu">{e.propio ? 'Propio' : `${e.musculo} · ${e.equipo}`}</span>
+                          <span className="text-[12.5px] text-mu">{e.propio ? 'Propio' : `${e.musculo} · ${e.equipo}`}</span>
                         </span>
-                        <span className="oro">{ya ? <Icono n="check" size={18} /> : <Icono n="mas" size={18} />}</span>
+                        <span className="oro">{ya ? <Icono n="check" size={20} /> : <Icono n="mas" size={20} />}</span>
                       </button>
                       <button aria-label={`Información de ${e.nombre}`} onClick={() => setInfo(e)}
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ln2 font-display text-[16px] italic text-mu hover:border-gold hover:text-tx">i</button>

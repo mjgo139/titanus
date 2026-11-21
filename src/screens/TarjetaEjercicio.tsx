@@ -31,8 +31,8 @@ export function AccionesEjercicio({ i, total, nombre, descanso, alDescanso, alMo
   return (
     <div className="mt-2 flex items-center gap-1.5">
       {descanso !== undefined ? (
-        <button className="mr-auto flex min-w-0 items-center gap-1 truncate text-[13px] font-semibold oro" onClick={alDescanso}>
-          <Icono n="reloj" size={15} />Descanso: {descanso}
+        <button className="mr-auto flex min-w-0 items-center gap-1 truncate text-[13.5px] font-semibold oro" onClick={alDescanso}>
+          <Icono n="reloj" size={16} />Descanso: {descanso}
         </button>
       ) : <span className="mr-auto" />}
       <button className={b} aria-label={`Subir ${nombre}`} title="Subir" disabled={i === 0} onClick={() => alMover(-1)}><Icono n="arriba" size={16} /></button>
@@ -79,12 +79,12 @@ export function TablaSeries<T extends FilaSerie>({ series, unidad, nombre, alCam
             <button aria-label={`Eliminar serie ${j + 1} de ${nombre}`} title="Eliminar serie" disabled={series.length <= 1}
               onClick={() => alCambiar(series.filter((_, k) => k !== j))}
               className="flex h-8 w-8 items-center justify-center rounded-[8px] text-mu2 hover:text-miss disabled:opacity-30">
-              <Icono n="basura" size={15} />
+              <Icono n="basura" size={16} />
             </button>
           </div>
         );
       })}
-      <button className="btn-sec mt-2 h-9 w-full text-[13px]" aria-label={`Más series de ${nombre}`} disabled={series.length >= 12}
+      <button className="btn-sec mt-2 h-9 w-full text-[13.5px]" aria-label={`Más series de ${nombre}`} disabled={series.length >= 12}
         onClick={() => {
           // La serie nueva copia la última normal (no la de fallo)
           const base = [...series].reverse().find((s) => (s.tipo ?? 'normal') === 'normal') ?? series[series.length - 1];
@@ -92,7 +92,7 @@ export function TablaSeries<T extends FilaSerie>({ series, unidad, nombre, alCam
           const iFallo = series.findIndex((s) => s.tipo === 'fallo');
           alCambiar(iFallo >= 0 ? [...series.slice(0, iFallo), n, ...series.slice(iFallo)] : [...series, n]);
         }}>
-        <Icono n="mas" size={15} />Agregar serie
+        <Icono n="mas" size={16} />Agregar serie
       </button>
     </div>
   );
@@ -118,7 +118,7 @@ export function TarjetaEjercicio<T extends FilaSerie>({
         <Miniatura musculo={ej?.musculo} id={ejercicioId} tam={44} />
         <span className="min-w-0 flex-1">
           <span className="block truncate font-semibold oro">{nombre}</span>
-          <span className="block truncate text-[12px] text-mu">{subtitulo ?? ej?.musculo}</span>
+          <span className="block truncate text-[12.5px] text-mu">{subtitulo ?? ej?.musculo}</span>
         </span>
       </div>
       <TablaSeries series={series} unidad={unidad} nombre={nombre} alCambiar={alSeries} nueva={nueva} />

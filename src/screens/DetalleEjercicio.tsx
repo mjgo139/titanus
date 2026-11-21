@@ -44,7 +44,7 @@ export default function DetalleEjercicio() {
               <div className="num mt-1 text-[20px]">{formatoPeso(est.mejorVolumen, u, 0)}</div>
             </div>
           </div>
-          <p className="mt-2 text-[12px] text-mu">1RM: el peso que podrías levantar una sola vez, estimado con tus series.</p>
+          <p className="mt-2 text-[12.5px] text-mu">1RM: el peso que podrías levantar una sola vez, estimado con tus series.</p>
           <div className="lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-start lg:gap-6">
           <Seccion titulo="Gráfico">
             <div className="tarjeta">
