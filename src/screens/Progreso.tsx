@@ -143,7 +143,7 @@ function ResumenProgreso() {
       <div>
       <Calendario dias={perfil.resumen.dias} />
 
-      <Grupo className="mt-6" extra={<Link to="/progreso?v=records" className="oro text-[15px] font-semibold">Ver récords</Link>}>Logros</Grupo>
+      <Grupo n={1} className="mt-6" extra={<Link to="/progreso?v=records" className="oro text-[15px] font-semibold">Ver récords</Link>}>Logros</Grupo>
       <div className="mt-3 grid grid-cols-3 gap-2">
         {[
           { i: 'fuego', v: romano(racha) === '—' ? '0' : romano(racha), t: 'Racha', s: racha === 1 ? 'semana' : 'semanas' },

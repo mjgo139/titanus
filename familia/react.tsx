@@ -43,9 +43,10 @@ export function Grupo({ n, children, extra, className = '' }: { n?: number; chil
   );
 }
 
-/** Ficha (chip): texto chico con ícono, borde fino */
-export function Ficha({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <span className={`ficha ${className}`}>{children}</span>;
+/** Ficha (chip): texto chico con ícono, borde fino. Con `href` es un enlace y muestra "›" (en las 4 apps igual) */
+export function Ficha({ children, className = '', href, ir, testId }: { children: ReactNode; className?: string; href?: string; ir?: (e: MouseEvent<HTMLAnchorElement>, href: string) => void; testId?: string }) {
+  if (href) return <a href={href} className={`ficha ${className}`} data-testid={testId} onClick={(e) => ir?.(e, href)}>{children}<span aria-hidden className="ir">›</span></a>;
+  return <span className={`ficha ${className}`} data-testid={testId}>{children}</span>;
 }
 
 /** Cabecera de página: etiqueta en oro, título grande y una línea */
@@ -139,3 +140,102 @@ export function Pestanas({ secciones, ir }: { secciones: Seccion[]; ir?: (e: Mou
 
 /** Iniciales para el avatar cuando no hay foto: "Lucas Pérez" → "LP" */
 export const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '').join('') || '·';
+
+/* ——————————————————— v1.3.0: Panel del día, Tu semana, tema y aviso de prueba ——————————————————— */
+
+/** Saludo según la hora (igual en las 4 apps) */
+export const saludoDeHora = (t = Date.now()) => { const h = new Date(t).getHours(); return h < 12 ? 'Buen día' : h < 19 ? 'Buenas tardes' : 'Buenas noches'; };
+/** "Sábado, 21 de noviembre" */
+export const fechaLarga = (t = Date.now()) => { const s = new Intl.DateTimeFormat('es-PY', { weekday: 'long', day: 'numeric', month: 'long' }).format(t); return s.charAt(0).toUpperCase() + s.slice(1); };
+
+/**
+ * Panel del día: lo primero de Inicio en las 4 apps.
+ * Orden fijo: [avatar] · FECHA (etiqueta oro) · "Buen día, Nombre" · línea (rango, frase…) · fichas.
+ * `lado` va a la derecha en PC y debajo en el celular (por ejemplo el anillo de calorías).
+ */
+export function PanelDia({ nombre, linea, avatar, fichas, esquina, lado, ahora = Date.now(), testId = 'panel-dia' }: {
+  nombre: string; linea?: ReactNode; avatar?: ReactNode; fichas?: ReactNode; esquina?: ReactNode; lado?: ReactNode; ahora?: number; testId?: string;
+}) {
+  return (
+    <section className="panel-dia" data-testid={testId}>
+      <Laurel fondo size={220} />
+      <div className="panel-dia-fila">
+        <div className="panel-dia-principal">
+          <div className="panel-dia-cabeza">
+            {avatar && <span className="panel-dia-avatar">{avatar}</span>}
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="grupo">{fechaLarga(ahora)}</div>
+              <h1 className="panel-dia-saludo">{saludoDeHora(ahora)}, {nombre}</h1>
+              {linea && <div className="panel-dia-linea">{linea}</div>}
+            </div>
+            {esquina && <span className="panel-dia-esquina">{esquina}</span>}
+          </div>
+          {fichas && <div className="panel-dia-fichas">{fichas}</div>}
+        </div>
+        {lado && <div className="panel-dia-lado">{lado}</div>}
+      </div>
+    </section>
+  );
+}
+
+/** Un día de "Tu semana": fecha AAAA-MM-DD; `hecho` = cumplido; `plan` = planificado (punto dorado) */
+export type DiaSemana = { fecha: string; hecho: boolean; hoy: boolean; plan?: boolean };
+
+/** "Tu semana", igual en las 4 apps: día corto, número, ✓ verde si se cumplió, hoy subrayado en oro, "n/7 …" con barra */
+export function TuSemana({ dias, texto, extra, nota, testId = 'tu-semana', className = '' }: {
+  dias: DiaSemana[]; texto: string; extra?: ReactNode; nota?: ReactNode; testId?: string; className?: string;
+}) {
+  const hechos = dias.filter((d) => d.hecho).length;
+  const corto = (f: string) => new Intl.DateTimeFormat('es-PY', { weekday: 'short' }).format(new Date(`${f}T12:00`)).replace('.', '').slice(0, 3);
+  return (
+    <div className={`tarjeta tu-semana ${className}`} data-testid={testId}>
+      <div className="tu-semana-dias">
+        {dias.map((d) => {
+          const n = Number(d.fecha.slice(8, 10));
+          return (
+            <div key={d.fecha} className={`tu-semana-dia${d.hoy ? ' hoy' : ''}${d.hecho ? ' cumplido' : ''}`} aria-label={`${corto(d.fecha)} ${n}: ${d.hecho ? 'cumplido' : 'sin cumplir'}`}>
+              <span className="tu-semana-corto">{corto(d.fecha)}</span>
+              <span className="num tu-semana-num">{n}</span>
+              <span className="tu-semana-marca">{d.hecho ? <Icono n="check" size={16} /> : d.plan ? <span className="tu-semana-plan" /> : null}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="tu-semana-pie">
+        <div className="tu-semana-cuenta">
+          <span className="num tu-semana-hechos">{hechos}</span><span className="num tu-semana-de">/7</span>
+          <span className="tu-semana-texto">{texto}</span>
+          {extra && <span className="tu-semana-extra">{extra}</span>}
+        </div>
+        <div className="tu-semana-barra"><div style={{ width: `${(hechos / 7) * 100}%` }} /></div>
+        {nota && <p className="tu-semana-nota">{nota}</p>}
+      </div>
+    </div>
+  );
+}
+
+/** Temas de la familia: los mismos nombres y el mismo predeterminado (Noche romana) en las 4 apps */
+export type Tema = 'oscuro' | 'claro' | 'sistema';
+export const TEMAS: { v: Tema; t: string }[] = [{ v: 'oscuro', t: 'Noche romana' }, { v: 'claro', t: 'Mármol' }, { v: 'sistema', t: 'Sistema' }];
+export const TEMA_PREDETERMINADO: Tema = 'oscuro';
+/** Pone data-theme en <html> y el color de la barra del teléfono */
+export function aplicarTema(t: Tema = TEMA_PREDETERMINADO) {
+  const oscuro = t === 'oscuro' || (t === 'sistema' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = oscuro ? 'dark' : 'light';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+}
+/** Selector de tema (Perfil → Apariencia) */
+export function ElegirTema({ valor, cambiar }: { valor: Tema; cambiar: (t: Tema) => void }) {
+  return (
+    <div className="elegir-tema" role="radiogroup" aria-label="Tema">
+      {TEMAS.map((x) => (
+        <button key={x.v} type="button" role="radio" aria-checked={valor === x.v} className={`chip${valor === x.v ? ' chip-on' : ''}`} onClick={() => cambiar(x.v)}>{x.t}</button>
+      ))}
+    </div>
+  );
+}
+
+/** Aviso de modo prueba, arriba de cada pantalla (igual en las 4 apps) */
+export function AvisoPrueba() {
+  return <div className="aviso-prueba">Modo prueba · datos inventados</div>;
+}

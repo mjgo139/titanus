@@ -46,7 +46,7 @@ export default function DetalleEjercicio() {
           </div>
           <p className="mt-2 text-[12.5px] text-mu">1RM: el peso que podrías levantar una sola vez, estimado con tus series.</p>
           <div className="lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-start lg:gap-6">
-          <Seccion titulo="Gráfico">
+          <Seccion n={1} titulo="Gráfico">
             <div className="tarjeta">
               <Selector nombre="Medida" valor={medida} alCambiar={setMedida}
                 opciones={[{ v: 'peso', t: 'Peso' }, { v: 'e1rm', t: '1RM' }, { v: 'volumen', t: 'Volumen' }, { v: 'reps', t: 'Reps' }]} />
@@ -58,7 +58,7 @@ export default function DetalleEjercicio() {
               </div>
             </div>
           </Seccion>
-          <Seccion titulo="Últimas sesiones">
+          <Seccion n={2} titulo="Últimas sesiones">
             <ul className="tarjeta py-1">
               {[...est.puntos].reverse().slice(0, 10).map((p) => (
                 <li key={p.fecha} className="fila last:border-0">

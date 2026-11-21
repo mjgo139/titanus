@@ -8,7 +8,7 @@ import { ESP, TIPO_APP } from './especialidades';
 import type { Solicitud, Vinculo } from './tipos';
 
 /** En Perfil: tu entrenador, tu panel de clientes (si sos profesional), pedir serlo y la administración */
-export function SeccionPro() {
+export function SeccionPro({ n }: { n?: number } = {}) {
   const { repo, usuario, perfil, profesional, admin, aviso } = useSesion();
   const [vinculo, setVinculo] = useState<Vinculo | null | undefined>();
   const [solicitud, setSolicitud] = useState<Solicitud | null>(null);
@@ -38,7 +38,7 @@ export function SeccionPro() {
 
   const fila = 'fila w-full text-left';
   return (
-    <Seccion titulo={ESP.rol}>
+    <Seccion n={n} titulo={ESP.rol}>
       <div className="tarjeta py-1" data-testid="seccion-pro">
         {profesional && (
           <Link to="/clientes" className={fila}>

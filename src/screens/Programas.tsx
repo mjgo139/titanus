@@ -231,7 +231,7 @@ export default function VerPrograma() {
         </section>
 
         <section>
-          <Grupo className="mb-3">Semanas</Grupo>
+          <Grupo n={1} className="mb-3">Semanas</Grupo>
           <ul className="flex flex-col gap-2">
             {p.semanas.map((w, i) => {
               const ab = semanaAbierta === i;

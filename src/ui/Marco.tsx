@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate, type NavigateFunction } from 'react-r
 import { leerBorrador } from '../lib/borrador';
 import { rango, reloj } from '../lib/logica';
 import { estatuas } from './estatuas';
-import { BarraLateral, Emblema, Pestanas } from './familia';
+import { AvisoPrueba, BarraLateral, Emblema, Pestanas } from './familia';
 import { AvisoMudanza } from './AvisoMudanza';
 import { Icono } from './Icono';
 import { useApp } from './contexto';
@@ -85,11 +85,7 @@ export function Marco() {
 
       <main className="mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:max-w-[1480px] lg:px-12 lg:pt-5 lg:pb-16">
         <AvisoMudanza className="mt-3 flex" />
-        {repo.modo === 'prueba' && (
-          <div className="mt-3 rounded-full border border-ln2 px-4 py-1 text-center text-[11px] font-semibold uppercase tracking-[.12em] text-mu2 lg:mx-auto lg:max-w-[360px]">
-            Modo prueba · datos inventados
-          </div>
-        )}
+        {repo.modo === 'prueba' && <AvisoPrueba />}
         <div key={loc.pathname} className="pagina"><Outlet /></div>
       </main>
 

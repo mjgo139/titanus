@@ -45,7 +45,7 @@ export default function Admin() {
         linea="Aprobá a quienes pueden llevar clientes. Solo vos ves esta pantalla." />
       {!solicitudes ? <Cargando /> : (
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-          <Seccion titulo={`Solicitudes pendientes · ${pendientes.length}`}>
+          <Seccion n={1} titulo={`Solicitudes pendientes · ${pendientes.length}`}>
             {!pendientes.length && <p className="tarjeta py-6 text-center text-[13.5px] text-mu">No hay solicitudes nuevas.</p>}
             <ul className="flex flex-col gap-3">
               {pendientes.map((s) => (
@@ -67,7 +67,7 @@ export default function Admin() {
             </ul>
           </Seccion>
 
-          <Seccion titulo={`Profesionales · ${pros.length}`}>
+          <Seccion n={2} titulo={`Profesionales · ${pros.length}`}>
             {!pros.length && <p className="tarjeta py-6 text-center text-[13.5px] text-mu">Todavía no hay profesionales.</p>}
             <ul className="flex flex-col gap-3">
               {pros.map((p) => (

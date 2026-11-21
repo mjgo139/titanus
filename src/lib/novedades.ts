@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.24.0',
+    fecha: '21/11/2026',
+    cambios: [
+      'Panel del día y Tu semana son las mismas piezas que en las otras apps de la familia: la fecha va arriba del saludo y las fichas llevan a Progreso.',
+      'Todas las secciones van numeradas (I · NOMBRE, II · APARIENCIA…).',
+    ],
+  },
+  {
     version: '1.23.0',
     fecha: '21/11/2026',
     cambios: [

@@ -29,6 +29,12 @@
   --sombra: 0 8px 25px rgba(0,0,0,.45);
   --sombra-boton: 0 3px 14px rgba(0,0,0,.35);
   --sombra-panel: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -14px rgba(0,0,0,.6);
+  /* Colores de datos (gráficos): validados para daltonismo y contraste contra la tarjeta de cada modo */
+  --prot:#d96a52; --carb:#4f8fdc; --gras:#b5840c;
+  --serie-1:#4f8fdc; --serie-2:#de7040; --serie-3:#24ab8a; --serie-4:#b5840c;
+  --serie-5:#cf6b96; --serie-6:#5ea64a; --serie-7:#8476dc; --serie-8:#e06a68; --serie-otras:#6f6656;
+  /* Acento que elige la persona (data-acento = oliva | terracota | bronce); por defecto oliva */
+  --elegido:#a3b06c; --elegidobg:#262a1b;
   --acento:#e6b84e;
   --lateral:#050505;
   color-scheme: dark;
@@ -46,6 +52,10 @@
   --marfil:#2b261e;
   --vena: rgba(126,93,34,.10);
   --sombra: 0 1px 2px rgba(60,45,20,.05), 0 6px 18px rgba(60,45,20,.08);
+  --prot:#c4553b; --carb:#2f6fb8; --gras:#a87a0a;
+  --serie-1:#2f6fb8; --serie-2:#d0632f; --serie-3:#16967a; --serie-4:#c98f00;
+  --serie-5:#c9618d; --serie-6:#3d7a2c; --serie-7:#6a58c4; --serie-8:#c43d3b; --serie-otras:#9a907f;
+  --elegido:#5e6b33; --elegidobg:#e6e8d3;
   --lateral:#16130e;
   color-scheme: light;
 }
@@ -86,3 +96,10 @@
   --alto-boton:52px; --alto-boton-sec:44px; --alto-campo:46px; --alto-ficha:32px;
   --ancho-lateral:248px; --ancho-celular:480px; --ancho-pc:1480px;
 }
+
+/* Acento elegido por la persona (Perfil → Apariencia) */
+:root[data-acento='terracota'] { --elegido:#d9875f; --elegidobg:#33211a; }
+:root[data-theme='light'][data-acento='terracota'] { --elegido:#a4512f; --elegidobg:#f1dccf; }
+:root[data-acento='bronce'] { --elegido:var(--gold); --elegidobg:var(--goldbg); }
+/* Muestras fijas de cada opción de acento */
+:root { --muestra-oliva:#5e6b33; --muestra-terracota:#a4512f; --muestra-bronce:#7e5d22; }

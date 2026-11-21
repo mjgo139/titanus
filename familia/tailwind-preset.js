@@ -13,6 +13,7 @@ export default {
         tx: 'var(--tx)', tx2: 'var(--tx2)', mu: 'var(--mu)', mu2: 'var(--mu2)',
         gold: 'var(--gold)', goldh: 'var(--goldh)', gold2: 'var(--gold2)', goldbg: 'var(--goldbg)', on: 'var(--on)',
         ok: 'var(--ok)', okbg: 'var(--okbg)', verde: 'var(--verde)', miss: 'var(--miss)', missbg: 'var(--missbg)',
+        elegido: 'var(--elegido)', elegidobg: 'var(--elegidobg)', prot: 'var(--prot)', carb: 'var(--carb)', gras: 'var(--gras)',
         aviso: 'var(--aviso)', info: 'var(--info)', marfil: 'var(--marfil)',
         lat: { tx: 'var(--lat-tx)', on: 'var(--lat-tx-on)', activo: 'var(--lat-activo)', oro: 'var(--lat-oro)', mu: 'var(--lat-mu)', borde: 'var(--lat-borde)' },
       },

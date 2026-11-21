@@ -100,7 +100,7 @@ export default function EditarRutina() {
           onChange={(e) => setR({ ...r, nombre: e.target.value })} />
       </label>
 
-      <Seccion titulo="Días">
+      <Seccion n={1} titulo="Días">
         <div className="flex justify-between gap-1">
           {[1, 2, 3, 4, 5, 6, 0].map((d) => {
             const on = r.dias.includes(d);
@@ -114,7 +114,7 @@ export default function EditarRutina() {
         </div>
       </Seccion>
 
-      <Seccion titulo={`Ejercicios · ${r.ejercicios.length}`}>
+      <Seccion n={2} titulo={`Ejercicios · ${r.ejercicios.length}`}>
         <ul className="flex flex-col gap-3">
           {r.ejercicios.map((e, i) => (
             <TarjetaEjercicio key={e.ejercicioId + i} i={i} total={r.ejercicios.length} ejercicioId={e.ejercicioId} propios={propios}

@@ -12,6 +12,7 @@ import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
 import { Hoja, Seccion, Selector } from '../ui/piezas';
+import { TEMAS } from '../ui/familia';
 import { SeccionPro } from '../pro/SeccionPerfil';
 
 export default function Perfil() {
@@ -87,7 +88,7 @@ export default function Perfil() {
 
       </div>
       <div className="lg:pt-16">
-      <Seccion titulo="Nombre">
+      <Seccion n={1} titulo="Nombre">
         <div className="flex gap-2">
           <input className="campo" value={nombre} onChange={(e) => setNombre(e.target.value)} aria-label="Nombre" />
           <button className="btn-sec h-[46px] shrink-0" disabled={!nombre.trim() || nombre === perfil.nombre}
@@ -95,21 +96,21 @@ export default function Perfil() {
         </div>
       </Seccion>
 
-      <Seccion titulo="Apariencia">
+      <Seccion n={2} titulo="Apariencia">
         <Selector<Tema> nombre="Apariencia" valor={perfil.tema} alCambiar={(t) => cambiarPerfil({ tema: t })}
-          opciones={[{ v: 'oscuro', t: 'Noche romana' }, { v: 'claro', t: 'Mármol' }, { v: 'sistema', t: 'Sistema' }]} />
+          opciones={TEMAS} />
         <div className="mt-3">
           <Selector<Figura> nombre="Estatuas" valor={perfil.figura ?? 'hombre'} alCambiar={(f) => cambiarPerfil({ figura: f })}
             opciones={[{ v: 'hombre', t: 'Legionario' }, { v: 'mujer', t: 'Legionaria' }]} />
         </div>
       </Seccion>
 
-      <Seccion titulo="Unidades">
+      <Seccion n={3} titulo="Unidades">
         <Selector<Unidad> nombre="Unidades" valor={perfil.unidad} alCambiar={(u) => cambiarPerfil({ unidad: u })}
           opciones={[{ v: 'kg', t: 'Kilos (kg)' }, { v: 'lb', t: 'Libras (lb)' }]} />
       </Seccion>
 
-      <Seccion titulo="Sobrecarga progresiva">
+      <Seccion n={4} titulo="Sobrecarga progresiva">
         <div className="tarjeta">
           <Selector<ModoSobrecarga> nombre="Sobrecarga progresiva" valor={sc.modo}
             alCambiar={(m) => cambiarPerfil({ sobrecarga: { ...sc, modo: m } })}
@@ -137,7 +138,7 @@ export default function Perfil() {
         </div>
       </Seccion>
 
-      <Seccion titulo="Recordatorios">
+      <Seccion n={5} titulo="Recordatorios">
         <div className="tarjeta">
           <label className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-3 font-semibold"><Icono n="campana" className="oro" />Avisarme para entrenar</span>
@@ -169,9 +170,9 @@ export default function Perfil() {
         </div>
       </Seccion>
 
-      <SeccionPro />
+      <SeccionPro n={6} />
 
-      <Seccion titulo="Tus datos">
+      <Seccion n={7} titulo="Tus datos">
         <div className="tarjeta py-1">
           <Link to="/conocerte?editar=1" className="fila w-full text-left" data-testid="datos-personales">
             <Icono n="perfil" className="oro" />
@@ -205,7 +206,7 @@ export default function Perfil() {
       </Seccion>
 
       {admin && (
-        <Seccion titulo="Versión (solo admin)">
+        <Seccion n={8} titulo="Versión (solo admin)">
           <button className="tarjeta w-full text-left" onClick={() => setNovedades(true)} data-testid="version">
             <div className="flex items-center justify-between">
               <span className="num text-[20px]">v{VERSION}</span>
