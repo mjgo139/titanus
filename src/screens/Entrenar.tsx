@@ -13,7 +13,8 @@ import { Biblioteca } from './Biblioteca';
 import { Animacion, Miniatura } from './Miniatura';
 import { Foco, siguientePendiente, type Posicion } from './Foco';
 import { AccionesEjercicio, TarjetaEjercicio, textoDescanso } from './TarjetaEjercicio';
-import { deIdSesion, marcarSesion } from '../lib/programas';
+import { deIdSesion, marcarEnLista, programasActivos } from '../lib/programas';
+import { anotarHoy } from '../lib/logica';
 import { OrdenEntreno } from './OrdenEntreno';
 export { textoDescanso };
 
@@ -154,9 +155,13 @@ export default function Entrenar() {
     }
     await repo.guardarEntrenamiento(usuario.uid, c.entreno, c.estados, c.resumen);
     // Si era una sesión de un programa, queda marcada (en la misma escritura del perfil)
+    // y si era una rutina, queda anotada como hecha hoy (para mostrar la siguiente del día)
     const ses = deIdSesion(b.rutinaId);
-    const prog = ses && perfil.programa?.id === ses.programaId ? { programa: marcarSesion(perfil.programa, ses.clave) } : {};
-    await cambiarPerfil({ resumen: c.resumen, ...prog });
+    const activos = programasActivos(perfil);
+    const prog = ses && activos.some((a) => a.id === ses.programaId)
+      ? { programas: marcarEnLista(activos, ses.programaId, ses.clave), programa: null } : {};
+    const hoy = b.rutinaId ? { hoy: anotarHoy(perfil, b.rutinaId) } : {};
+    await cambiarPerfil({ resumen: c.resumen, ...prog, ...hoy });
     borrarBorrador(usuario.uid);
     nav('/resumen', { replace: true, state: { entreno: c.entreno } });
   }

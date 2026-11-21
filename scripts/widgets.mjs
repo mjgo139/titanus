@@ -34,9 +34,12 @@ const vistas = {
     <div class="serif" style="font-size:44px;margin-top:16px">A · Full body</div><div class="mu" style="font-size:26px;margin-top:4px">7 ejercicios · 50 min</div>
     <div style="flex:1"></div><div class="btn">Entrenar</div></div>`],
   programa: [760, 380, `<div class="w" style="width:760px;height:380px;flex-direction:column"><div style="display:flex;align-items:center">${E(68, 44)}
-    <div class="et" style="flex:1;margin-left:16px">TU PROGRAMA</div><div class="serif oro" style="font-size:28px">25 %</div></div>
-    <div class="serif" style="font-size:42px;margin-top:16px">Más dominadas</div><div class="mu" style="font-size:26px;margin-top:4px">Sesión 4 de 12 · Tirón</div>
-    <div style="flex:1"></div><div style="height:16px;border-radius:8px;background:#3B3226"><div style="width:25%;height:100%;border-radius:8px;background:linear-gradient(90deg,#B77C22,#FFD67A)"></div></div></div>`],
+    <div class="et" style="flex:1;margin-left:16px">TUS PROGRAMAS</div></div>
+    <div style="margin-top:18px"><div style="display:flex;align-items:center"><div class="serif" style="font-size:32px;flex:1">Más dominadas</div><div class="serif oro" style="font-size:26px">25 %</div></div>
+    <div style="height:10px;border-radius:5px;background:#3B3226;margin-top:8px"><div style="width:25%;height:100%;border-radius:5px;background:linear-gradient(90deg,#B77C22,#FFD67A)"></div></div>
+    <div class="mu" style="font-size:22px;margin-top:6px">Sesión 4 de 12 · Tirón</div></div><div style="margin-top:18px"><div style="display:flex;align-items:center"><div class="serif" style="font-size:32px;flex:1">Abdomen de acero</div><div class="serif oro" style="font-size:26px">50 %</div></div>
+    <div style="height:10px;border-radius:5px;background:#3B3226;margin-top:8px"><div style="width:50%;height:100%;border-radius:5px;background:linear-gradient(90deg,#B77C22,#FFD67A)"></div></div>
+    <div class="mu" style="font-size:22px;margin-top:6px">Sesión 7 de 12 · Núcleo</div></div></div>`],
 };
 
 const nav = await chromium.launch({ executablePath: process.env.PW_CHROME || undefined });

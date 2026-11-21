@@ -91,6 +91,14 @@ describe('reglas de Firestore', () => {
     await assertFails(setDoc(doc(ana, 'users/ana'), { ...perfil('ana'), figura: 'robot' }));
   });
 
+  it('hasta 3 programas a la vez y las rutinas hechas hoy', async () => {
+    const ana = env.authenticatedContext('ana').firestore();
+    const prog = (id: string) => ({ id, inicio: 1, hechas: [] });
+    await assertSucceeds(setDoc(doc(ana, 'users/ana'), { ...perfil('ana'), programas: [prog('a'), prog('b'), prog('c')], programa: null,
+      hoy: { fecha: '2026-11-20', ids: ['r1', 'r2'] } }));
+    await assertFails(setDoc(doc(ana, 'users/ana'), { ...perfil('ana'), programas: [prog('a'), prog('b'), prog('c'), prog('d')] }));
+  });
+
   describe('profesionales y clientes', () => {
     // ana = admin · pepe = entrenador activo · beto = cliente de pepe · zoe = otra persona
     const vinculo = (extra = {}) => ({

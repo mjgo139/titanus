@@ -310,3 +310,18 @@ describe('sobrecarga progresiva', async () => {
     expect(aplicarSugerencia(manual.ejercicios[0].series, manual.ejercicios[0].sugerencia!).map((s) => s.peso)).toEqual([82.5, 82.5, 82.5, 82.5]);
   });
 });
+
+describe('varias rutinas el mismo día', () => {
+  it('rutinasDeHoy las da en orden y hechasHoy solo cuenta las de hoy', async () => {
+    const { rutinasDeHoy, hechasHoy, anotarHoy, fechaLocal } = await import('./logica');
+    const lunes = new Date(2026, 10, 16, 10).getTime(); // lunes 16/11/2026
+    const r = (id: string, orden: number, dias: number[]) => ({ id, nombre: id, orden, dias, ejercicios: [] }) as never;
+    const lista = [r('cardio', 2, [1]), r('pecho', 1, [1, 3]), r('piernas', 3, [2])];
+    expect(rutinasDeHoy(lista, lunes).map((x: { id: string }) => x.id)).toEqual(['pecho', 'cardio']);
+    const p = { hoy: anotarHoy({}, 'pecho', lunes) };
+    expect(p.hoy.fecha).toBe(fechaLocal(lunes));
+    expect(hechasHoy(p, lunes)).toEqual(['pecho']);
+    expect(hechasHoy(p, lunes + 86_400_000)).toEqual([]);
+    expect(anotarHoy(p, 'pecho', lunes).ids).toEqual(['pecho']);
+  });
+});

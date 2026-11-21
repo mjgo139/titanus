@@ -295,5 +295,30 @@ export function marcarSesion(a: AvancePrograma, clave: string): AvancePrograma {
   return a.hechas.includes(clave) ? a : { ...a, hechas: [...a.hechas, clave] };
 }
 
+/** Cuántos programas se pueden seguir a la vez (decisión del dueño, v1.20) */
+export const MAX_PROGRAMAS = 3;
+
+/** Programas en curso del perfil (lee también el formato viejo de uno solo) */
+export function programasActivos(perfil: { programa?: AvancePrograma | null; programas?: AvancePrograma[] }): AvancePrograma[] {
+  if (perfil.programas) return perfil.programas;
+  return perfil.programa ? [perfil.programa] : [];
+}
+
+/** Suma un programa (si ya está, no cambia; si se pasa del máximo, devuelve null) */
+export function sumarPrograma(lista: AvancePrograma[], id: string, ahora = Date.now()): AvancePrograma[] | null {
+  if (lista.some((a) => a.id === id)) return lista;
+  if (lista.length >= MAX_PROGRAMAS) return null;
+  return [...lista, { id, inicio: ahora, hechas: [] }];
+}
+
+export function quitarPrograma(lista: AvancePrograma[], id: string): AvancePrograma[] {
+  return lista.filter((a) => a.id !== id);
+}
+
+/** Marca una sesión en el programa que corresponda de la lista */
+export function marcarEnLista(lista: AvancePrograma[], programaId: string, clave: string): AvancePrograma[] {
+  return lista.map((a) => (a.id === programaId ? marcarSesion(a, clave) : a));
+}
+
 export const textoAcceso: Record<Acceso, string> = { gratis: 'Gratis', pro: 'Pro' };
 export type { TipoSerie };

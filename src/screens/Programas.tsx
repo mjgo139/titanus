@@ -6,7 +6,7 @@ import { buscarEjercicio } from '../lib/biblioteca';
 import { NOMBRES_DIA } from '../lib/logica';
 import { textoObjetivo } from '../lib/plantillas';
 import {
-  LUGARES, PROGRAMAS, buscarPrograma, portadaDe, claveSesion, proximaSesion, rutinaDeSesion, textoAcceso, totalSesiones, type Lugar, type Programa,
+  LUGARES, MAX_PROGRAMAS, PROGRAMAS, buscarPrograma, portadaDe, programasActivos, quitarPrograma, sumarPrograma, claveSesion, proximaSesion, rutinaDeSesion, textoAcceso, totalSesiones, type Lugar, type Programa,
 } from '../lib/programas';
 import { Animacion, Miniatura } from './Miniatura';
 import { imagenesEjercicio } from '../lib/biblioteca';
@@ -60,7 +60,7 @@ function Avance({ hechas, total }: { hechas: number; total: number }) {
 export function TarjetaPrograma({ p }: { p: Programa }) {
   const { perfil } = useSesion();
   const img = imagenDe(p, perfil.figura);
-  const activo = perfil.programa?.id === p.id ? perfil.programa : null;
+  const activo = programasActivos(perfil).find((a) => a.id === p.id) ?? null;
   return (
     <Link to={`/programas/${p.id}`} className="hero relative flex h-[212px] w-full flex-col overflow-hidden p-4 text-left transition-colors hover:border-gold" data-testid="programa">
       <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[52%] object-cover opacity-90" style={{ objectPosition: img.pos }} />
@@ -94,13 +94,13 @@ export function NavEntreno() {
 export function PaginaProgramas() {
   const { perfil } = useSesion();
   const [filtro, setFiltro] = useState<Lugar | 'todos'>('todos');
-  const activo = perfil.programa ? buscarPrograma(perfil.programa.id) : undefined;
+  const activos = programasActivos(perfil).map((a) => a.id);
   const lugares = filtro === 'todos' ? LUGARES : LUGARES.filter((l) => l.id === filtro);
-  const ordenar = (ps: Programa[]) => (activo ? [...ps.filter((p) => p.id === activo.id), ...ps.filter((p) => p.id !== activo.id)] : ps);
+  const ordenar = (ps: Programa[]) => [...ps.filter((p) => activos.includes(p.id)), ...ps.filter((p) => !activos.includes(p.id))];
   const chip = (activa: boolean) => `ficha h-9 px-4 ${activa ? 'border-gold oro' : 'text-mu'}`;
   return (
     <div className="pt-6">
-      <CabeceraPagina etiqueta="Planes con objetivo" titulo="Programas" linea="Planes de varias semanas. Seguís uno a la vez y la app marca tu avance." />
+      <CabeceraPagina etiqueta="Planes con objetivo" titulo="Programas" linea={`Planes de varias semanas. Podés seguir hasta ${MAX_PROGRAMAS} a la vez y la app marca tu avance.`} />
       <NavEntreno />
       <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Dónde entrenás" data-testid="filtro-lugar">
         <button className={chip(filtro === 'todos')} aria-pressed={filtro === 'todos'} onClick={() => setFiltro('todos')}>Todos</button>
@@ -124,23 +124,33 @@ export function PaginaProgramas() {
   );
 }
 
+/** Inicio: una tarjeta por cada programa en curso (hasta 3) */
 export function ProgramaEnCurso() {
   const { perfil } = useSesion();
-  const empezar = useEmpezar();
-  const p = perfil.programa ? buscarPrograma(perfil.programa.id) : undefined;
-  if (!p || !perfil.programa) return null;
-  const sig = proximaSesion(p, perfil.programa.hechas);
+  const activos = programasActivos(perfil).map((a) => ({ a, p: buscarPrograma(a.id) })).filter((x) => x.p);
+  if (!activos.length) return null;
   return (
-    <div className="tarjeta entrar" data-testid="programa-en-curso">
+    <div className={`grid gap-3 ${activos.length > 1 ? 'lg:grid-cols-2 xl:grid-cols-3' : ''}`}>
+      {activos.map(({ a, p }) => <TarjetaEnCurso key={a.id} p={p!} hechas={a.hechas} varios={activos.length > 1} />)}
+    </div>
+  );
+}
+
+function TarjetaEnCurso({ p, hechas, varios }: { p: Programa; hechas: string[]; varios: boolean }) {
+  const empezar = useEmpezar();
+  const sig = proximaSesion(p, hechas);
+  return (
+    <div className="tarjeta entrar flex flex-col" data-testid="programa-en-curso">
       <div className="flex items-start gap-3">
         <Icono n="corona" className="oro shrink-0" />
         <div className="min-w-0 flex-1">
-          <div className="etiqueta oro">Tu programa</div>
-          <Link to={`/programas/${p.id}`} className="font-display text-[18px] font-semibold">{p.nombre}</Link>
-          <p className="text-[13px] text-mu">{sig ? `Semana ${sig.semana + 1} · ${p.semanas[sig.semana].sesiones[sig.sesion].nombre}` : '¡Programa completo!'}</p>
+          <div className="etiqueta oro">{varios ? 'Programa en curso' : 'Tu programa'}</div>
+          <Link to={`/programas/${p.id}`} className="block truncate font-display text-[18px] font-semibold">{p.nombre}</Link>
+          <p className="truncate text-[13px] text-mu">{sig ? `Semana ${sig.semana + 1} · ${p.semanas[sig.semana].sesiones[sig.sesion].nombre}` : '¡Programa completo!'}</p>
         </div>
       </div>
-      <div className="mt-3"><Avance hechas={perfil.programa.hechas.length} total={totalSesiones(p)} /></div>
+      <div className="mt-3"><Avance hechas={hechas.length} total={totalSesiones(p)} /></div>
+      <div className="flex-1" />
       {sig && <button className="btn mt-3 h-11 w-full text-[15px]" onClick={() => empezar.rutina(rutinaDeSesion(p, sig.semana, sig.sesion))}><Icono n="play" size={14} />Empezar sesión</button>}
     </div>
   );
@@ -156,14 +166,19 @@ export default function VerPrograma() {
   const p = buscarPrograma(id);
   if (!p) return <Navigate to="/entreno" replace />;
   const img = imagenDe(p, perfil.figura);
-  const activo = perfil.programa?.id === p.id ? perfil.programa : null;
-  const otro = perfil.programa && !activo ? buscarPrograma(perfil.programa.id) : undefined;
+  const lista = programasActivos(perfil);
+  const activo = lista.find((a) => a.id === p.id) ?? null;
+  const lleno = !activo && lista.length >= MAX_PROGRAMAS;
   const hechas = activo?.hechas ?? [];
   const sig = activo ? proximaSesion(p, hechas) : null;
   const semanaAbierta = abierta ?? sig?.semana ?? 0;
 
-  async function comenzar() {
-    await cambiarPerfil({ programa: { id: p!.id, inicio: Date.now(), hechas: [] } });
+  /** Suma este programa; si ya hay 3, primero deja el elegido (dejar) */
+  async function comenzar(dejar?: string) {
+    const base = dejar ? quitarPrograma(lista, dejar) : lista;
+    const nueva = sumarPrograma(base, p!.id);
+    if (!nueva) { setCambiar(true); return; }
+    await cambiarPerfil({ programas: nueva, programa: null });
     setCambiar(false);
     aviso(`Empezaste «${p!.nombre}»`);
   }
@@ -198,10 +213,10 @@ export default function VerPrograma() {
                 </button>
               ) : <p className="mt-3 text-center font-display text-[18px] oro">¡Completaste el programa!</p>}
               <button className="mt-3 w-full p-2 text-[13px] font-semibold text-miss"
-                onClick={async () => { await cambiarPerfil({ programa: null }); aviso('Dejaste el programa'); }}>Dejar el programa</button>
+                onClick={async () => { await cambiarPerfil({ programas: quitarPrograma(lista, p.id), programa: null }); aviso('Dejaste el programa'); }}>Dejar el programa</button>
             </div>
           ) : (
-            <button className="btn h-14 w-full text-[17px]" onClick={() => (otro ? setCambiar(true) : comenzar())}>
+            <button className="btn h-14 w-full text-[17px]" onClick={() => (lleno ? setCambiar(true) : comenzar())}>
               <Icono n="corona" size={18} />Empezar programa
             </button>
           )}
@@ -274,12 +289,23 @@ export default function VerPrograma() {
         </section>
       </div>
 
-      <Hoja abierta={cambiar} alCerrar={() => setCambiar(false)} etiqueta="Cambiar de programa" titulo={`¿Dejar «${otro?.nombre ?? ''}»?`}>
-        <p className="text-mu">Solo podés seguir un programa a la vez. Tus entrenamientos quedan guardados igual.</p>
-        <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" onClick={comenzar}>Sí, empezar «{p.nombre}»</button>
-          <button className="btn-sec" onClick={() => setCambiar(false)}>Cancelar</button>
-        </div>
+      <Hoja abierta={cambiar} alCerrar={() => setCambiar(false)} etiqueta="Programas en curso" titulo={`Ya seguís ${MAX_PROGRAMAS} programas`}>
+        <p className="text-mu">Para empezar «{p.nombre}», elegí cuál dejar. Tus entrenamientos quedan guardados igual.</p>
+        <ul className="mt-4 flex flex-col gap-2" data-testid="elegir-dejar">
+          {lista.map((a) => {
+            const q = buscarPrograma(a.id);
+            return (
+              <li key={a.id}>
+                <button className="btn-sec h-auto w-full justify-between py-3 text-left" onClick={() => comenzar(a.id)}>
+                  <span className="min-w-0"><span className="block truncate font-semibold">Dejar «{q?.nombre ?? a.id}»</span>
+                    <span className="text-[12px] text-mu">{a.hechas.length} de {q ? totalSesiones(q) : '?'} sesiones hechas</span></span>
+                  <Icono n="cerrar" size={18} className="shrink-0 text-miss" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <button className="btn-sec mt-4 w-full" onClick={() => setCambiar(false)}>Cancelar</button>
       </Hoja>
     </div>
   );

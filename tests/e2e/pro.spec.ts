@@ -5,6 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function captura(page: Page, nombre: string) {
   await expect(page.getByText('Cargando…')).toHaveCount(0);
+  await expect(page.locator('#inicio')).toHaveCount(0, { timeout: 8000 }); // la pantalla de inicio ya se fue
   const ancho = page.viewportSize()!.width;
   expect(await page.evaluate(() => document.documentElement.scrollWidth), `${nombre}: la página es más ancha que la pantalla`).toBeLessThanOrEqual(ancho);
   await page.screenshot({ path: `capturas/${test.info().project.name}/${nombre}.png`, fullPage: true, animations: 'disabled' });

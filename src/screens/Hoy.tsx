@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { actualizarWidgets, fechaCorta } from '../lib/widget';
-import { buscarPrograma, proximaSesion, totalSesiones } from '../lib/programas';
+import { buscarPrograma, programasActivos, proximaSesion, totalSesiones } from '../lib/programas';
 import { leerBorrador } from '../lib/borrador';
-import { rachaSemanas, rango, romano, rutinaDeHoy, semanaActual } from '../lib/logica';
+import { hechasHoy, rachaSemanas, rango, romano, rutinaDeHoy, rutinasDeHoy, semanaActual } from '../lib/logica';
 import type { Rutina } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
@@ -31,7 +31,12 @@ export default function Hoy() {
   const racha = rachaSemanas(dias, ahora);
   const semana = semanaActual(dias, ahora);
   const r = rango(perfil.resumen.total);
-  const deHoy = rutinas ? rutinaDeHoy(rutinas, ahora) : undefined;
+  // Todas las rutinas del día, en orden; la tarjeta muestra la próxima pendiente
+  const delDia = rutinas ? rutinasDeHoy(rutinas, ahora) : [];
+  const listasHoy = hechasHoy(perfil, ahora);
+  const deHoy = delDia.find((x) => !listasHoy.includes(x.id));
+  const todoHecho = delDia.length > 0 && !deHoy;
+  const nHoy = deHoy ? delDia.indexOf(deHoy) + 1 : 0;
   const idx = deHoy && rutinas ? [...rutinas].sort((a, b) => a.orden - b.orden).indexOf(deHoy) + 1 : 0;
   const proxima = rutinas && !deHoy
     ? [1, 2, 3, 4, 5, 6].map((k) => ({ k, r: rutinaDeHoy(rutinas, ahora + k * 86_400_000) })).find((x) => x.r)
@@ -46,17 +51,26 @@ export default function Hoy() {
   // Widgets de Android: les pasamos lo que muestra Inicio (solo en la APK; si nada cambió no se manda)
   useEffect(() => {
     if (!rutinas) return;
-    const prog = perfil.programa ? buscarPrograma(perfil.programa.id) : undefined;
-    const sig = prog && perfil.programa ? proximaSesion(prog, perfil.programa.hechas) : null;
-    const rut = deHoy ?? proxima?.r;
+    const progs = programasActivos(perfil).map((a) => {
+      const p = buscarPrograma(a.id);
+      if (!p) return null;
+      const sig = proximaSesion(p, a.hechas);
+      return { id: p.id, nombre: p.nombre, hechas: a.hechas.length, total: totalSesiones(p), siguiente: sig ? p.semanas[sig.semana].sesiones[sig.sesion].nombre : '¡Completo!' };
+    }).filter(Boolean);
+    const restan = delDia.filter((x) => !listasHoy.includes(x.id)).length - 1;
+    const prox = proxima?.r;
     actualizarWidgets({
       racha, rango: `${r.nombre} · Nivel ${r.nivel}`,
       fechas: dias.filter((d) => d > ahora - 15 * 86_400_000).map((d) => fechaCorta(d)).join(','),
-      entreno: rut?.nombre ?? '', esHoy: !!deHoy,
-      entrenoDetalle: rut ? (deHoy ? `${rut.ejercicios.length} ejercicios · ${minutosEstimados(rut)} min` : proxima!.k === 1 ? 'Mañana' : `En ${proxima!.k} días`) : '',
-      programa: prog?.nombre ?? '', programaId: prog?.id ?? '',
-      programaSiguiente: prog && sig ? prog.semanas[sig.semana].sesiones[sig.sesion].nombre : '',
-      programaHechas: perfil.programa?.hechas.length ?? 0, programaTotal: prog ? totalSesiones(prog) : 0,
+      esHoy: !!deHoy,
+      etiqueta: deHoy ? (delDia.length > 1 ? `HOY TOCA · ${nHoy} DE ${delDia.length}` : 'HOY TOCA') : todoHecho ? 'HOY · CUMPLIDO' : prox ? 'LO PRÓXIMO' : 'ENTRENAMIENTO',
+      entreno: deHoy?.nombre ?? (todoHecho ? 'Entrenamiento cumplido' : prox?.nombre ?? ''),
+      entrenoDetalle: deHoy
+        ? `${deHoy.ejercicios.length} ejercicios · ${minutosEstimados(deHoy)} min${restan > 0 ? ` · +${restan} más hoy` : ''}`
+        : todoHecho ? `${delDia.length} de ${delDia.length} ${delDia.length === 1 ? 'rutina hecha' : 'rutinas hechas'} ✓`
+          : prox ? (proxima!.k === 1 ? 'Mañana' : `En ${proxima!.k} días`) : '',
+      boton: deHoy ? 'Entrenar' : 'Abrir', rutaBoton: deHoy ? '/?empezar=hoy' : '/entreno',
+      programas: JSON.stringify(progs),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rutinas, perfil, racha]);
@@ -110,13 +124,22 @@ export default function Hoy() {
               <img src={estatuas(perfil.figura).espalda} alt="" style={{ objectPosition: foco(perfil.figura, 'espalda') }} className="h-full w-[40%] object-cover" />
               <div className="flex flex-1 flex-col justify-center py-4 pr-4">
                 {deHoy ? <>
-                  <div className="etiqueta oro">Día {romano(idx)} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : 'Primera sesión'}</div>
+                  <div className="etiqueta oro">{delDia.length > 1 ? `Hoy ${nHoy} de ${delDia.length}` : `Día ${romano(idx)}`} · {perfil.resumen.total ? `Sesión ${perfil.resumen.total + 1}` : 'Primera sesión'}</div>
                   <h3 className="mt-1 font-display text-[21px] font-semibold leading-tight">{deHoy.nombre}</h3>
                   <p className="mt-1 text-[14px] text-mu">{deHoy.ejercicios.length} ejercicios</p>
                   <div className="mt-4 flex items-center justify-between">
                     <span className="flex items-center gap-1 text-[14px]"><Icono n="reloj" size={16} className="oro" />{minutosEstimados(deHoy)} min</span>
                     <button className="btn-redondo" aria-label={`Empezar ${deHoy.nombre}`} disabled={enCurso}
                       onClick={() => empezar.rutina(deHoy)}><Icono n="play" size={20} /></button>
+                  </div>
+                </> : todoHecho ? <>
+                  <div className="etiqueta" style={{ color: 'var(--verde)' }}>Hoy · cumplido</div>
+                  <h3 className="mt-1 font-display text-[21px] font-semibold leading-tight">Entrenamiento cumplido</h3>
+                  <p className="mt-1 text-[14px] text-mu">{delDia.length === 1 ? `${delDia[0].nombre} hecha.` : `Las ${delDia.length} rutinas de hoy, hechas.`} {proxima?.r ? proximaTexto : ''}</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="flex items-center gap-1 text-[14px]" style={{ color: 'var(--verde)' }}><Icono n="check" size={16} />Bien hecho</span>
+                    <button className="btn-redondo" aria-label="Empezar entrenamiento libre" disabled={enCurso}
+                      onClick={() => empezar.libre()}><Icono n="play" size={20} /></button>
                   </div>
                 </> : <>
                   <div className="etiqueta oro">{rutinas.length ? 'Día libre' : 'Primer paso'}</div>
@@ -132,6 +155,29 @@ export default function Hoy() {
             </div>
           )}
         </div>
+
+        {delDia.length > 1 && (
+          <ul className="tarjeta flex flex-col gap-1 px-3 py-2 lg:col-start-1 lg:row-start-3" data-testid="rutinas-de-hoy" aria-label="Rutinas de hoy">
+            {delDia.map((x, i) => {
+              const hecha = listasHoy.includes(x.id);
+              const ahoraToca = deHoy?.id === x.id;
+              return (
+                <li key={x.id} className={`flex items-center gap-3 rounded-[12px] px-2 py-2 ${ahoraToca ? 'bg-sf2' : ''}`}>
+                  <span className={`num flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[13px] ${hecha ? '' : ahoraToca ? 'border-gold oro' : 'border-ln3 text-mu'}`}
+                    style={hecha ? { background: 'var(--verde)', borderColor: 'var(--verde)', color: '#0b0a08' } : undefined}>
+                    {hecha ? <Icono n="check" size={15} /> : romano(i + 1)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className={`block truncate font-semibold ${hecha ? 'text-mu' : ''}`}>{x.nombre}</span>
+                    <span className="text-[12px] text-mu">{hecha ? 'Hecha hoy' : `${x.ejercicios.length} ejercicios · ${minutosEstimados(x)} min${ahoraToca ? ' · ahora' : ''}`}</span>
+                  </span>
+                  {!hecha && <button className="btn-sec h-9 px-3 text-[13px]" disabled={enCurso} aria-label={`Hacer ${x.nombre}`}
+                    onClick={() => empezar.rutina(x)}><Icono n="play" size={13} />Hacer</button>}
+                </li>
+              );
+            })}
+          </ul>
+        )}
 
         <Grupo n={2} className="mt-4 lg:col-start-2 lg:row-start-1 lg:mt-0">Tu semana</Grupo>
 

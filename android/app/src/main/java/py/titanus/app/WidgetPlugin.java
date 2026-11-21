@@ -25,11 +25,10 @@ public class WidgetPlugin extends Plugin {
         e.putString("entreno", call.getString("entreno", ""));
         e.putString("entrenoDetalle", call.getString("entrenoDetalle", ""));
         e.putBoolean("esHoy", call.getBoolean("esHoy", false));
-        e.putString("programa", call.getString("programa", ""));
-        e.putString("programaId", call.getString("programaId", ""));
-        e.putString("programaSiguiente", call.getString("programaSiguiente", ""));
-        e.putInt("programaHechas", call.getInt("programaHechas", 0));
-        e.putInt("programaTotal", call.getInt("programaTotal", 0));
+        e.putString("etiqueta", call.getString("etiqueta", ""));
+        e.putString("boton", call.getString("boton", ""));
+        e.putString("rutaBoton", call.getString("rutaBoton", ""));
+        e.putString("programas", call.getString("programas", "[]"));
         e.apply();
         Widgets.actualizarTodos(getContext());
         call.resolve();

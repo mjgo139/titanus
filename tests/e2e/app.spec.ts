@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function captura(page: Page, nombre: string) {
   await expect(page.getByText('Cargando…')).toHaveCount(0);
+  await expect(page.locator('#inicio')).toHaveCount(0, { timeout: 8000 }); // la pantalla de inicio ya se fue
   // Nada puede ser más ancho que la pantalla (si no, el celular achica toda la página)
   const ancho = page.viewportSize()!.width;
   expect(await page.evaluate(() => document.documentElement.scrollWidth), `${nombre}: la página es más ancha que la pantalla`).toBeLessThanOrEqual(ancho);
@@ -508,5 +509,29 @@ test('widget "Entrenamiento de hoy": /?empezar=hoy arranca la rutina del día', 
   await page.goto('/?empezar=hoy');
   if (hayHoy) await expect(page).toHaveURL(/\/entrenar/);
   else await expect(page).toHaveURL(/\/$/);
+});
+
+test('programas: hasta 3 a la vez; con el cuarto elijo cuál dejar', async ({ page }) => {
+  await entrar(page);
+  const empezarPrograma = async (nombre: string) => {
+    await page.goto('/programas');
+    await page.getByTestId('programa').filter({ has: page.getByRole('heading', { name: nombre, exact: true }) }).click();
+    await page.getByRole('button', { name: 'Empezar programa' }).click();
+  };
+  for (const n of ['Más dominadas', 'Abdomen de acero', 'Legión en casa']) {
+    await empezarPrograma(n);
+    await expect(page.getByTestId('avance-programa')).toBeVisible();
+  }
+  await page.goto('/');
+  await expect(page.getByTestId('programa-en-curso')).toHaveCount(3);
+  await captura(page, '06e-tres-programas');
+  // El cuarto pide elegir cuál dejar
+  await empezarPrograma('Fuerza base 5×5');
+  await expect(page.getByTestId('elegir-dejar').getByRole('button')).toHaveCount(3);
+  await page.getByRole('button', { name: /Dejar «Abdomen de acero»/ }).click();
+  await expect(page.getByTestId('avance-programa')).toBeVisible();
+  await page.goto('/');
+  await expect(page.getByTestId('programa-en-curso')).toHaveCount(3);
+  await expect(page.getByText('Abdomen de acero')).toHaveCount(0);
 });
 

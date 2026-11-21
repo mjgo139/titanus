@@ -81,8 +81,30 @@ export function semanaActual(dias: number[], hoy = Date.now()): DiaSemana[] {
 
 /* ───────── Rutinas ───────── */
 export function rutinaDeHoy(rutinas: Rutina[], hoy = Date.now()): Rutina | undefined {
+  return rutinasDeHoy(rutinas, hoy)[0];
+}
+
+/** Todas las rutinas asignadas al día, en el orden de la lista */
+export function rutinasDeHoy(rutinas: Rutina[], hoy = Date.now()): Rutina[] {
   const dow = new Date(hoy).getDay();
-  return [...rutinas].sort((a, b) => a.orden - b.orden).find((r) => r.dias.includes(dow));
+  return [...rutinas].sort((a, b) => a.orden - b.orden).filter((r) => r.dias.includes(dow));
+}
+
+/** Fecha local AAAA-MM-DD */
+export function fechaLocal(t = Date.now()): string {
+  const d = new Date(t);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Ids de rutinas terminadas hoy, según el perfil */
+export function hechasHoy(perfil: { hoy?: { fecha: string; ids: string[] } | null }, ahora = Date.now()): string[] {
+  return perfil.hoy && perfil.hoy.fecha === fechaLocal(ahora) ? perfil.hoy.ids : [];
+}
+
+/** Anota una rutina como hecha hoy (para la escritura del perfil al terminar) */
+export function anotarHoy(perfil: { hoy?: { fecha: string; ids: string[] } | null }, rutinaId: string, ahora = Date.now()) {
+  const ids = hechasHoy(perfil, ahora);
+  return { fecha: fechaLocal(ahora), ids: ids.includes(rutinaId) ? ids : [...ids, rutinaId].slice(-20) };
 }
 
 export const NOMBRES_DIA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];

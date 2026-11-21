@@ -146,8 +146,12 @@ export interface Perfil {
   nivel?: Nivel;
   /** Ya pasó (o salteó) la bienvenida */
   conocido?: boolean;
-  /** Programa en curso (ver src/lib/programas.ts) */
+  /** Programa en curso (formato viejo, hasta v1.19; se lee con programasActivos) */
   programa?: { id: string; inicio: number; hechas: string[] } | null;
+  /** Programas en curso, hasta 3 (v1.20; ver src/lib/programas.ts) */
+  programas?: { id: string; inicio: number; hechas: string[] }[];
+  /** Rutinas terminadas hoy (para mostrar la siguiente del día) */
+  hoy?: { fecha: string; ids: string[] } | null;
   creado: number;
   /** Fechas (ms) de los entrenamientos de las últimas semanas, para Hoy con 1 sola lectura */
   resumen: Resumen;

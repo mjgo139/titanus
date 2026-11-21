@@ -9,11 +9,12 @@ export interface DatosWidget {
   entreno: string;
   entrenoDetalle: string;
   esHoy: boolean;
-  programa: string;
-  programaId: string;
-  programaSiguiente: string;
-  programaHechas: number;
-  programaTotal: number;
+  /** Textos del widget "Entrenamiento de hoy" (desde v1.20) */
+  etiqueta: string;
+  boton: string;
+  rutaBoton: string;
+  /** Hasta 3 programas, como JSON: [{ id, nombre, hechas, total, siguiente }] */
+  programas: string;
 }
 
 interface PluginWidget {
@@ -35,10 +36,7 @@ export function actualizarWidgets(d: DatosWidget) {
 }
 
 /** Fecha local yyyy-MM-dd (igual que la que compara el widget) */
-export function fechaCorta(t: number) {
-  const d = new Date(t);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
+export { fechaLocal as fechaCorta } from './logica';
 
 /** Si la app se abrió tocando un widget, va a esa pantalla (al abrir y al volver a primer plano) */
 export function escucharWidgets(ir: (ruta: string) => void) {

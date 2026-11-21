@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.20.0',
+    fecha: '2026-11-20',
+    cambios: [
+      'Hasta 3 programas a la vez. Con el cuarto, elegís cuál dejar; Inicio muestra una tarjeta por programa.',
+      'Varias rutinas el mismo día: Inicio muestra la próxima pendiente y la lista de todas las de hoy, con ✓ en las hechas.',
+      'Widgets: "Entrenamiento de hoy" pasa sola a la siguiente rutina del día ("+1 más hoy") y "Programa" muestra hasta 3.',
+    ],
+  },
+  {
     version: '1.19.1',
     fecha: '2026-11-20',
     cambios: ['Arreglo: los widgets "Entrenamiento de hoy" y "Programa" ya se pueden agregar a la pantalla de inicio.'],

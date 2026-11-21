@@ -56,3 +56,21 @@ describe('carátulas de los programas', () => {
     }
   });
 });
+
+describe('varios programas a la vez', () => {
+  it('lee el formato viejo, suma hasta 3, quita y marca en el que corresponde', async () => {
+    const { programasActivos, sumarPrograma, quitarPrograma, marcarEnLista, MAX_PROGRAMAS } = await import('./programas');
+    expect(MAX_PROGRAMAS).toBe(3);
+    expect(programasActivos({ programa: { id: 'x', inicio: 1, hechas: ['s1-1'] } })).toEqual([{ id: 'x', inicio: 1, hechas: ['s1-1'] }]);
+    expect(programasActivos({ programa: null })).toEqual([]);
+    let l = sumarPrograma([], 'a', 1)!;
+    l = sumarPrograma(l, 'b', 1)!;
+    expect(sumarPrograma(l, 'a', 1)).toBe(l);
+    l = sumarPrograma(l, 'c', 1)!;
+    expect(sumarPrograma(l, 'd', 1)).toBeNull();
+    l = marcarEnLista(l, 'b', 's1-1');
+    expect(l.find((a) => a.id === 'b')!.hechas).toEqual(['s1-1']);
+    expect(l.find((a) => a.id === 'a')!.hechas).toEqual([]);
+    expect(quitarPrograma(l, 'a').map((a) => a.id)).toEqual(['b', 'c']);
+  });
+});
