@@ -23,7 +23,7 @@ export function OrdenEntreno({ b, propios, actual, alElegir, className = '' }: {
               <button onClick={() => alElegir(i)} aria-current={esActual ? 'step' : undefined}
                 className={`relative flex w-full items-center gap-3 rounded-[12px] px-1.5 py-2 text-left transition-colors hover:bg-sf2 ${esActual ? 'bg-sf2' : ''}`}>
                 <span className={`num flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[13px] ${listo ? '' : esActual ? 'border-gold oro' : 'border-ln3 text-mu'}`}
-                  style={listo ? { background: 'var(--verde)', borderColor: 'var(--verde)', color: '#0b0a08' } : undefined}>
+                  style={listo ? { background: 'var(--verde)', borderColor: 'var(--verde)', color: 'var(--sobre-verde)' } : undefined}>
                   {listo ? <Icono n="check" size={15} /> : romano(i + 1)}
                 </span>
                 <span className="min-w-0 flex-1">

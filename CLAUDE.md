@@ -69,6 +69,12 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 - **Varias rutinas el mismo día (v1.20.0, decisión del dueño):** `rutinasDeHoy()` da todas las del día en orden; `perfil.hoy {fecha, ids}` anota las terminadas hoy (`anotarHoy` en la misma escritura del perfil al terminar). La tarjeta de Inicio muestra la próxima pendiente ("Hoy 1 de 2"), o "Entrenamiento cumplido"; debajo, la lista `rutinas-de-hoy` con ✓. El widget usa `etiqueta`, `boton`, `rutaBoton` y `programas` (JSON, hasta 3 filas; con 3 se oculta el detalle). Reglas: `programas` ≤ 3 y `hoy.ids` ≤ 20.
 - Rangos por entrenamientos: Recluta 0, Legionario 10, Decurión 30, Centurión 60, Tribuno 120, Legado 200, César 365. Nivel = total/5 + 1.
 
+## Diseño: familia estoica (obligatorio, v1.21.0)
+- El diseño sale de la carpeta `familia/`, copia exacta del repo **mjgo139/familia-estoica** (StoaGym es la app modelo; las otras: Stoica, Nutrición, Recetas). **No editar `familia/`**: los cambios de estilo se hacen en ese repo (`node scripts/sellar.mjs X.Y.Z`) y se vuelve a copiar la carpeta entera.
+- **Prohibido escribir colores a mano** (#…, rgb(), hsl(), `bg-[#…]`). Solo `var(--…)` de `familia/tokens.css` o clases del preset (`bg-sf`, `text-gold`, `text-lat-tx`, `accent-familia`…). Si falta un color, se agrega en familia-estoica. Excepción puntual con el comentario `familia-ok` en la línea (logo de Google, máscaras).
+- `familia/familia.css` se importa en `main.tsx` antes de `index.css`; `index.css` solo tiene lo propio de StoaGym. `tailwind.config.js` usa `familia/tailwind-preset.js`. Piezas React: `familia/react.tsx`, reexportadas en `src/ui/familia.tsx` (que agrega la mancuerna al `Emblema`). Íconos: `scripts/iconos.mjs` usa `familia/emblema.mjs`.
+- `npm test` corre primero `node familia/revisar.mjs` (falla si `familia/` cambió o hay colores sueltos).
+
 ## Reglas de trabajo
 
 - Commits en español: `vX.Y.Z - qué cambia`. **Nunca** agregar líneas `Co-Authored-By` ni `Claude-Session`.

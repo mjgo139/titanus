@@ -155,7 +155,7 @@ export default function MiProfesional() {
       <Hoja abierta={cortar} alCerrar={() => setCortar(false)} etiqueta="Confirmar" titulo={`¿Dejar a ${v.nombreProfesional}?`}>
         <p className="text-mu">Deja de ver tus datos al instante. Tus entrenamientos y las rutinas que te asignó quedan en tu cuenta.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }}
+          <button className="btn btn-peligro"
             onClick={async () => { await repo.terminarVinculo(v.id); setCortar(false); aviso('Dejaste de compartir tus datos'); await recargar(); }}>Sí, dejar de compartir</button>
           <button className="btn-sec" onClick={() => setCortar(false)}>Cancelar</button>
         </div>

@@ -1,0 +1,35 @@
+/* Familia estoica · animaciones (mismos tiempos y curvas en las 4 apps). */
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes rebote { 0% { transform: scale(.6); opacity: 0 } 60% { transform: scale(1.08); opacity: 1 } 100% { transform: scale(1) } }
+@keyframes subir { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes bajar { from { transform: none; } to { transform: translateY(100%); } }
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+@keyframes desaparecer { from { opacity: 1; } to { opacity: 0; } }
+@keyframes zoom-in { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes zoom-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(10px) scale(.97); } }
+@keyframes pagina { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes brillo { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+.entrar { animation: entrar .32s ease both; }
+.rebote { animation: rebote .38s ease both; }
+.subir { animation: subir .34s cubic-bezier(.22,1,.36,1) both; }
+.aparece, .velo-entra { animation: aparecer .3s ease both; }
+.velo-sale { animation: desaparecer .22s ease both; }
+.hoja-entra { animation: subir .34s cubic-bezier(.22,1,.36,1) both; }
+.hoja-sale { animation: bajar .22s cubic-bezier(.4,0,1,1) both; }
+@media (min-width: 1024px) {
+  .hoja-entra { animation: zoom-in .28s cubic-bezier(.22,1,.36,1) both; }
+  .hoja-sale { animation: zoom-out .2s ease both; }
+}
+/* Cambio de pantalla: aparece suave y sube apenas */
+.pagina { animation: pagina .38s cubic-bezier(.2,.8,.2,1) backwards; }
+
+/* Fundido cruzado entre pantallas (View Transitions) */
+::view-transition-old(root) { animation: .22s ease both desaparecer; }
+::view-transition-new(root) { animation: .32s cubic-bezier(.2,.8,.2,1) both pagina; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pagina, .hoja-entra, .hoja-sale, .velo-entra, .velo-sale, .subir, .entrar { animation-duration: 1ms !important; }
+  .esqueleto { animation: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

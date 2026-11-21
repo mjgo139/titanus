@@ -21,7 +21,7 @@ export function Logo({ grande = false }: { grande?: boolean }) {
     <div className={`flex items-center gap-2 ${grande ? 'flex-col' : ''}`}>
       <Emblema size={grande ? 92 : 34} />
       <span className={`marca oro ${grande ? 'text-[46px] leading-none' : 'text-[21px]'}`}
-        style={grande ? { textShadow: '0 2px 3px #000, 0 0 20px rgba(182,122,42,.7)' } : undefined}>StoaGym</span>
+        style={grande ? { textShadow: 'var(--brillo-marca)' } : undefined}>StoaGym</span>
     </div>
   );
 }
@@ -72,13 +72,13 @@ export function Marco() {
   const enEntreno = loc.pathname.startsWith('/entrenar');
   return (
     <div className="min-h-screen lg:pl-[248px]">
-      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-4 pt-7 pb-5 border-r border-ln2" style={{ background: 'var(--lateral)', ['--marfil' as string]: '#F3EDDF' }}>
+      <aside className="lateral-fija hidden lg:flex fixed inset-y-0 left-0 w-[248px] flex-col px-4 pt-7 pb-5 border-r border-ln2" style={{ background: 'var(--lateral)', ['--marfil' as string]: 'var(--lat-marfil)' }}>
         <div className="px-2.5"><Logo /></div>
         <div className="divisor mt-6" />
         <nav className="mt-6 flex flex-col gap-1" aria-label="Menú">
           {PESTANAS.map((p) => (
             <NavLink key={p.a} to={p.a} end={p.a === '/'} onClick={(e) => navegarSuave(e, nav, p.a)}
-              className={({ isActive }) => `flex items-center gap-[14px] rounded-[10px] px-[14px] h-[46px] text-[14.5px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-[#1d180f] text-[#f2c55c]' : 'text-[#c9bda7] hover:text-[#f7f1e7]'}`}>
+              className={({ isActive }) => `flex items-center gap-[14px] rounded-[10px] px-[14px] h-[46px] text-[14.5px] font-semibold transition-colors ${activa(p.a, isActive, loc.pathname) ? 'bg-lat-activo text-lat-oro' : 'text-lat-tx hover:text-lat-on'}`}>
               <Icono n={p.n} size={22} />{p.t}
             </NavLink>
           ))}
@@ -87,15 +87,15 @@ export function Marco() {
         <div className="mt-auto">
           {perfil && (
             <Link to="/perfil" onClick={(e) => navegarSuave(e, nav, '/perfil')} data-testid="persona-lateral"
-              className="flex items-center gap-3 rounded-xl px-2 py-2 text-[14px] font-semibold text-[#c9bda7] transition-colors hover:bg-[#1d180f] hover:text-[#f7f1e7]">
-              <img src={estatuas(perfil.figura).avatar} alt="" className="h-9 w-9 rounded-full border border-[#a66c16] object-cover" />
+              className="flex items-center gap-3 rounded-xl px-2 py-2 text-[14px] font-semibold text-lat-tx transition-colors hover:bg-lat-activo hover:text-lat-on">
+              <img src={estatuas(perfil.figura).avatar} alt="" className="h-9 w-9 rounded-full border border-lat-borde object-cover" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate">{perfil.nombre.split(' ')[0]}</span>
-                <span className="block truncate text-[11px] font-semibold uppercase tracking-[.12em] text-[#7d7462]">{rango(perfil.resumen.total).nombre}</span>
+                <span className="block truncate text-[11px] font-semibold uppercase tracking-[.12em] text-lat-mu">{rango(perfil.resumen.total).nombre}</span>
               </span>
             </Link>
           )}
-          <div className="mt-3 px-2 text-[10.5px] uppercase tracking-[.14em] text-[#7d7462]">
+          <div className="mt-3 px-2 text-[10.5px] uppercase tracking-[.14em] text-lat-mu">
             {repo.modo === 'prueba' ? 'Modo prueba' : 'Entrenamiento · Disciplina · Fuerza'}
           </div>
         </div>

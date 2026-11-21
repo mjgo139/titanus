@@ -9,6 +9,7 @@ import '@fontsource/cinzel/latin-600.css';
 import '@fontsource/cinzel/latin-700.css';
 import '@fontsource/playfair-display/latin-600.css';
 import '@fontsource/playfair-display/latin-700.css';
+import '../familia/familia.css';
 import './index.css';
 import App from './App';
 import type { Repo } from './data/repo';

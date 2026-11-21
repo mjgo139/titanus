@@ -1,0 +1,27 @@
+/* Familia estoica · fondo y letras base (se carga después de tokens.css). */
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  color: var(--tx);
+  font-family: var(--f-body);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  background:
+    radial-gradient(ellipse at 100% 20%, var(--bg3) 0%, transparent 40%),
+    radial-gradient(ellipse at 0% 75%, var(--bg2) 0%, transparent 40%),
+    var(--bg);
+  background-attachment: fixed;
+}
+/* Vetas doradas finas, como mármol */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(115deg, transparent 22%, var(--vena) 22.2%, transparent 22.5%, transparent 62%, var(--vena) 62.1%, transparent 62.4%),
+    linear-gradient(30deg, transparent 38%, var(--vena) 38.1%, transparent 38.3%);
+  background-size: 370px 520px, 290px 430px;
+}
+#root { position: relative; z-index: 1; min-height: 100%; }
+input, select, textarea, button { font: inherit; color: inherit; }
+::selection { background: var(--goldbg); }
+input[type=checkbox], input[type=radio] { accent-color: var(--acento); }

@@ -1,0 +1,5 @@
+/* Familia estoica · un solo archivo para importar todo, en este orden. */
+@import './tokens.css';
+@import './base.css';
+@import './piezas.css';
+@import './movimiento.css';

@@ -19,10 +19,10 @@ import { OrdenEntreno } from './OrdenEntreno';
 export { textoDescanso };
 
 const TIPOS: { v: TipoSerie; t: string; l: string; c: string }[] = [
-  { v: 'calentamiento', t: 'Calentamiento', l: 'C', c: '#e0b04a' },
+  { v: 'calentamiento', t: 'Calentamiento', l: 'C', c: 'var(--aviso)' },
   { v: 'normal', t: 'Normal', l: '', c: 'var(--tx)' },
-  { v: 'fallo', t: 'Al fallo', l: 'F', c: '#d9826f' },
-  { v: 'drop', t: 'Drop set', l: 'D', c: '#8fb3d9' },
+  { v: 'fallo', t: 'Al fallo', l: 'F', c: 'var(--miss)' },
+  { v: 'drop', t: 'Drop set', l: 'D', c: 'var(--info)' },
 ];
 const SENSACIONES: { v: Sensacion; t: string }[] = [{ v: 2, t: 'Fácil' }, { v: 3, t: 'Justa' }, { v: 5, t: 'Al límite' }];
 const DESCANSOS = [0, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300];
@@ -397,7 +397,7 @@ export default function Entrenar() {
                     <button aria-label={s.hecha ? `Desmarcar serie ${j + 1}` : `Marcar serie ${j + 1} como hecha`} aria-pressed={s.hecha}
                       onClick={() => marcar(i, j)}
                       className={`mx-auto flex h-8 w-8 items-center justify-center rounded-[8px] border ${s.hecha ? 'rebote' : 'border-ln3 text-mu'}`}
-                      style={s.hecha ? { background: 'var(--verde)', borderColor: 'var(--verde)', color: '#0b0a08' } : undefined}>
+                      style={s.hecha ? { background: 'var(--verde)', borderColor: 'var(--verde)', color: 'var(--sobre-verde)' } : undefined}>
                       <Icono n="check" size={17} />
                     </button>
                     <button aria-label={`Eliminar serie ${j + 1} de ${ej?.nombre}`} title="Eliminar serie"
@@ -529,7 +529,7 @@ export default function Entrenar() {
             const btn = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ln3 text-[18px] oro disabled:opacity-30';
             return (
               <li key={i} className={`tarjeta flex items-center gap-3 px-3 py-2.5 ${on ? 'border-gold' : 'opacity-70'}`}>
-                <input type="checkbox" className="h-5 w-5 shrink-0 accent-[#e6b84e]" checked={on} aria-label={`Subir ${ej?.nombre}`}
+                <input type="checkbox" className="h-5 w-5 shrink-0 accent-familia" checked={on} aria-label={`Subir ${ej?.nombre}`}
                   onChange={(ev) => setElegidos((x) => ({ ...x, [i]: ev.target.checked }))} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">{ej?.nombre}</span>
@@ -560,7 +560,7 @@ export default function Entrenar() {
         titulo={eliminarEj !== null ? `¿Quitar ${buscarEjercicio(b.ejercicios[eliminarEj]?.ejercicioId ?? '', propios)?.nombre ?? 'este ejercicio'}?` : ''}>
         <p className="text-mu">Se quitan sus series de este entrenamiento. Tu rutina guardada no cambia.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }}
+          <button className="btn btn-peligro"
             onClick={() => { const i = eliminarEj!; cambiar((x) => { x.ejercicios.splice(i, 1); }); setEliminarEj(null); setPos(null); }}>Sí, quitar</button>
           <button className="btn-sec" onClick={() => setEliminarEj(null)}>Cancelar</button>
         </div>
@@ -585,7 +585,7 @@ export default function Entrenar() {
       <Hoja abierta={descartar} alCerrar={() => setDescartar(false)} etiqueta="Descartar" titulo="¿Descartar este entrenamiento?">
         <p className="text-mu">Se pierden las series de esta sesión.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }}
+          <button className="btn btn-peligro"
             onClick={() => { borrarBorrador(usuario.uid); nav('/entreno', { replace: true }); }}>Sí, descartar</button>
           <button className="btn-sec" onClick={() => setDescartar(false)}>Cancelar</button>
         </div>

@@ -116,7 +116,7 @@ export default function FichaCliente() {
       <Hoja abierta={cortar} alCerrar={() => setCortar(false)} etiqueta="Confirmar" titulo={`¿Dejar de llevar a ${perfil.nombre}?`}>
         <p className="text-mu">Vas a dejar de ver sus datos. Sus entrenamientos quedan guardados en su cuenta y las rutinas que le asignaste las puede seguir usando. Para volver, {ESP.tuRol === 'tu entrenador' ? 'tiene que' : 'debe'} ingresar de nuevo tu código.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }} onClick={terminar}>Sí, dejar de llevarlo</button>
+          <button className="btn btn-peligro" onClick={terminar}>Sí, dejar de llevarlo</button>
           <button className="btn-sec" onClick={() => setCortar(false)}>Cancelar</button>
         </div>
       </Hoja>

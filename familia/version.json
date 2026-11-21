@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "fecha": "2026-11-21",
+  "archivos": {
+    "LEEME.md": "24636d62c6f41d46ed8f6c9f51dbb880cfa8ee71e5308a0cfb8e304ef0924e58",
+    "base.css": "c43b2da1f4e99a4d0d8fbc1dd08f319531effed363c197741529d4cc490fd199",
+    "emblema.mjs": "c428ee891819feb90fe5f4cb019c931adfe6accccb21ba211b98c1a331c8cbb2",
+    "familia.css": "3bdd3836557d6348ae79cb3385b1f8a2869864ef76066bfea7561f37dabd351b",
+    "movimiento.css": "46f2ae1b261c900721a5c08cb3f066a26f3423e958cd1aacd527997265c08831",
+    "piezas.css": "8b5029e4f643efd9d70b85e801194a6411c3eb2aceb95f91918f607056201dc9",
+    "react.tsx": "0972254154cf8193bd251060b29c4aaef06161621296fb03eed5829bc3106dca",
+    "revisar.mjs": "9e0eace4b8a1eb358c478f825dfe5f492e74272b94f5dadb2c84d737262e3e05",
+    "tailwind-preset.js": "8e278a6c6d636bf09669235aaf827aed47a9c295dfb2fafc91bee5f7b02b8b56",
+    "tokens.css": "f52eb331baa996065b8555c9ff01000ad4b364b3ef0fcc04cb7a9c8ae9ea6f66"
+  }
+}

@@ -260,7 +260,7 @@ function Rutinas(c: CtxFicha) {
       <Hoja abierta={!!borrar} alCerrar={() => setBorrar(null)} etiqueta="Confirmar" titulo={`¿Quitar "${borrar?.nombre ?? ''}"?`}>
         <p className="text-mu">Deja de aparecerle. Los entrenamientos que ya hizo con ella quedan guardados.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }}
+          <button className="btn btn-peligro"
             onClick={async () => { await repo.borrarRutina(cid, borrar!.id); setBorrar(null); recargar(); aviso('Rutina quitada'); }}>Sí, quitar</button>
           <button className="btn-sec" onClick={() => setBorrar(null)}>Cancelar</button>
         </div>

@@ -141,7 +141,7 @@ export default function Perfil() {
         <div className="tarjeta">
           <label className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-3 font-semibold"><Icono n="campana" className="oro" />Avisarme para entrenar</span>
-            <input type="checkbox" className="h-6 w-6 accent-[#e6b84e]" checked={r.activo}
+            <input type="checkbox" className="h-6 w-6 accent-familia" checked={r.activo}
               onChange={(e) => guardarRecordatorio({ ...r, activo: e.target.checked })} />
           </label>
           {r.activo && (
@@ -243,7 +243,7 @@ export default function Perfil() {
         </label>
         {error && <p role="alert" className="mt-3 rounded-xl bg-missbg text-miss px-4 py-3 text-[14px]">{error}</p>}
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }} disabled={confirmacion.trim().toUpperCase() !== 'BORRAR'} onClick={borrarCuenta}>Borrar mi cuenta</button>
+          <button className="btn btn-peligro" disabled={confirmacion.trim().toUpperCase() !== 'BORRAR'} onClick={borrarCuenta}>Borrar mi cuenta</button>
           <button className="btn-sec" onClick={() => setBorrar(false)}>Cancelar</button>
         </div>
       </Hoja>

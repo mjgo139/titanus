@@ -171,7 +171,7 @@ export default function EditarRutina() {
       <Hoja abierta={confirmar} alCerrar={() => setConfirmar(false)} etiqueta="Confirmar" titulo="¿Borrar esta rutina?">
         <p className="text-mu">Tu historial de entrenamientos no se borra.</p>
         <div className="mt-5 flex flex-col gap-3">
-          <button className="btn" style={{ background: 'var(--miss)', borderColor: 'var(--miss)', color: '#fff' }} onClick={borrar}>Sí, borrar</button>
+          <button className="btn btn-peligro" onClick={borrar}>Sí, borrar</button>
           <button className="btn-sec" onClick={() => setConfirmar(false)}>Cancelar</button>
         </div>
       </Hoja>

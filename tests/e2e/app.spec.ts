@@ -505,7 +505,7 @@ test('widget "Entrenamiento de hoy": /?empezar=hoy arranca la rutina del día', 
   await entrar(page);
   await expect(page.getByTestId('tarjeta-hoy')).toBeVisible();
   await expect(page.getByTestId('esqueleto')).toHaveCount(0);
-  const hayHoy = await page.getByTestId('tarjeta-hoy').getByRole('button', { name: /^Empezar / }).count() > 0;
+  const hayHoy = await page.getByTestId('tarjeta-hoy').getByRole('button', { name: /^Empezar (?!entrenamiento libre)/ }).count() > 0; // los días sin rutina solo hay "Empezar entrenamiento libre"
   await page.goto('/?empezar=hoy');
   if (hayHoy) await expect(page).toHaveURL(/\/entrenar/);
   else await expect(page).toHaveURL(/\/$/);

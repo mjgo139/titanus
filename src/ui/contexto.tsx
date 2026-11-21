@@ -24,7 +24,7 @@ export function aplicarTema(t: Tema) {
   try { localStorage.setItem('titanus-tema', t); } catch { /* sin almacenamiento */ }
   const oscuro = t === 'oscuro' || (t === 'sistema' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = oscuro ? 'dark' : 'light';
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', oscuro ? '#090909' : '#ECE6DB');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
 }
 
 export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNode }) {

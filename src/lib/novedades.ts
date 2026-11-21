@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.21.0',
+    fecha: '21/11/2026',
+    cambios: [
+      'StoaGym ahora toma colores, letras, medidas y piezas de la familia estoica (carpeta familia/), el mismo diseño que van a usar Stoica, Nutrición y Recetas.',
+      'Control automático: no se publica si aparece un color escrito a mano fuera de la familia.',
+      'Modo Mármol: las marcas de serie calentamiento, fallo y drop usan los tonos del modo claro.',
+    ],
+  },
+  {
     version: '1.20.0',
     fecha: '2026-11-20',
     cambios: [

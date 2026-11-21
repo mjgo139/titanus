@@ -42,7 +42,7 @@ export default function Resumen() {
     <div className="pt-4">
       <div className="relative -mx-[17px] h-[190px] overflow-hidden lg:mx-0 lg:h-[240px] lg:rounded-[14px] lg:border lg:border-ln">
         <img src={estatuas(perfil.figura).capa} alt="" style={{ objectPosition: foco(perfil.figura, 'capa') }} className="mascara-izq absolute right-0 top-0 h-full w-[52%] object-cover lg:w-[40%]" />
-        <div className="absolute bottom-3 left-[18px] max-w-[62%]" style={{ textShadow: '0 2px 6px #000' }}>
+        <div className="absolute bottom-3 left-[18px] max-w-[62%]" style={{ textShadow: 'var(--sombra-texto)' }}>
           <Icono n="corona" size={34} className="oro rebote" />
           <div className="etiqueta oro mt-1">Entrenamiento N.º {romano(e.numero ?? perfil.resumen.total)}</div>
           <h1 className="mt-1 font-display text-[26px] font-semibold leading-tight">¡Bien hecho, {perfil.nombre.split(' ')[0]}!</h1>
