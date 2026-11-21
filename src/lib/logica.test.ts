@@ -176,7 +176,7 @@ describe('biblioteca y frases', () => {
   it('la frase del día es estable durante el día y cambia al siguiente', () => {
     expect(fraseDelDia(dia(14, 7))).toEqual(fraseDelDia(dia(14, 22)));
     expect(fraseDelDia(dia(14))).not.toEqual(fraseDelDia(dia(15)));
-    expect(FRASES.every((f) => ['Séneca', 'Marco Aurelio', 'Epicteto'].includes(f.autor))).toBe(true);
+    expect(FRASES.every((f) => f.texto.length > 10 && f.autor.length > 2)).toBe(true);
   });
 });
 

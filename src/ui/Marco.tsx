@@ -1,7 +1,7 @@
 import { flushSync } from 'react-dom';
 import { Outlet, useLocation, useNavigate, type NavigateFunction } from 'react-router-dom';
 import { leerBorrador } from '../lib/borrador';
-import { rango, reloj } from '../lib/logica';
+import { reloj } from '../lib/logica';
 import { estatuas } from './estatuas';
 import { AvisoPrueba, BarraLateral, Emblema, Pestanas } from './familia';
 import { AvisoMudanza } from './AvisoMudanza';
@@ -64,7 +64,7 @@ const activa = (a: string, isActive: boolean, ruta: string) =>
 
 /** Celular: pestañas abajo. PC: barra lateral. Las dos son piezas de la familia (BarraLateral, Pestanas) */
 export function Marco() {
-  const { mensaje, repo, profesional, perfil } = useApp();
+  const { mensaje, repo, profesional, perfil, usuario } = useApp();
   // Los profesionales tienen una pestaña más: sus clientes
   const PESTANAS = profesional ? [...PESTANAS_BASE.slice(0, 3), { a: '/clientes', n: 'clientes', t: 'Clientes' }, PESTANAS_BASE[3]] : PESTANAS_BASE;
   const loc = useLocation();
@@ -80,7 +80,7 @@ export function Marco() {
   return (
     <div className="con-lateral min-h-screen">
       <BarraLateral emblema={<Emblema size={40} />} nombreApp="StoaGym" secciones={secciones} ir={ir}
-        persona={perfil ? { avatar: <img src={estatuas(perfil.figura).avatar} alt="" />, nombre: perfil.nombre.split(' ')[0], detalle: rango(perfil.resumen.total).nombre, href: '/perfil' } : undefined}
+        persona={perfil ? { avatar: <img src={estatuas(perfil.figura).avatar} alt="" />, nombre: perfil.nombre.split(' ')[0], detalle: usuario?.invitado ? 'Modo invitado' : usuario?.email ?? '', href: '/perfil' } : undefined}
         nota={repo.modo === 'prueba' ? 'Modo prueba' : 'Entrenamiento · Disciplina · Fuerza'} />
 
       <main className="mx-auto w-full max-w-[480px] px-[17px] pb-seguro lg:max-w-[1480px] lg:px-12 lg:pt-5 lg:pb-16">

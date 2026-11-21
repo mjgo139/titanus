@@ -4,6 +4,14 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.25.0',
+    fecha: '21/11/2026',
+    cambios: [
+      'El Panel del día ya no muestra el nivel: debajo del saludo va una frase estoica que cambia cada día (sobre esfuerzo y disciplina).',
+      'Sin el emblema chiquito en el panel; en la barra lateral, debajo de tu nombre va tu correo.',
+    ],
+  },
+  {
     version: '1.24.0',
     fecha: '21/11/2026',
     cambios: [

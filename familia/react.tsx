@@ -149,12 +149,13 @@ export const saludoDeHora = (t = Date.now()) => { const h = new Date(t).getHours
 export const fechaLarga = (t = Date.now()) => { const s = new Intl.DateTimeFormat('es-PY', { weekday: 'long', day: 'numeric', month: 'long' }).format(t); return s.charAt(0).toUpperCase() + s.slice(1); };
 
 /**
- * Panel del día: lo primero de Inicio en las 4 apps.
- * Orden fijo: [avatar] · FECHA (etiqueta oro) · "Buen día, Nombre" · línea (rango, frase…) · fichas.
- * `lado` va a la derecha en PC y debajo en el celular (por ejemplo el anillo de calorías).
+ * Panel del día: lo primero de Inicio, igual en las 4 apps.
+ * Orden fijo: [avatar] · FECHA (etiqueta oro) · "Buen día, Nombre" · frase estoica del día (de familia/frases.ts) · fichas.
+ * Sin niveles ni rangos, y sin emblema (decisión del dueño, v1.5.0). Lo propio de cada app va en `avatar` (por ejemplo,
+ * la estatua de StoaGym), en las fichas y en `lado`, que va a la derecha en PC y debajo en el celular (por ejemplo, el anillo de calorías).
  */
-export function PanelDia({ nombre, linea, avatar, fichas, esquina, lado, ahora = Date.now(), testId = 'panel-dia' }: {
-  nombre: string; linea?: ReactNode; avatar?: ReactNode; fichas?: ReactNode; esquina?: ReactNode; lado?: ReactNode; ahora?: number; testId?: string;
+export function PanelDia({ nombre, frase, avatar, fichas, lado, ahora = Date.now(), testId = 'panel-dia' }: {
+  nombre: string; frase: { texto: string; autor: string }; avatar?: ReactNode; fichas?: ReactNode; lado?: ReactNode; ahora?: number; testId?: string;
 }) {
   return (
     <section className="panel-dia" data-testid={testId}>
@@ -166,9 +167,8 @@ export function PanelDia({ nombre, linea, avatar, fichas, esquina, lado, ahora =
             <div style={{ minWidth: 0, flex: 1 }}>
               <div className="grupo">{fechaLarga(ahora)}</div>
               <h1 className="panel-dia-saludo">{saludoDeHora(ahora)}, {nombre}</h1>
-              {linea && <div className="panel-dia-linea">{linea}</div>}
+              <p className="panel-dia-frase" data-testid="frase-del-dia">“{frase.texto}” <span className="panel-dia-autor">— {frase.autor}</span></p>
             </div>
-            {esquina && <span className="panel-dia-esquina">{esquina}</span>}
           </div>
           {fichas && <div className="panel-dia-fichas">{fichas}</div>}
         </div>

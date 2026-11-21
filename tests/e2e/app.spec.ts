@@ -91,7 +91,7 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /(Buen día|Buenas tardes|Buenas noches), Lucía/ })).toBeVisible();
   // Eligió mujer: ve las estatuas de legionaria y sus datos quedan en Perfil
   await expect(page.locator('img[src*="avatar-f"]:visible').first()).toBeVisible();
-  await expect(page.getByTestId('rango')).toHaveText('Recluta · Nivel 1');
+  await expect(page.getByTestId('frase-del-dia')).toBeVisible();
   await captura(page, '03-inicio-vacio');
   await ir(page, 'Perfil');
   await expect(page.getByTestId('datos-personales')).toContainText('168 cm');
@@ -121,7 +121,7 @@ test('invitado: entra sin cuenta y después crea su cuenta sin perder nada', asy
 
 test('inicio: rango, racha, entrenamiento de hoy y semana (sin frase ni accesos)', async ({ page }) => {
   await entrar(page);
-  await expect(page.getByTestId('rango')).toContainText('Nivel');
+  await expect(page.getByTestId('frase-del-dia')).toContainText('—');
   await expect(page.getByTestId('racha')).not.toHaveText('—');
   await expect(page.getByRole('heading', { name: 'Entrenamiento de hoy' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Tu semana' })).toBeVisible();

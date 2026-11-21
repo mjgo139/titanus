@@ -12,7 +12,8 @@ import { Cargando } from '../ui/piezas';
 import { useEmpezar } from './empezar';
 import { AvisoHoy } from '../pro/AvisoHoy';
 import { ProgramaEnCurso } from './Programas';
-import { Emblema, Grupo, PanelDia, TuSemana } from '../ui/familia';
+import { Grupo, PanelDia, TuSemana } from '../ui/familia';
+import { fraseDelDia } from '../lib/frases';
 
 export function minutosEstimados(r: Rutina): number {
   return Math.max(10, Math.round(r.ejercicios.reduce((t, e) => t + e.series * (e.descanso + 40), 0) / 60 / 5) * 5);
@@ -86,8 +87,7 @@ export default function Hoy() {
       <div className="entrar">
         <PanelDia nombre={perfil.nombre.split(' ')[0]} ahora={ahora}
           avatar={<img src={estatuas(perfil.figura).avatar} alt="" />}
-          linea={<span data-testid="rango">{r.nombre} · Nivel {r.nivel}</span>}
-          esquina={<Link to="/perfil" aria-label="Ir a mi perfil" className="toque flex items-center justify-center"><Emblema size={40} /></Link>}
+          frase={fraseDelDia(ahora)}
           fichas={<>
             <Link to="/progreso" className="ficha">
               <Icono n="fuego" size={16} className="oro" />

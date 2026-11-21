@@ -23,7 +23,7 @@
   --ok:#f2c55c; --okbg:#2b2210; --verde:#7dba70; --miss:#d9826f; --missbg:#331b16;
   --aviso:#e0b04a; --info:#8fb3d9;
   /* Marfil: la figura del emblema y textos sobre fotos */
-  --marfil:#F3EDDF;
+  --marfil:#F3EDDF; --figura-trazo:#14120E;
   /* Detalles */
   --vena: rgba(154,113,55,.16);
   --sombra: 0 8px 25px rgba(0,0,0,.45);
@@ -49,7 +49,7 @@
   --panel-grad: linear-gradient(125deg, #fbf8f2, #f4eee3);
   --ok:#7e5d22; --okbg:#efe3c6; --verde:#3f6e38; --miss:#9c3f2e; --missbg:#f4ded6;
   --aviso:#a06b14; --info:#3d6a96;
-  --marfil:#2b261e;
+  --marfil:#2b261e; --figura-trazo:#fbf8f1;
   --vena: rgba(126,93,34,.10);
   --sombra: 0 1px 2px rgba(60,45,20,.05), 0 6px 18px rgba(60,45,20,.08);
   --prot:#c4553b; --carb:#2f6fb8; --gras:#a87a0a;

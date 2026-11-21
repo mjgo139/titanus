@@ -101,7 +101,7 @@ a.ficha:hover, button.ficha:hover { border-color: var(--gold); }
   position: fixed; inset: 0 auto 0 0; width: var(--ancho-lateral); box-sizing: border-box; z-index: 30;
   display: none; flex-direction: column; padding: 28px 16px 20px;
   background: var(--lateral); border-right: 1px solid var(--lat-linea); color: var(--lat-tx);
-  --gold: var(--lat-oro); --marfil: var(--lat-marfil);
+  --gold: var(--lat-oro); --marfil: var(--lat-marfil); --figura-trazo: var(--icono-fondo);
 }
 @media (min-width: 1024px) { .lateral { display: flex; } .con-lateral { padding-left: var(--ancho-lateral); } }
 .lateral-marca { display: flex; align-items: center; gap: 10px; padding: 0 8px; color: var(--lat-oro); text-decoration: none; }
@@ -152,8 +152,8 @@ a.lateral-persona:hover { background: var(--lat-activo); }
 @media (min-width: 1024px) { .panel-dia-avatar { width: 88px; height: 88px; } }
 .panel-dia-saludo { margin: 4px 0 0; font-family: var(--f-display); font-weight: 700; font-size: 26px; line-height: 1.2; color: var(--tx); }
 @media (min-width: 1024px) { .panel-dia-saludo { margin-top: 8px; font-size: 40px; line-height: 44px; } }
-.panel-dia-linea { margin-top: 4px; font-size: 15px; font-weight: 600; color: var(--gold); }
-.panel-dia-esquina { align-self: flex-start; color: var(--gold); }
+.panel-dia-frase { margin: 6px 0 0; max-width: 640px; font-family: var(--f-display); font-style: italic; font-size: 15px; line-height: 1.4; color: var(--gold); }
+.panel-dia-autor { font-family: var(--f-body); font-style: normal; font-size: 13.5px; font-weight: 500; color: var(--mu); white-space: nowrap; }
 .panel-dia-fichas { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
 @media (min-width: 1024px) { .panel-dia-fichas { margin-top: 20px; } .panel-dia-lado { flex-shrink: 0; } }
 .ficha .ir { color: var(--mu); }
