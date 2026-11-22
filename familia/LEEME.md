@@ -13,6 +13,7 @@ Si una app necesita un color o una pieza nueva, se agrega en ese repo, se sella 
 | `tailwind-preset.js` | Colores de Tailwind atados a las variables |
 | `iconos.tsx` | Juego único de íconos (`Icono`, `TAM`) |
 | `react.tsx` | `Laurel`, `Grupo`, `Ficha`, `CabeceraPagina`, `Emblema`, `romano` |
+| `portada-filosofo.webp` | Foto de la pantalla de acceso, la misma en las 4 apps |
 | `frases.ts` | Frases estoicas del día, una lista para las 4 apps (`fraseDelDia(tema)`) |
 | `figuras.tsx` | Figuras del emblema de cada app (mancuerna, manzana, check) para usar dentro de la app |
 | `emblema.mjs` | Dibujo del ícono y de la pantalla de inicio con la figura de cada app |

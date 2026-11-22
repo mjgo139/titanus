@@ -47,12 +47,16 @@ async function registrarSW() {
   const desdeLaWeb = location.protocol === 'https:' && !location.hostname.includes('localhost');
   if ((Capacitor.isNativePlatform() && !desdeLaWeb) || !('serviceWorker' in navigator) || import.meta.env.DEV) return;
   const { registerSW } = await import('virtual:pwa-register');
+  // v1.28.0: la versión nueva se instala sola, pero la página se recarga recién cuando la app queda en segundo plano
+  // (antes se recargaba en plena pantalla y volvía a salir el esqueleto). La próxima vez que la abras ya está la nueva.
   let recargando = false;
+  const recargar = () => { if (!recargando) { recargando = true; location.reload(); } };
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (recargando) return;
-    recargando = true;
-    location.reload();
+    if (document.visibilityState === 'hidden') recargar();
+    else document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') recargar(); });
   });
+  // Si falta un pedazo de la versión vieja (porque ya se instaló la nueva), recargar
+  window.addEventListener('vite:preloadError', recargar);
   registerSW({
     immediate: true,
     // Buscar versión nueva cada 30 minutos y al volver a la app

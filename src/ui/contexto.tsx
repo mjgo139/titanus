@@ -36,6 +36,7 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
   const [mensaje, setMensaje] = useState<string | null>(null);
 
   const previo = useRef<Usuario | null>(null);
+  const ultimoCambio = useRef(0);
   useEffect(() => repo.escucharSesion(async (u) => {
     const antes = previo.current;
     previo.current = u;
@@ -60,6 +61,10 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
     } finally {
       setCargando(false);
     }
+    // El perfil se mostró desde el teléfono; ahora se refresca con lo del servidor (cambios hechos en otro equipo)
+    const pedido = Date.now();
+    const fresco = await repo.perfilDelServidor?.(u);
+    if (fresco && previo.current?.uid === u.uid && ultimoCambio.current < pedido) setPerfil((p) => (p && JSON.stringify(p) === JSON.stringify(fresco) ? p : fresco));
   }), [repo]);
 
   useEffect(() => {
@@ -71,6 +76,7 @@ export function ProveedorApp({ repo, children }: { repo: Repo; children: ReactNo
 
   const cambiarPerfil = useCallback(async (c: Partial<Perfil>) => {
     if (!usuario) return;
+    ultimoCambio.current = Date.now();
     setPerfil((p) => (p ? { ...p, ...c } : p));
     if (c.tema) aplicarTema(c.tema);
     await repo.guardarPerfil(usuario.uid, c);

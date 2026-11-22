@@ -4,6 +4,15 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.28.0',
+    fecha: '22/11/2026',
+    cambios: [
+      'Abre más rápido: lo que ya está guardado en tu teléfono se muestra al instante y lo nuevo se trae por detrás, sin esqueletos cada vez.',
+      'Las actualizaciones ya no recargan la app mientras la estás usando: se aplican cuando la dejás en segundo plano.',
+      'Pantalla de acceso nueva con la estatua del filósofo, igual en todas las apps de la familia.',
+    ],
+  },
+  {
     version: '1.27.0',
     fecha: '22/11/2026',
     cambios: [

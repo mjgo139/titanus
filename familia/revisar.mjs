@@ -19,7 +19,8 @@ const errores = [];
 
 // 1. Integridad de la copia
 const version = JSON.parse(readFileSync(join(aqui, 'version.json'), 'utf8'));
-const hash = (ruta) => createHash('sha256').update(readFileSync(ruta, 'utf8').replace(/\r\n/g, '\n')).digest('hex');
+const BINARIO = /\.(webp|png|jpe?g|avif)$/;
+const hash = (ruta) => createHash('sha256').update(BINARIO.test(ruta) ? readFileSync(ruta) : readFileSync(ruta, 'utf8').replace(/\r\n/g, '\n')).digest('hex');
 for (const [nombre, esperado] of Object.entries(version.archivos)) {
   const ruta = join(aqui, nombre);
   if (!existsSync(ruta)) errores.push(`familia/${nombre}: falta. Copiá de nuevo la carpeta familia/ del repo mjgo139/familia-estoica.`);

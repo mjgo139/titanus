@@ -30,6 +30,8 @@ export interface Repo {
   borrarCuenta(): Promise<void>;
 
   leerPerfil(u: Usuario): Promise<Perfil>;
+  /** Arranque rápido: el perfil recién traído del servidor (null si no hay conexión o no aplica) */
+  perfilDelServidor?(u: Usuario): Promise<Perfil | null>;
   guardarPerfil(uid: string, cambios: Partial<Perfil>): Promise<void>;
   esAdmin(uid: string): Promise<boolean>;
 

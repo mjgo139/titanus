@@ -306,3 +306,31 @@ export function TarjetaPerfil({ avatar, nombre, correo, detalle, acciones, testI
     </section>
   );
 }
+
+/* ——————————————————— v1.7.0: portada de acceso común ——————————————————— */
+
+/**
+ * Portada de acceso, igual en las 4 apps (estructura de StoaGym): emblema, nombre en Cinzel con brillo,
+ * lema en mayúsculas, la foto del filósofo sentado (familia/portada-filosofo.webp) y los botones.
+ * En la PC: foto a la izquierda y todo lo demás a la derecha.
+ * `imagen` = la URL de la foto (importala con `import portada from '../../familia/portada-filosofo.webp'`).
+ */
+export function PortadaAcceso({ emblema, nombre, lema, frase, imagen, aviso, children }: {
+  emblema: ReactNode; nombre: string; lema: string; frase?: string; imagen: string; aviso?: ReactNode; children: ReactNode;
+}) {
+  return (
+    <div className="portada">
+      <div className="portada-foto" role="img" aria-label="Estatua de un filósofo sentado en una galería de columnas" style={{ backgroundImage: `url(${imagen})` }} />
+      <div className="portada-lado">
+        <div className="portada-marca entrar">
+          {aviso}
+          <div className="portada-emblema">{emblema}</div>
+          <div className="marca portada-nombre">{nombre}</div>
+          <div className="portada-lema">{lema}</div>
+          {frase && <p className="portada-frase">{frase}</p>}
+        </div>
+        <div className="portada-acciones">{children}</div>
+      </div>
+    </div>
+  );
+}

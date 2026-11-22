@@ -5,9 +5,9 @@ import {
   signInWithPopup, signOut, updateProfile,
 } from 'firebase/auth';
 import {
-  collection, deleteDoc, doc, getDoc, getDocs, initializeFirestore, limit, orderBy,
+  collection, deleteDoc, doc, getDoc, getDocFromCache, getDocFromServer, getDocs, getDocsFromCache, initializeFirestore, limit, orderBy,
   persistentLocalCache, persistentMultipleTabManager, query, setDoc, startAfter, where,
-  documentId, writeBatch, type Firestore,
+  documentId, writeBatch, type Firestore, type DocumentReference, type Query,
 } from 'firebase/firestore';
 import type {
   Ejercicio, Entrenamiento, EstadoEjercicio, Perfil, RegistroCuerpo, Rutina,
@@ -120,8 +120,39 @@ export class RepoFirebase implements Repo {
     await deleteUser(fu);
   }
 
+  /**
+   * Arranque rápido (v1.28.0): primero lo que ya está guardado en el teléfono (caché de Firestore) y,
+   * mientras tanto, se trae lo del servidor para la próxima vez. Sin caché, espera al servidor como antes.
+   */
+  private async docRapido(ref: DocumentReference) {
+    try {
+      const c = await getDocFromCache(ref);
+      if (c.exists()) { void getDoc(ref).catch(() => undefined); return c; }
+    } catch { /* no estaba en el teléfono */ }
+    return getDoc(ref);
+  }
+
+  private async docsRapido(q: Query) {
+    try {
+      const c = await getDocsFromCache(q);
+      if (!c.empty) { void getDocs(q).catch(() => undefined); return c; }
+    } catch { /* no estaba en el teléfono */ }
+    return getDocs(q);
+  }
+
+  /** El perfil recién traído del servidor (para refrescar lo que se mostró desde el teléfono) */
+  async perfilDelServidor(u: Usuario): Promise<Perfil | null> {
+    try {
+      const s = await getDocFromServer(this.u(u.uid));
+      if (!s.exists()) return null;
+      const base = perfilInicial(u);
+      const p = s.data() as Partial<Perfil>;
+      return { ...base, ...p, uid: u.uid, resumen: p.resumen ?? base.resumen, recordatorio: p.recordatorio ?? base.recordatorio };
+    } catch { return null; }
+  }
+
   async leerPerfil(u: Usuario): Promise<Perfil> {
-    const s = await getDoc(this.u(u.uid));
+    const s = await this.docRapido(this.u(u.uid));
     const base = perfilInicial(u);
     if (!s.exists()) {
       await sinBloquear(setDoc(this.u(u.uid), limpio(base)));
@@ -137,7 +168,7 @@ export class RepoFirebase implements Repo {
 
   async esAdmin(uid: string) {
     try {
-      const s = await getDoc(doc(this.db, 'config', 'admins'));
+      const s = await this.docRapido(doc(this.db, 'config', 'admins'));
       const uids = (s.data()?.uids as string[] | undefined) ?? [];
       return uids.includes(uid);
     } catch {
@@ -146,7 +177,7 @@ export class RepoFirebase implements Repo {
   }
 
   async leerRutinas(uid: string) {
-    const s = await getDocs(this.col(uid, 'routines'));
+    const s = await this.docsRapido(this.col(uid, 'routines'));
     return s.docs.map((d) => ({ ...(d.data() as Rutina), id: d.id })).sort((a, b) => a.orden - b.orden);
   }
   async guardarRutina(uid: string, r: Rutina) {
@@ -157,7 +188,7 @@ export class RepoFirebase implements Repo {
   }
 
   async leerPropios(uid: string) {
-    const s = await getDocs(this.col(uid, 'customExercises'));
+    const s = await this.docsRapido(this.col(uid, 'customExercises'));
     return s.docs.map((d) => ({ ...(d.data() as Ejercicio), id: d.id, propio: true }));
   }
   async guardarPropio(uid: string, e: Ejercicio) {
@@ -192,17 +223,17 @@ export class RepoFirebase implements Repo {
     const q = antesDe !== undefined
       ? query(this.col(uid, 'workouts'), ...base, startAfter(antesDe), limit(limite))
       : query(this.col(uid, 'workouts'), ...base, limit(limite));
-    const s = await getDocs(q);
+    const s = antesDe === undefined ? await this.docsRapido(q) : await getDocs(q);
     return s.docs.map((d) => ({ ...(d.data() as Entrenamiento), id: d.id }));
   }
 
   async leerSesionesDeRutina(uid: string, rutinaId: string, limite: number) {
-    const s = await getDocs(query(this.col(uid, 'workouts'), where('rutinaId', '==', rutinaId), orderBy('inicio', 'desc'), limit(limite)));
+    const s = await this.docsRapido(query(this.col(uid, 'workouts'), where('rutinaId', '==', rutinaId), orderBy('inicio', 'desc'), limit(limite)));
     return s.docs.map((d) => ({ ...(d.data() as Entrenamiento), id: d.id }));
   }
 
   async leerCuerpo(uid: string) {
-    const s = await getDocs(query(this.col(uid, 'bodyLogs'), orderBy('fecha', 'asc')));
+    const s = await this.docsRapido(query(this.col(uid, 'bodyLogs'), orderBy('fecha', 'asc')));
     return s.docs.map((d) => ({ ...(d.data() as RegistroCuerpo), id: d.id }));
   }
   async guardarCuerpo(uid: string, r: RegistroCuerpo) {
@@ -235,7 +266,7 @@ export class RepoFirebase implements Repo {
     return s.exists() ? ({ ...(s.data() as Perfil), uid, resumen: (s.data() as Perfil).resumen ?? { dias: [], total: 0 } }) : null;
   }
   async leerProfesional(uid: string) {
-    const s = await this.sinPermiso(getDoc(doc(this.db, 'profesionales', uid)), null);
+    const s = await this.sinPermiso(this.docRapido(doc(this.db, 'profesionales', uid)), null);
     return s?.exists() ? ({ ...(s.data() as Profesional), uid }) : null;
   }
   async leerMiSolicitud(uid: string) {
