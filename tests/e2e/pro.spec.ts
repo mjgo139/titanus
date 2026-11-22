@@ -133,7 +133,7 @@ test('invitación: se vincula con el enlace, pide ser entrenador y el admin lo a
   await page.getByLabel('Nombre').fill('Lucas Benítez');
   await page.getByLabel('Correo').fill('lucas@ejemplo.com');
   await page.getByLabel('Contraseña', { exact: true }).fill('secreta1');
-  await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
+  await page.getByRole('button', { name: 'Crear cuenta' }).click();
   await page.getByRole('button', { name: 'Omitir' }).click();
   await expect(page.getByTestId('aviso-invitacion')).toContainText('STG-M4RC');
   await page.getByTestId('aviso-invitacion').click();

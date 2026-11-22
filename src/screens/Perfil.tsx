@@ -214,7 +214,7 @@ export default function Perfil() {
           onClick={async () => { await cambiarPerfil({ nombre: nombre.trim() }); setEditarNombre(false); aviso('Nombre guardado'); }}>Guardar</button>
       </Hoja>
       <Hoja abierta={crear} alCerrar={() => setCrear(false)} titulo="Crear cuenta">
-        <FormAcceso inicial="registrar" alTerminar={() => { setCrear(false); aviso('¡Cuenta creada! Tu progreso quedó guardado'); }} />
+        <FormAcceso enHoja inicial="registrar" alTerminar={() => { setCrear(false); aviso('¡Cuenta creada! Tu progreso quedó guardado'); }} />
       </Hoja>
 
       <Hoja abierta={novedades} alCerrar={() => setNovedades(false)} etiqueta="Novedades" titulo={`Versión ${VERSION}`}>

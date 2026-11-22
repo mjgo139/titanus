@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.29.0',
+    fecha: '22/11/2026',
+    cambios: [
+      'Iniciar sesión, crear cuenta y recuperar la contraseña ahora son una pantalla completa, igual en todas las apps de la familia.',
+    ],
+  },
+  {
     version: '1.28.0',
     fecha: '22/11/2026',
     cambios: [

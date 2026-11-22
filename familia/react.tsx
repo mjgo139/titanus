@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from 'react';
+import { useState, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import { Icono } from './iconos';
 
 /**
@@ -332,5 +332,117 @@ export function PortadaAcceso({ emblema, nombre, lema, frase, imagen, aviso, chi
         <div className="portada-acciones">{children}</div>
       </div>
     </div>
+  );
+}
+
+/* ——————————————————— v1.8.0: iniciar sesión, crear cuenta y recuperar, iguales en las 4 apps ——————————————————— */
+
+export type VistaAcceso = 'ingresar' | 'registrar' | 'recuperar';
+
+export const TITULOS_ACCESO: Record<VistaAcceso, string> = {
+  ingresar: 'Bienvenido de nuevo', registrar: 'Creá tu cuenta', recuperar: 'Recuperar contraseña',
+};
+
+/**
+ * Pantalla completa de acceso (la que se abre desde la portada): emblema, nombre en Cinzel,
+ * el formulario y "Volver" a la portada. Igual en las 4 apps.
+ */
+export function PantallaAcceso({ emblema, nombre, alVolver, children }: {
+  emblema: ReactNode; nombre: string; alVolver: () => void; children: ReactNode;
+}) {
+  return (
+    <div className="acceso">
+      <div className="acceso-cabeza entrar">
+        <div className="acceso-emblema">{emblema}</div>
+        <div className="marca acceso-nombre">{nombre}</div>
+      </div>
+      <div className="entrar">{children}</div>
+      <button type="button" className="acceso-volver" onClick={alVolver}><Icono n="atras" size={16} />Volver</button>
+    </div>
+  );
+}
+
+/**
+ * Formulario de acceso común: Iniciar sesión · Crear cuenta · Recuperar contraseña, con Google.
+ * Mismos textos, campos con su etiqueta arriba y ojito en la contraseña. Cada app pasa sus funciones.
+ * `nota` = texto chico debajo del título (p. ej. "Tu progreso de invitado queda guardado").
+ * `sinTitulo` cuando va dentro de una Hoja que ya tiene título.
+ */
+export function FormularioAcceso({ vista, alCambiarVista, acciones, mensajeError, inicial, nota, sinTitulo, alTerminar }: {
+  vista: VistaAcceso;
+  alCambiarVista: (v: VistaAcceso) => void;
+  acciones: {
+    ingresar: (email: string, clave: string) => Promise<unknown>;
+    registrar: (nombre: string, email: string, clave: string) => Promise<unknown>;
+    recuperar: (email: string) => Promise<unknown>;
+    google?: () => Promise<unknown>;
+  };
+  mensajeError: (e: unknown) => string;
+  inicial?: { email?: string; clave?: string };
+  nota?: ReactNode;
+  sinTitulo?: boolean;
+  alTerminar?: () => void;
+}) {
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState(inicial?.email ?? '');
+  const [clave, setClave] = useState(inicial?.clave ?? '');
+  const [ver, setVer] = useState(false);
+  const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
+  const [ocupado, setOcupado] = useState(false);
+
+  async function hacer(f: () => Promise<unknown>, alFin?: () => void) {
+    setError(''); setInfo(''); setOcupado(true);
+    try { await f(); alFin?.(); } catch (e) { setError(mensajeError(e)); } finally { setOcupado(false); }
+  }
+
+  function enviar(e: FormEvent) {
+    e.preventDefault();
+    if (vista === 'ingresar') hacer(() => acciones.ingresar(email.trim(), clave), alTerminar);
+    else if (vista === 'registrar') hacer(() => acciones.registrar(nombre.trim(), email.trim(), clave), alTerminar);
+    else hacer(() => acciones.recuperar(email.trim()), () => setInfo('Listo. Si existe una cuenta con ese correo, te llegó un enlace para crear una contraseña nueva.'));
+  }
+
+  const ir = (v: VistaAcceso) => { setError(''); setInfo(''); alCambiarVista(v); };
+
+  return (
+    <form className="acceso-form" onSubmit={enviar} noValidate>
+      {!sinTitulo && <h2 className="acceso-titulo">{TITULOS_ACCESO[vista]}</h2>}
+      {nota && <p className="acceso-nota">{nota}</p>}
+      {vista === 'registrar' && (
+        <label className="acceso-campo"><span className="etiqueta">Nombre</span>
+          <input className="campo" autoComplete="given-name" value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={80} />
+        </label>
+      )}
+      <label className="acceso-campo"><span className="etiqueta">Correo</span>
+        <input className="campo" type="email" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      </label>
+      {vista !== 'recuperar' && (
+        <div className="acceso-campo">
+          <label className="etiqueta" htmlFor="acceso-clave">Contraseña</label>
+          <span className="acceso-clave">
+            <input id="acceso-clave" className="campo" type={ver ? 'text' : 'password'} aria-label="Contraseña"
+              autoComplete={vista === 'registrar' ? 'new-password' : 'current-password'} value={clave} onChange={(e) => setClave(e.target.value)} />
+            <button type="button" className="acceso-ojo" aria-pressed={ver} aria-label={ver ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              onClick={() => setVer((v) => !v)}><Icono n={ver ? 'ojo-no' : 'ojo'} size={20} /></button>
+          </span>
+        </div>
+      )}
+      {error && <p role="alert" className="acceso-error">{error}</p>}
+      {info && <p role="status" className="acceso-info">{info}</p>}
+      <button className="btn acceso-entrar" disabled={ocupado}>
+        {ocupado ? 'Un momento…' : vista === 'ingresar' ? 'Entrar' : vista === 'registrar' ? 'Crear cuenta' : 'Enviar enlace'}
+      </button>
+      {vista !== 'recuperar' && acciones.google && (
+        <button type="button" className="btn-sec acceso-google" disabled={ocupado} onClick={() => hacer(acciones.google!, alTerminar)}>
+          <Icono n="google" size={20} />Continuar con Google
+        </button>
+      )}
+      <div className="acceso-enlaces">
+        {vista === 'ingresar' && <button type="button" className="acceso-enlace oro-fuerte" onClick={() => ir('recuperar')}>Olvidé mi contraseña</button>}
+        {vista === 'ingresar' && <button type="button" className="acceso-enlace" onClick={() => ir('registrar')}>¿No tenés cuenta? <b>Creá una</b></button>}
+        {vista !== 'ingresar' && <button type="button" className="acceso-enlace" onClick={() => ir('ingresar')}>¿Ya tenés cuenta? <b>Iniciá sesión</b></button>}
+      </div>
+    </form>
   );
 }

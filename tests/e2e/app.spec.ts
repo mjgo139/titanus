@@ -35,11 +35,12 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await expect(page.getByText('ENTRENAMIENTO · DISCIPLINA · FUERZA')).toBeVisible();
   await captura(page, '01-portada');
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+  await expect(page.getByRole('heading', { name: 'Bienvenido de nuevo' })).toBeVisible();
   await captura(page, '02-iniciar-sesion');
   await page.getByRole('button', { name: 'Olvidé mi contraseña' }).click();
   await page.getByRole('button', { name: 'Enviar enlace' }).click();
   await expect(page.getByRole('status')).toContainText('Si existe una cuenta');
-  await page.getByRole('button', { name: 'Ya tengo cuenta' }).click();
+  await page.getByRole('button', { name: '¿Ya tenés cuenta? Iniciá sesión' }).click();
   await page.getByLabel('Contraseña', { exact: true }).fill('mala');
   // El ojito muestra y oculta la contraseña
   await expect(page.getByLabel('Contraseña', { exact: true })).toHaveAttribute('type', 'password');
@@ -49,11 +50,11 @@ test('portada y acceso: ingresar, recuperar y registrar', async ({ page }) => {
   await expect(page.getByLabel('Contraseña', { exact: true })).toHaveAttribute('type', 'password');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('alert')).toContainText('no coinciden');
-  await page.getByRole('button', { name: '¿No tenés cuenta? Creala' }).click();
+  await page.getByRole('button', { name: '¿No tenés cuenta? Creá una' }).click();
   await page.getByLabel('Nombre').fill('Lucía');
   await page.getByLabel('Correo').fill('lucia@ejemplo.com');
   await page.getByLabel('Contraseña', { exact: true }).fill('secreta1');
-  await page.getByRole('dialog').getByRole('button', { name: 'Crear cuenta' }).click();
+  await page.getByRole('button', { name: 'Crear cuenta' }).click();
   // Bienvenida "Conocerte": seis preguntas
   await expect(page.getByTestId('conocerte')).toBeVisible();
   await page.getByRole('radio', { name: /Mujer/ }).click();
