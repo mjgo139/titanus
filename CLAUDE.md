@@ -22,7 +22,7 @@ Este archivo resume cómo trabajar en este repositorio. Leelo entero antes de ca
 | Para qué | Comando |
 |---|---|
 | Probar en modo prueba (sin Firebase) | `npm run demo` → http://localhost:5173 (cuenta `marco@ejemplo.com` / `titanus`) |
-| Modo prueba en la web publicada | abrir `https://stoagym.web.app/?prueba=1` (`?prueba=0` para salir) |
+| Modo prueba | solo con `npm run demo` y en las pruebas automáticas; en la web publicada no existe (v1.30.0, decisión del dueño) |
 | Pruebas de lógica | `npm test` |
 | Pruebas de pantallas + capturas | `npm run test:e2e` (capturas en `capturas/celular` y `capturas/pc`). Fuera de GitHub, indicar Chrome con `PW_CHROME=/usr/bin/google-chrome` |
 | Pruebas de reglas | `npm run test:reglas` (necesita Java y descarga el emulador) |

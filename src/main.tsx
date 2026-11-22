@@ -19,17 +19,10 @@ import { guardarInvitacionDeLaUrl } from './pro/MiProfesional';
 // Enlace de invitación de un entrenador (?codigo=TIT-XXXX): se guarda para después de ingresar
 guardarInvitacionDeLaUrl();
 
-/** Modo prueba: al armar con --mode demo, o abriendo la web con ?prueba=1 */
+/** Modo prueba: solo al armar con --mode demo (pruebas automáticas y `npm run demo`). En la web publicada no existe (v1.30.0). */
 function esModoPrueba(): boolean {
-  if (import.meta.env.VITE_DEMO === '1') return true;
-  try {
-    const q = new URLSearchParams(location.search);
-    if (q.get('prueba') === '1') sessionStorage.setItem('titanus-prueba', '1');
-    if (q.get('prueba') === '0') sessionStorage.removeItem('titanus-prueba');
-    return sessionStorage.getItem('titanus-prueba') === '1';
-  } catch {
-    return false;
-  }
+  try { sessionStorage.removeItem('titanus-prueba'); } catch { /* nada */ }
+  return import.meta.env.VITE_DEMO === '1';
 }
 
 async function crearRepo(): Promise<Repo> {

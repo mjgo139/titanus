@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.30.0',
+    fecha: '22/11/2026',
+    cambios: [
+      'La web publicada ya no tiene modo prueba (?prueba=1): los datos de ejemplo solo existen en las pruebas automáticas.',
+    ],
+  },
+  {
     version: '1.29.0',
     fecha: '22/11/2026',
     cambios: [
