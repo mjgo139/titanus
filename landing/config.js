@@ -4,7 +4,7 @@
  * Huella del código de acceso (SHA-256). La genera el dueño en /huella.html y la pega acá.
  * Vacía = la puerta queda cerrada para todos ("Muy pronto").
  */
-export const HUELLA = '';
+export const HUELLA = 'ddbfcf9039bb715af359feaad70eb3875d5c804654c4727ea219825ad9c1c478';
 
 /** Sal fija: hace que la huella sirva solo para esta página */
 export const SAL = 'familia-estoica·stoa:';
