@@ -15,7 +15,7 @@ body.bloqueado { overflow: hidden; height: 100dvh; }
 #escena { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; display: block; z-index: 0; }
 .velo { position: fixed; inset: 0; z-index: 1; pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.55) 100%); }
-#pista { height: 1100vh; }
+#pista { height: 1700vh; }
 .sin-3d #escena { display: none; }
 .sin-3d .velo { background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.8)), url('img/portada-filosofo.webp') center / cover; }
 
@@ -46,11 +46,13 @@ body.bloqueado { overflow: hidden; height: 100dvh; }
 
 /* ——— Capítulos del recorrido ——— */
 #textos { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
-.capitulo { position: absolute; left: 7vw; top: 50%; max-width: 480px; opacity: 0; transform: translateY(-50%);
+.capitulo { position: absolute; isolation: isolate; left: 7vw; top: 50%; max-width: 480px; opacity: 0; transform: translateY(-50%);
   will-change: opacity, transform; text-shadow: 0 2px 18px rgba(0,0,0,.85); }
 .capitulo.derecha { left: auto; right: 7vw; text-align: right; }
 .capitulo.centro { left: 50%; top: 22%; transform: translate(-50%, 0); text-align: center; max-width: 560px; }
 .capitulo.inicio { left: 50%; top: 44%; transform: translate(-50%, -50%); text-align: center; max-width: 640px; width: 90vw; }
+.capitulo::before { content: ''; position: absolute; inset: -40px -60px; z-index: -1; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(5,4,3,.72), rgba(5,4,3,.4) 60%, transparent); }
 .capitulo .numero { font-family: var(--f-display); font-weight: 600; font-size: 64px; line-height: 1; color: var(--gold); margin: 0 0 8px; opacity: .9; }
 .capitulo blockquote { margin: 14px 0 10px; font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 36px; line-height: 1.2; color: var(--tx); }
 .capitulo cite { font-style: normal; font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
@@ -64,10 +66,10 @@ body.bloqueado { overflow: hidden; height: 100dvh; }
 #apps { position: fixed; left: 0; right: 0; bottom: 5vh; z-index: 6; text-align: center; padding: 0 16px;
   opacity: 0; visibility: hidden; transition: opacity .8s ease, visibility .8s; }
 #apps.visible { opacity: 1; visibility: visible; }
-#apps .etiqueta { color: var(--gold); }
+#apps .etiqueta { display: inline-block; color: var(--gold); padding: 5px 12px; border-radius: 999px; background: rgba(9,9,9,.7); }
 .apps-fila { margin: 14px auto 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); justify-content: center; gap: 16px; }
 .app { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 12px 14px; text-decoration: none; color: var(--tx);
-  border-radius: var(--radio-panel); border: 1px solid var(--ln); background: linear-gradient(160deg, rgba(28,24,18,.88), rgba(9,9,9,.88));
+  border-radius: var(--radio-panel); border: 1px solid var(--ln); background: linear-gradient(160deg, rgba(28,24,18,.95), rgba(9,9,9,.95));
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 18px 40px -18px rgba(0,0,0,.8);
   opacity: 0; transform: translateY(60px) scale(.6); transition: transform .9s cubic-bezier(.2,.8,.2,1.15), opacity .7s ease, border-color .25s, box-shadow .25s; }
 #apps.visible .app { opacity: 1; transform: none; }
@@ -77,12 +79,12 @@ body.bloqueado { overflow: hidden; height: 100dvh; }
 .app img { width: 64px; height: 64px; border-radius: 15px; box-shadow: 0 6px 18px rgba(0,0,0,.5); }
 .app-nombre { margin-top: 6px; font-family: var(--f-marca); font-weight: 700; font-size: 20px; color: var(--gold); }
 .app-tema { font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--tx2); }
-.app-lema { font-size: 12.5px; color: var(--mu); }
+.app-lema { font-size: 12.5px; color: var(--tx2); }
 .app-ir { margin-top: 6px; font-size: 13.5px; font-weight: 600; color: var(--gold); }
 body.bloqueado #textos { opacity: 0; }
 #textos { transition: opacity 1s; }
 .app-textos { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.apps-nota { margin: 0; font-size: 12.5px; color: var(--mu); text-shadow: 0 1px 8px #000; }
+.apps-nota { display: inline-block; margin: 0; padding: 6px 14px; border-radius: 999px; font-size: 12.5px; color: var(--tx2); background: rgba(9,9,9,.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 
 /* ——— Riel de avance ——— */
 #riel { position: fixed; right: 22px; top: 50%; height: 46vh; transform: translateY(-50%); z-index: 6; width: 30px; opacity: 0; transition: opacity .6s; }
