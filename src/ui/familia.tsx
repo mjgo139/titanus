@@ -6,7 +6,7 @@ import { Emblema as EmblemaFamilia } from '../../familia/react';
  */
 export { Laurel, Grupo, Ficha, CabeceraPagina, BarraLateral, Pestanas, iniciales,
   PanelDia, TuSemana, ElegirTema, AvisoPrueba, aplicarTema, saludoDeHora, fechaLarga, TEMAS, TEMA_PREDETERMINADO,
-  Avatar, BotonFoto, TarjetaPerfil, prepararFoto, PortadaAcceso, PantallaAcceso, FormularioAcceso, type VistaAcceso } from '../../familia/react';
+  Avatar, BotonFoto, TarjetaPerfil, prepararFoto, PortadaAcceso, PantallaAcceso, FormularioAcceso, type VistaAcceso, DescargarApp } from '../../familia/react';
 
 /** Mancuerna de StoaGym (lienzo 512, centro 256,245) */
 const MANCUERNA = (

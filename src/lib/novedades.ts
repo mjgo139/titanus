@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.31.0',
+    fecha: '22/11/2026',
+    cambios: [
+      'En la portada, "Descargar para Android" baja la app (solo en el navegador; no aparece en la app instalada ni en iPhone).',
+    ],
+  },
+  {
     version: '1.30.0',
     fecha: '22/11/2026',
     cambios: [

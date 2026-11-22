@@ -1,0 +1,107 @@
+/*
+  Familia estoica · variables (la ÚNICA fuente de colores de las 4 apps).
+  No se edita dentro de cada app: se cambia en el repo mjgo139/familia-estoica y se copia.
+
+  Modos:
+    - "Noche romana" (oscuro, predeterminado): negro con vetas y oro brillante.
+    - "Mármol" (claro): piedra cálida y bronce.
+  Se elige con <html data-theme="dark|light">.
+*/
+:root, :root[data-theme='dark'] {
+  /* Fondos */
+  --bg:#090909; --bg2:#1c1712; --bg3:#25211e;
+  --sf:#141311; --sf2:#1a1918; --nav:#0b0b0a;
+  /* Líneas (bordes) */
+  --ln:#685338; --ln2:#3b3226; --ln3:#74572e;
+  /* Texto: principal, secundario y apagados */
+  --tx:#f7f1e7; --tx2:#e6dccb; --mu:#c9bda7; --mu2:#9d917c;
+  /* Oro (único color de acción) */
+  --gold:#f2c55c; --goldh:#ffd67a; --gold2:#a66c16; --goldbg:#2a2113; --on:#0b0b0b;
+  --oro-grad: linear-gradient(#ffe7a0, #e6b84e 55%, #b77c22);
+  --panel-grad: linear-gradient(125deg, rgba(26,25,24,.92), rgba(9,9,9,.92));
+  /* Estados: hecho (verde), no hecho (ladrillo), aviso e información */
+  --ok:#f2c55c; --okbg:#2b2210; --verde:#7dba70; --miss:#d9826f; --missbg:#331b16;
+  --aviso:#e0b04a; --info:#8fb3d9;
+  /* Marfil: la figura del emblema y textos sobre fotos */
+  --marfil:#F3EDDF; --figura-trazo:#14120E;
+  /* Detalles */
+  --vena: rgba(154,113,55,.16);
+  --sombra: 0 8px 25px rgba(0,0,0,.45);
+  --sombra-boton: 0 3px 14px rgba(0,0,0,.35);
+  --sombra-panel: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -14px rgba(0,0,0,.6);
+  /* Colores de datos (gráficos): validados para daltonismo y contraste contra la tarjeta de cada modo */
+  --prot:#d96a52; --carb:#4f8fdc; --gras:#b5840c;
+  --serie-1:#4f8fdc; --serie-2:#de7040; --serie-3:#24ab8a; --serie-4:#b5840c;
+  --serie-5:#cf6b96; --serie-6:#5ea64a; --serie-7:#8476dc; --serie-8:#e06a68; --serie-otras:#6f6656;
+  /* Acento que elige la persona (data-acento = oliva | terracota | bronce); por defecto oliva */
+  --elegido:#a3b06c; --elegidobg:#262a1b;
+  --acento:#e6b84e;
+  --lateral:#050505;
+  --sombra-texto: 0 2px 6px #000;
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  --bg:#ece6db; --bg2:#e4dccd; --bg3:#f3eee5;
+  --sf:#faf7f1; --sf2:#f6f1e8; --nav:#f6f2ea;
+  --ln:#d8ccb4; --ln2:#e5ddcd; --ln3:#c5b48f;
+  --tx:#16120d; --tx2:#2b261e; --mu:#4a4337; --mu2:#6a604f;
+  --gold:#7e5d22; --goldh:#674b1a; --gold2:#a07a35; --goldbg:#eadbb8; --on:#fbf8f1;
+  --oro-grad: linear-gradient(#9a7333, #7e5d22 60%, #664a19);
+  --panel-grad: linear-gradient(125deg, #fbf8f2, #f4eee3);
+  --ok:#7e5d22; --okbg:#efe3c6; --verde:#3f6e38; --miss:#9c3f2e; --missbg:#f4ded6;
+  --aviso:#a06b14; --info:#3d6a96;
+  --marfil:#2b261e; --figura-trazo:#fbf8f1;
+  --vena: rgba(126,93,34,.10);
+  --sombra: 0 1px 2px rgba(60,45,20,.05), 0 6px 18px rgba(60,45,20,.08);
+  --prot:#c4553b; --carb:#2f6fb8; --gras:#a87a0a;
+  --serie-1:#2f6fb8; --serie-2:#d0632f; --serie-3:#16967a; --serie-4:#c98f00;
+  --serie-5:#c9618d; --serie-6:#3d7a2c; --serie-7:#6a58c4; --serie-8:#c43d3b; --serie-otras:#9a907f;
+  --elegido:#5e6b33; --elegidobg:#e6e8d3;
+  --lateral:#16130e;
+  /* Texto que pisa una foto: en Mármol, un halo de piedra (la sombra negra se veía sucia) */
+  --sombra-texto: 0 0 2px rgba(236,230,219,.95), 0 1px 10px rgba(236,230,219,.9);
+  color-scheme: light;
+}
+/* Iguales en los dos modos (sombras de botón y panel también: definidas arriba, el modo claro no las cambia) */
+:root {
+  /* Barra lateral de PC: siempre oscura */
+  --lat-tx:#c9bda7; --lat-tx-on:#f7f1e7; --lat-activo:#1d180f;
+  --lat-oro:#f2c55c; --lat-mu:#7d7462; --lat-borde:#a66c16; --lat-marfil:#F3EDDF;
+  --lat-linea: rgba(255,255,255,.08);
+  /* Texto sobre botones de color fuerte */
+  --sobre-verde:#0b0a08; --sobre-miss:#ffffff;
+  /* Textos sobre fotos y la marca grande */
+  --brillo-marca: 0 2px 3px #000, 0 0 20px rgba(182,122,42,.7);
+  /* Ícono y pantalla de inicio (iguales en las 4 apps) */
+  --icono-fondo:#14120E; --icono-laurel:#C9A66B; --icono-figura:#F3EDDF;
+  /* Letras */
+  --f-marca:'Cinzel', Georgia, serif;
+  --f-display:'Playfair Display', Georgia, serif;
+  --f-body:Inter, system-ui, sans-serif;
+  /* Escala única de letras (no se inventan otros tamaños; la revisa revisar.mjs) */
+  --t-micro:11px;      /* pestañas, textos mínimos */
+  --t-etiqueta:11.5px; /* ETIQUETAS en mayúsculas */
+  --t-ficha:12.5px;    /* fichas, notas */
+  --t-sec:13.5px;      /* texto secundario, chips */
+  --t-texto:15px;      /* texto normal, botón secundario */
+  --t-boton:16px;      /* botón principal */
+  --t-num:18px;        /* números */
+  --t-tarjeta:20px;    /* títulos de tarjeta, números grandes */
+  --t-saludo:26px;     /* saludo (40 en PC) */
+  --t-titulo:28px;     /* título de página (36 en PC) */
+  --t-titulo-pc:36px; --t-saludo-pc:40px;
+  --t-grande:48px; --t-gigante:64px; /* solo números decorativos */
+  /* Tamaños de íconos */
+  --i-linea:16px; --i-boton:20px; --i-nav:23px; --i-grande:32px; --i-gigante:44px;
+  /* Medidas */
+  --radio-tarjeta:16px; --radio-panel:20px; --radio-boton:12px; --radio-campo:9px;
+  --alto-boton:52px; --alto-boton-sec:44px; --alto-campo:46px; --alto-ficha:32px;
+  --ancho-lateral:248px; --ancho-celular:480px; --ancho-pc:1480px;
+}
+
+/* Acento elegido por la persona (Perfil → Apariencia) */
+:root[data-acento='terracota'] { --elegido:#d9875f; --elegidobg:#33211a; }
+:root[data-theme='light'][data-acento='terracota'] { --elegido:#a4512f; --elegidobg:#f1dccf; }
+:root[data-acento='bronce'] { --elegido:var(--gold); --elegidobg:var(--goldbg); }
+/* Muestras fijas de cada opción de acento */
+:root { --muestra-oliva:#5e6b33; --muestra-terracota:#a4512f; --muestra-bronce:#7e5d22; }

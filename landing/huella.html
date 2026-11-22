@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crear el código de la stoa</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="estilos.css" />
+  <style>
+    body { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--bg); }
+    .caja { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
+    h1 { font-size: 28px; }
+    p { color: var(--tx2); line-height: 1.5; margin: 0; }
+    .resultado { margin-top: 12px; padding: 14px; border: 1px solid var(--ln); border-radius: var(--radio-tarjeta); background: var(--sf); word-break: break-all;
+      font: 600 13.5px ui-monospace, monospace; color: var(--gold); }
+    .nota { font-size: 12.5px; color: var(--mu); }
+  </style>
+</head>
+<body>
+  <main class="caja">
+    <p class="etiqueta">Familia estoica · solo para el dueño</p>
+    <h1 class="marca">Crear el código</h1>
+    <p>Escribí el código que van a usar para entrar a la stoa. Acá no se guarda ni se envía: esta página solo calcula su <b>huella</b>, un resumen del que no se puede sacar el código de vuelta.</p>
+    <label class="etiqueta" for="c1">Código</label>
+    <input id="c1" class="campo" autocomplete="off" spellcheck="false" />
+    <label class="etiqueta" for="c2">Repetilo</label>
+    <input id="c2" class="campo" autocomplete="off" spellcheck="false" />
+    <button class="btn" id="calcular" type="button">Calcular la huella</button>
+    <p id="error" class="puerta-error" role="alert" hidden></p>
+    <div id="salida" hidden>
+      <p>Copiá esta huella y mandásela a Claude (no mandes el código):</p>
+      <div class="resultado" id="huella"></div>
+      <button class="btn" id="copiar" type="button">Copiar la huella</button>
+    </div>
+    <p class="nota">No distingue mayúsculas y minúsculas, y no tiene en cuenta los espacios al principio ni al final. Usá un código de al menos 8 letras y números: si es corto, se puede adivinar probando.</p>
+  </main>
+  <script type="module">
+    import { huellaDe } from './config.js';
+    const $ = (s) => document.querySelector(s);
+    $('#calcular').addEventListener('click', async () => {
+      const a = $('#c1').value.trim(), b = $('#c2').value.trim();
+      const e = $('#error');
+      e.hidden = true;
+      if (a.length < 8) { e.textContent = 'Usá al menos 8 caracteres.'; e.hidden = false; return; }
+      if (a.toUpperCase() !== b.toUpperCase()) { e.textContent = 'Los dos códigos no coinciden.'; e.hidden = false; return; }
+      $('#huella').textContent = await huellaDe(a);
+      $('#salida').hidden = false;
+    });
+    $('#copiar').addEventListener('click', async () => {
+      await navigator.clipboard.writeText($('#huella').textContent);
+      $('#copiar').textContent = 'Copiada ✓';
+    });
+  </script>
+</body>
+</html>

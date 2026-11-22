@@ -5,7 +5,7 @@ import { mensajeError } from '../data/repo';
 import { CLAVE_PRUEBA, USUARIO_PRUEBA } from '../data/semilla';
 import { useApp } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
-import { Emblema, FormularioAcceso, PantallaAcceso, PortadaAcceso, type VistaAcceso } from '../ui/familia';
+import { DescargarApp, Emblema, FormularioAcceso, PantallaAcceso, PortadaAcceso, type VistaAcceso } from '../ui/familia';
 
 export type { VistaAcceso };
 
@@ -51,6 +51,7 @@ export default function Acceso() {
       <button className="btn" onClick={() => setVista('ingresar')}><Icono n="corona" size={20} />Iniciar sesión</button>
       <button className="btn-sec" onClick={() => setVista('registrar')}>Crear cuenta</button>
       <button className="portada-invitado" onClick={invitado}>Continuar como invitado</button>
+      <DescargarApp apk="https://github.com/mjgo139/titanus/releases/download/apk-ultima/titanus.apk" />
       {error && <p role="alert" className="text-miss text-[15px]">{error}</p>}
       {repo.modo === 'prueba' && <p className="text-[12.5px] text-mu2">Modo prueba: la cuenta de ejemplo ya está cargada en "Iniciar sesión".</p>}
     </PortadaAcceso>

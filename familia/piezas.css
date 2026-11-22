@@ -263,3 +263,8 @@ a.lateral-persona:hover { background: var(--lat-activo); }
 .acceso-enlace { padding: 4px; border: 0; background: none; font-size: 15px; color: var(--mu); cursor: pointer; }
 .acceso-enlace b, .acceso-enlace.oro-fuerte { color: var(--gold); font-weight: 600; }
 .acceso-volver { margin: 24px auto 0; display: flex; align-items: center; gap: 4px; padding: 4px; border: 0; background: none; font-size: 15px; color: var(--mu); cursor: pointer; }
+
+/* v1.9.0 · Descargar la app (portada) */
+.portada-descarga { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto; padding: 8px 12px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); text-decoration: none; }
+.portada-descarga:hover { color: var(--goldh); }

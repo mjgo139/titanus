@@ -446,3 +446,24 @@ export function FormularioAcceso({ vista, alCambiarVista, acciones, mensajeError
     </form>
   );
 }
+
+/* ——————————————————— v1.9.0: descargar la app desde la portada ——————————————————— */
+
+/**
+ * Enlace "Descargar para Android" para la portada de acceso. Solo aparece en el navegador:
+ * no en la app instalada (Capacitor) ni en iPhone (allá no sirve un .apk).
+ * `apk` = dirección del archivo (Release `apk-ultima` de GitHub o `/descargas/…` del propio sitio).
+ */
+export function DescargarApp({ apk }: { apk: string }) {
+  if (typeof window === 'undefined') return null;
+  const w = window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } };
+  const nativo = Boolean(w.Capacitor?.isNativePlatform?.());
+  const ua = navigator.userAgent;
+  const ios = /iphone|ipad|ipod/i.test(ua) || (ua.includes('Macintosh') && navigator.maxTouchPoints > 1);
+  if (nativo || ios) return null;
+  return (
+    <a className="portada-descarga" href={apk} download data-testid="descargar-app">
+      <Icono n="descargar" size={16} />Descargar para Android
+    </a>
+  );
+}
