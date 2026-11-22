@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.7.1",
   "fecha": "2026-11-22",
   "archivos": {
     "LEEME.md": "ea73258c63923254191278ef1b6946dbffc2487384e1a1d1e225fd8b8da70a83",
@@ -10,9 +10,9 @@
     "frases.ts": "32f940ac6c9ef9d4132bf9d12630028e7f2c9236aaa3143e6de29932a5e309d4",
     "iconos.tsx": "d046ea97c9670fc063a212c8f4c7b57994481a865a9f0bee85998e1e78277495",
     "movimiento.css": "b451666a3fbbcd60083398c65bd5acda9bd30ae1ec758809d834a57bbf425395",
-    "piezas.css": "86ae6feaccdf93db9055b49d6de3fd54d3c2d07c309c9617e6775c38afdd561f",
+    "piezas.css": "8276a3f5ff4bd748d61154a2ac95e058bccce47e389feb17ced1af56739f4d7a",
     "portada-filosofo.webp": "301af29802abb33a766a052c5fc32ef3b6d45e8a48e8d891ea884876710ef7e0",
-    "react.tsx": "1b70d8536a5bfab0fbb3fe2591aeaf65ccc97905d2ed823f00c65bfc9ffa04f0",
+    "react.tsx": "8c92d09418f128984947432f769e7131246c88d21b8b84d2c8d5073b4efcaa14",
     "revisar.mjs": "6dae2ed098b6ba83159b22f50c1cf78e93fd22620925114d1e80f017e2493f5a",
     "tailwind-preset.js": "b87d3178e23ecbbc8b034cfbc8c950fb2610630bf597304ade7f2eef860025ab",
     "tokens.css": "a5b4857e35fc6362df60d494c5611dfc9a5cd430d8398f90a63b9113f315b9d5"

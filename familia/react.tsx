@@ -325,7 +325,7 @@ export function PortadaAcceso({ emblema, nombre, lema, frase, imagen, aviso, chi
         <div className="portada-marca entrar">
           {aviso}
           <div className="portada-emblema">{emblema}</div>
-          <div className="marca portada-nombre">{nombre}</div>
+          <h1 className="marca portada-nombre">{nombre}</h1>
           <div className="portada-lema">{lema}</div>
           {frase && <p className="portada-frase">{frase}</p>}
         </div>
