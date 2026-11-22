@@ -309,8 +309,8 @@ test('perfil: rango, apariencia, unidades, versión de admin y salir', async ({ 
   await page.getByRole('radio', { name: 'Automática' }).click();
   await expect(page.getByText('la rutina ya arranca con más peso')).toBeVisible();
   await page.getByRole('radio', { name: 'Libras (lb)' }).click();
-  await page.getByRole('radio', { name: 'Legionaria' }).click();
-  await expect(page.locator('img[src*="avatar-f"]:visible').first()).toBeVisible();
+  // Las estatuas salen del género elegido al empezar; ya no se eligen en Perfil
+  await expect(page.getByRole('radio', { name: 'Legionaria' })).toHaveCount(0);
   await expect(page.getByTestId('version')).toContainText('commit');
   await captura(page, '20-perfil');
   await page.getByRole('radio', { name: 'Mármol' }).click();
@@ -552,4 +552,20 @@ test('perfil: tarjeta, cambiar foto y nombre', async ({ page }) => {
   await captura(page, '21b-perfil-foto');
   await ir(page, 'Inicio');
   await expect(page.getByTestId('panel-dia').getByTestId('foto-perfil')).toBeVisible();
+});
+
+// v1.27.0: ningún programa se sale de la pantalla del celular (360 px) ni pide deslizar de costado
+test('programas: ninguna ficha es más ancha que la pantalla', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await entrar(page);
+  await page.goto('/programas');
+  await expect(page.getByTestId('programa').first()).toBeVisible();
+  const enlaces = await page.getByTestId('programa').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+  expect(enlaces.length).toBeGreaterThanOrEqual(6);
+  for (const h of enlaces) {
+    await page.goto(h!);
+    await expect(page.getByRole('button', { name: /Empezar programa|Empezar:/ }).first()).toBeVisible();
+    const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(ancho, h!).toBeLessThanOrEqual(360);
+  }
 });

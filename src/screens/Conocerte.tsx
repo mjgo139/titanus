@@ -201,14 +201,6 @@ export default function Conocerte() {
                 icono={<img src={estatuas('hombre').avatar} alt="" className="h-12 w-12 rounded-full border border-gold2 object-cover" />} />
               <Opcion activo={genero === 'mujer'} titulo="Mujer" alElegir={() => { setGenero('mujer'); setFigura('mujer'); }}
                 icono={<img src={estatuas('mujer').avatar} alt="" className="h-12 w-12 rounded-full border border-gold2 object-cover" />} />
-              <Opcion activo={genero === 'otro'} titulo="Otro" alElegir={() => setGenero('otro')}
-                icono={<span className="flex h-12 w-12 items-center justify-center rounded-full border border-gold2"><Icono n="laurel" className="oro" /></span>} />
-              {genero === 'otro' && (
-                <div className="tarjeta entrar">
-                  <div className="etiqueta mb-2">¿Qué estatuas preferís ver?</div>
-                  <Selector<Figura> nombre="Estatuas" valor={figura} alCambiar={setFigura} opciones={[{ v: 'hombre', t: 'Legionario' }, { v: 'mujer', t: 'Legionaria' }]} />
-                </div>
-              )}
             </div>
           )}
 

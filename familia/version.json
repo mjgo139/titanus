@@ -1,6 +1,6 @@
 {
-  "version": "1.6.0",
-  "fecha": "2026-11-21",
+  "version": "1.6.1",
+  "fecha": "2026-11-22",
   "archivos": {
     "LEEME.md": "c4a81198941298b65646a55762a16af5e974cc0b6a3c57bec68caf53b58a3341",
     "base.css": "c43b2da1f4e99a4d0d8fbc1dd08f319531effed363c197741529d4cc490fd199",
@@ -14,6 +14,6 @@
     "react.tsx": "43f47ed2eedcf5ac062331358472a8d27b7633822c18eabf0220ecd6c857fb93",
     "revisar.mjs": "b963f21a96eb8332796dffd2e1d29a83268de6c88b68f25f70190809b3be3688",
     "tailwind-preset.js": "b87d3178e23ecbbc8b034cfbc8c950fb2610630bf597304ade7f2eef860025ab",
-    "tokens.css": "3d935e9c4954f2c0806ec7cca53f22a68d6135b6427d17dc73ae9485b464354b"
+    "tokens.css": "a5b4857e35fc6362df60d494c5611dfc9a5cd430d8398f90a63b9113f315b9d5"
   }
 }

@@ -46,7 +46,7 @@ export default function Entreno() {
 
       <div className="relative -mx-[17px] mt-3 mb-3 h-[200px] overflow-hidden lg:mx-0 lg:h-[260px] lg:rounded-[14px] lg:border lg:border-ln">
         <img src={estatuas(perfil.figura).legionario} alt="" style={{ objectPosition: foco(perfil.figura, 'legionario') }} className="mascara-izq absolute right-0 top-0 h-full w-[58%] object-cover lg:w-[45%]" />
-        <div className="absolute bottom-4 left-[18px] max-w-[60%] lg:bottom-8 lg:left-8 lg:max-w-[50%]" style={{ textShadow: 'var(--sombra-texto)' }}>
+        <div className="absolute bottom-4 left-[18px] max-w-[55%] lg:bottom-8 lg:left-8 lg:max-w-[50%]" style={{ textShadow: 'var(--sombra-texto)' }}>
           <div className="etiqueta oro">Forjá tu fuerza</div>
           <h2 className="mt-1 font-display text-[26px] font-semibold leading-tight lg:text-[40px]">Cada serie cuenta</h2>
           <div className="mt-4 hidden lg:block">

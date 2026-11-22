@@ -64,7 +64,7 @@ export function TarjetaPrograma({ p }: { p: Programa }) {
   return (
     <Link to={`/programas/${p.id}`} className="hero relative flex h-[212px] w-full flex-col overflow-hidden p-4 text-left transition-colors hover:border-gold" data-testid="programa">
       <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[52%] object-cover opacity-90" style={{ objectPosition: img.pos }} />
-      <div className="relative flex w-[66%] flex-1 flex-col">
+      <div className="relative flex w-[62%] flex-1 flex-col" style={{ textShadow: 'var(--sombra-texto)' }}>
         <div className="flex items-center gap-2">
           <span className="etiqueta oro inline-flex items-center gap-1" data-testid="lugar-programa"><Icono n={iconoLugar[p.lugar]} size={16} />{nombreLugar(p.lugar)}</span><Sello p={p} />
         </div>
@@ -187,11 +187,11 @@ export default function VerPrograma() {
     <div>
       <Encabezado atras="/programas" etiqueta={`${nombreLugar(p.lugar)} · ${p.categoria}`} titulo={p.nombre} linea={p.lema} />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
-        <section className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
+        <section className="flex min-w-0 flex-col gap-4">
           <div className="hero relative min-h-[220px] overflow-hidden p-5 text-left">
-            <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[60%] object-cover" style={{ objectPosition: img.pos }} />
-            <div className="relative w-[60%]">
+            <img src={img.src} alt="" className="mascara-izq absolute inset-y-0 right-0 h-full w-[52%] object-cover" style={{ objectPosition: img.pos }} />
+            <div className="relative w-[56%] min-w-0 break-words" style={{ textShadow: 'var(--sombra-texto)' }}>
               <Sello p={p} />
               <div className="mt-3 flex flex-col gap-1 text-[15px] text-tx2">
                 <span><b className="num oro text-[20px]">{p.semanas.length}</b> semanas</span>
@@ -230,7 +230,7 @@ export default function VerPrograma() {
           </div>
         </section>
 
-        <section>
+        <section className="min-w-0">
           <Grupo n={1} className="mb-3">Semanas</Grupo>
           <ul className="flex flex-col gap-2">
             {p.semanas.map((w, i) => {

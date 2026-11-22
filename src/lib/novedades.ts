@@ -4,6 +4,16 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.27.0',
+    fecha: '22/11/2026',
+    cambios: [
+      'En modo Mármol, los textos que pisan una foto ("Cada serie cuenta", las tarjetas de programas) ya no tienen esa sombra negra sucia.',
+      'Las fichas de los programas ya no se salen de la pantalla del celular ni hay que deslizar de costado.',
+      'Perfil: los botones de Apariencia y Sobrecarga quedan alineados aunque el texto ocupe dos líneas.',
+      'Las estatuas (legionario o legionaria) salen del género que elegís al empezar; ya no se eligen en Perfil, y el género tiene solo Hombre y Mujer.',
+    ],
+  },
+  {
     version: '1.26.0',
     fecha: '21/11/2026',
     cambios: [

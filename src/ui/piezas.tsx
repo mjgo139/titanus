@@ -162,7 +162,7 @@ export function Selector<T extends string>({ opciones, valor, alCambiar, nombre 
     <div role="radiogroup" aria-label={nombre} className="flex gap-[5px]">
       {opciones.map((o) => (
         <button key={o.v} role="radio" aria-checked={valor === o.v} onClick={() => alCambiar(o.v)}
-          className={`chip flex-1 h-10 ${valor === o.v ? 'chip-on' : ''}`}>
+          className={`chip h-auto min-h-10 min-w-0 flex-1 px-2 py-1.5 text-center leading-tight ${valor === o.v ? 'chip-on' : ''}`}>
           {o.t}
         </button>
       ))}

@@ -7,7 +7,7 @@ import { SOBRECARGA_POR_DEFECTO } from '../lib/sobrecarga';
 import { FormAcceso } from './Acceso';
 import { COMMIT, FECHA_ARMADO, NOVEDADES, VERSION } from '../lib/novedades';
 import { esNativo, programarRecordatorios } from '../lib/recordatorios';
-import type { ModoSobrecarga, Recordatorio, Tema, Unidad, Figura } from '../lib/tipos';
+import type { ModoSobrecarga, Recordatorio, Tema, Unidad } from '../lib/tipos';
 import { estatuas } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
 import { Icono } from '../ui/Icono';
@@ -88,10 +88,6 @@ export default function Perfil() {
       <Seccion n={1} titulo="Apariencia">
         <Selector<Tema> nombre="Apariencia" valor={perfil.tema} alCambiar={(t) => cambiarPerfil({ tema: t })}
           opciones={TEMAS} />
-        <div className="mt-3">
-          <Selector<Figura> nombre="Estatuas" valor={perfil.figura ?? 'hombre'} alCambiar={(f) => cambiarPerfil({ figura: f })}
-            opciones={[{ v: 'hombre', t: 'Legionario' }, { v: 'mujer', t: 'Legionaria' }]} />
-        </div>
       </Seccion>
 
       <Seccion n={2} titulo="Unidades">
@@ -110,7 +106,7 @@ export default function Perfil() {
                 : 'No se sugieren cambios de peso.'}
           </p>
           {sc.modo !== 'apagada' && (
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
               {([['superior', 'Tren superior', [1, 1.25, 2.5]], ['inferior', 'Piernas y peso muerto', [2.5, 5]]] as const).map(([k, t, ops]) => (
                 <div key={k}>
                   <div className="etiqueta">{t}</div>
