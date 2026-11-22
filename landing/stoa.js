@@ -15,7 +15,7 @@ const N_COL = 21; // columnas por lado
 const X_COL = 4.2;
 const Z_FIN = 2 - (N_COL - 1) * PASO; // última columna (-108)
 const Z_PORTAL = -116;
-const TUNEL = { desde: -121, hasta: -410, radio: 7 };
+const TUNEL = { desde: -116.6, hasta: -410, radio: 7 };
 const COSMOS = new THREE.Vector3(0, 0, -480); // estatua gigante
 const ISLA = new THREE.Vector3(0, 0, -578); // isla con el cofre
 
@@ -398,15 +398,20 @@ export function crearStoa(canvas, { alAbrirApp }) {
   const aro2 = new THREE.Mesh(new THREE.TorusGeometry(3.45, 0.04, 8, 96), oro);
   portal.add(aro, aro2);
   const velo = new THREE.Mesh(new THREE.CircleGeometry(3.05, 96), new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    side: THREE.DoubleSide, fog: false,
     uniforms: { uTiempo: { value: 0 }, uFuerza: { value: 1 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
     fragmentShader: `${RUIDO_GLSL} uniform float uTiempo; uniform float uFuerza; varying vec2 vUv;
       void main(){ vec2 p = vUv - 0.5; float r = length(p) * 2.0; float a = atan(p.y, p.x);
         float remolino = fbm(vec3(cos(a * 3.0 + r * 6.0 - uTiempo * 1.2), sin(a * 3.0 + r * 6.0 - uTiempo * 1.2), r * 2.0 - uTiempo * 0.3));
-        vec3 c = mix(vec3(1.0, 0.75, 0.35), paleta(remolino * 1.3 + uTiempo * 0.05 + r * 0.4), 0.55);
-        float alfa = smoothstep(1.0, 0.75, r) * (0.25 + 0.75 * remolino) * uFuerza;
-        gl_FragColor = vec4(c * alfa * 1.5, alfa); }`,
+        float k = fract(remolino * 1.4 + r * 0.5 - uTiempo * 0.05);
+        vec3 violeta = vec3(0.32, 0.08, 0.45), turquesa = vec3(0.05, 0.38, 0.42), dorado = vec3(1.0, 0.72, 0.3);
+        vec3 c = k < 0.5 ? mix(violeta, turquesa, smoothstep(0.0, 0.5, k)) : mix(turquesa, violeta, smoothstep(0.5, 1.0, k));
+        c = mix(c, dorado, smoothstep(0.55, 0.9, remolino) * 0.7);
+        c *= 0.55 + remolino * 0.8;
+        c += vec3(1.0, 0.85, 0.55) * pow(1.0 - r, 3.0) * 0.6; // luz al centro
+        c = mix(c, vec3(1.0, 0.8, 0.45), smoothstep(0.82, 1.0, r) * 0.7); // borde dorado
+        gl_FragColor = vec4(c, 1.0); }`,
   }));
   portal.add(velo);
   // Dos columnas enormes enmarcan el umbral
@@ -425,7 +430,7 @@ export function crearStoa(canvas, { alAbrirApp }) {
   scene.add(tunel);
   const largoT = TUNEL.desde - TUNEL.hasta;
   const tunelMat = new THREE.ShaderMaterial({
-    side: THREE.BackSide, fog: false, transparent: true, depthWrite: false,
+    side: THREE.BackSide, fog: false,
     uniforms: { uTiempo: { value: 0 }, uFuerza: { value: 1 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
     fragmentShader: `${RUIDO_GLSL} uniform float uTiempo; uniform float uFuerza; varying vec2 vUv;
@@ -443,8 +448,9 @@ export function crearStoa(canvas, { alAbrirApp }) {
         c *= 0.35 + n * 0.75;
         c = mix(c, vec3(1.0, 0.78, 0.38), vetas * 0.55);
         c += vec3(1.0, 0.8, 0.45) * anillos * 0.35;
-        float bordes = smoothstep(0.0, 0.025, vUv.y) * smoothstep(1.0, 0.975, vUv.y);
-        gl_FragColor = vec4(c, bordes * uFuerza);
+        // cerca de la salida se aclara hacia la nebulosa
+        c = mix(c, vec3(0.12, 0.08, 0.2), smoothstep(0.08, 0.0, vUv.y) * 0.6);
+        gl_FragColor = vec4(c, 1.0);
       }`,
   });
   const tubo = new THREE.Mesh(new THREE.CylinderGeometry(TUNEL.radio, TUNEL.radio, largoT, 72, 1, true), tunelMat);
@@ -617,7 +623,7 @@ export function crearStoa(canvas, { alAbrirApp }) {
   const cofre = new THREE.Group();
   cofre.position.y = 0.78;
   isla.add(cofre);
-  const maderaCofre = new THREE.MeshStandardMaterial({ color: 0x3a2412, roughness: 0.55, metalness: 0.2 });
+  const maderaCofre = new THREE.MeshStandardMaterial({ color: 0x6b3f1d, roughness: 0.5, metalness: 0.15, side: THREE.DoubleSide, emissive: 0x1a0c04, emissiveIntensity: 0.4 });
   const cuerpo = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.85, 1.05), maderaCofre);
   cuerpo.position.y = 0.425;
   cofre.add(cuerpo);
@@ -634,6 +640,15 @@ export function crearStoa(canvas, { alAbrirApp }) {
   tapa.rotation.y = Math.PI / 2;
   tapa.position.set(0, 0, 0.525);
   bisagra.add(tapa);
+  const fondoTapa = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.05), maderaCofre);
+  fondoTapa.rotation.x = Math.PI / 2;
+  fondoTapa.position.set(0, 0, 0.525);
+  bisagra.add(fondoTapa);
+  for (const z of [0.02, 1.03]) {
+    const fleje = new THREE.Mesh(new THREE.BoxGeometry(1.76, 0.06, 0.06), oro);
+    fleje.position.set(0, 0, z);
+    bisagra.add(fleje);
+  }
   for (const x of [-0.82, 0, 0.82]) {
     const a = new THREE.Mesh(new THREE.TorusGeometry(0.53, 0.035, 8, 32, Math.PI), oro);
     a.rotation.y = Math.PI / 2;
@@ -864,11 +879,13 @@ export function crearStoa(canvas, { alAbrirApp }) {
 
     // Mostrar solo lo que está cerca (más liviano)
     const z = camara.position.z;
-    stoa.visible = z > -170;
-    portal.visible = z > -180;
-    tunel.visible = z < -90 && z > -440;
-    cosmos.visible = z < -360;
-    isla.visible = z < -430;
+    const cruzado = z < Z_PORTAL - 0.3; // ya atravesó el portal
+    stoa.visible = !cruzado;
+    portal.visible = !cruzado;
+    luzPortal.visible = !cruzado;
+    tunel.visible = cruzado && z > -445;
+    cosmos.visible = cruzado; // se ve a lo lejos por la salida del túnel y crece al acercarse
+    isla.visible = z < -380;
     cielo.position.copy(camara.position);
 
     // Cielo, niebla y luces según la fase
@@ -877,7 +894,7 @@ export function crearStoa(canvas, { alAbrirApp }) {
     cieloMat.uniforms.uTiempo.value = t;
     colNiebla.copy(C_NOCHE).lerp(C_COSMOS, suave(0.5, 0.6, p)).lerp(C_ALBA, fAlba);
     scene.fog.color.copy(colNiebla);
-    scene.fog.density = 0.03 * (1 - suave(0.3, 0.37, p)) + 0.004 * suave(0.55, 0.62, p) * (1 - fAlba) + 0.004 * fAlba;
+    scene.fog.density = 0.03 * (1 - suave(0.3, 0.37, p)) + 0.004 * suave(0.55, 0.62, p) * (1 - fAlba) + 0.0015 * fAlba;
     hemi.intensity = 0.55 + fCosmos * 0.1 + fAlba * 0.15;
     hemi.color.setHex(0x5a6a90).lerp(new THREE.Color(0xffc9a8), fAlba);
     luna.intensity = 0.7 * (1 - fCosmos);
@@ -896,6 +913,7 @@ export function crearStoa(canvas, { alAbrirApp }) {
     tunelMat.uniforms.uTiempo.value = t;
     if (tunel.visible) moverFlotantes(t);
     gigante.rotation.y = t * 0.08 + p * 3;
+    marmolGigante.emissiveIntensity = 0.35 + (1 - suave(0.56, 0.64, p)) * 1.2; // brilla al aparecer por la salida
     gigante.position.y = -9 + Math.sin(t * 0.5) * 0.4;
     corona.rotation.z = Math.sin(t * 0.3) * 0.05;
     anillo.rotation.y = t * 0.05;
