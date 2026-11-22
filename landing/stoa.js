@@ -15,7 +15,7 @@ const N_COL = 21; // columnas por lado
 const X_COL = 4.2;
 const Z_FIN = 2 - (N_COL - 1) * PASO; // última columna (-108)
 const Z_PORTAL = -116;
-const TUNEL = { desde: -116.6, hasta: -410, radio: 7 };
+const TUNEL = { desde: -114.5, hasta: -410, radio: 7 }; // empieza antes del portal: al cruzarlo ya estás adentro
 const COSMOS = new THREE.Vector3(0, 0, -480); // estatua gigante
 const ISLA = new THREE.Vector3(0, 0, -578); // isla con el cofre
 
@@ -879,7 +879,7 @@ export function crearStoa(canvas, { alAbrirApp }) {
 
     // Mostrar solo lo que está cerca (más liviano)
     const z = camara.position.z;
-    const cruzado = z < Z_PORTAL - 0.3; // ya atravesó el portal
+    const cruzado = z < Z_PORTAL + 0.12; // ya tocó el portal (el disco llena la pantalla)
     stoa.visible = !cruzado;
     portal.visible = !cruzado;
     luzPortal.visible = !cruzado;
