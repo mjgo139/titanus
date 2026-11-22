@@ -46,7 +46,7 @@ const avanceRiel = $('#riel-avance');
 
 function leerScroll() {
   const max = document.documentElement.scrollHeight - innerHeight;
-  objetivo = max > 0 ? limitar(scrollY / max) : 0;
+  objetivo = max > 0 && !document.body.classList.contains('bloqueado') ? limitar(scrollY / max) : 0;
 }
 addEventListener('scroll', leerScroll, { passive: true });
 addEventListener('resize', leerScroll);

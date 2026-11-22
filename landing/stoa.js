@@ -4,6 +4,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { APPS } from './config.js';
 
 const PASO = 5.5; // distancia entre columnas
@@ -250,28 +252,44 @@ export function crearStoa(canvas, { alAbrirApp }) {
   for (let i = 0; i < N_COL; i++) { m.makeTranslation(0, 7.95, 2 - i * PASO); vigas.setMatrixAt(i, m); }
   scene.add(vigas);
 
-  // ——— Cipreses afuera (siluetas) ———
-  const nCip = movil ? 40 : 80;
-  const cipreses = new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, 8), new THREE.MeshStandardMaterial({ color: 0x0b110b, roughness: 1 }), nCip);
-  const q = new THREE.Quaternion(), s = new THREE.Vector3(), pos = new THREE.Vector3();
-  for (let i = 0; i < nCip; i++) {
-    const lado = i % 2 ? 1 : -1;
-    const alto = 7 + Math.random() * 9;
-    pos.set(lado * (11 + Math.random() * 30), alto / 2, 20 - Math.random() * 170);
-    s.set(1.1 + Math.random() * 0.8, alto, 1.1 + Math.random() * 0.8);
-    m.compose(pos, q, s);
-    cipreses.setMatrixAt(i, m);
+  // ——— Parapeto de piedra afuera de las columnas ———
+  for (const lado of [-1, 1]) {
+    const muro = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.05, largo), piedra);
+    muro.position.set(lado * (X_COL + 1.35), 0.52, zMedio);
+    scene.add(muro);
+    const remate = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.14, largo), piedra);
+    remate.position.set(lado * (X_COL + 1.35), 1.1, zMedio);
+    scene.add(remate);
   }
-  scene.add(cipreses);
+
+  // ——— Montañas lejanas (silueta contra el cielo) ———
+  const gMontes = new THREE.CylinderGeometry(190, 190, 1, 256, 1, true);
+  const pm = gMontes.attributes.position;
+  for (let i = 0; i < pm.count; i++) {
+    if (pm.getY(i) > 0) {
+      const a = Math.atan2(pm.getZ(i), pm.getX(i));
+      const h = 10 + 9 * Math.sin(a * 3 + 1) + 6 * Math.sin(a * 7 + 2.3) + 3 * Math.sin(a * 17) + 1.5 * Math.sin(a * 41);
+      pm.setY(i, Math.max(3, h));
+    } else pm.setY(i, -2);
+  }
+  gMontes.computeVertexNormals();
+  const montes = new THREE.Mesh(gMontes, new THREE.MeshBasicMaterial({ color: 0x07060a, fog: false, side: THREE.BackSide }));
+  scene.add(montes);
+  const montes2 = new THREE.Mesh(gMontes.clone().scale(0.82, 0.6, 0.82), new THREE.MeshBasicMaterial({ color: 0x0b0909, fog: false, side: THREE.BackSide }));
+  montes2.rotation.y = 1.7;
+  scene.add(montes2);
 
   // ——— Braseros con fuego ———
   const bronce = new THREE.MeshStandardMaterial({ color: 0x8a6a35, roughness: 0.35, metalness: 0.9 });
   const zBraseros = [];
-  for (let z = -3; z > Z_FIN; z -= movil ? 22 : 11) zBraseros.push(z);
+  for (let z = -3; z > Z_FIN; z -= 11) zBraseros.push(z);
+  const zAltar = Z_COFRE + 1.2;
   const fuegoBases = [];
-  zBraseros.forEach((z, i) => {
-    const lado = i % 2 ? 1 : -1;
-    const x = lado * 3.05;
+  const texHalo = halo('rgba(255,170,80,1)');
+  [...zBraseros, zAltar, zAltar].forEach((z, i) => {
+    const enAltar = i >= zBraseros.length;
+    const lado = enAltar ? (i === zBraseros.length ? -1 : 1) : i % 2 ? 1 : -1;
+    const x = lado * (enAltar ? 2.9 : 3.05);
     const pie = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.14, 1.1, 12), bronce);
     pie.position.set(x, 0.55, z);
     const cuenco = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), bronce);
@@ -279,12 +297,21 @@ export function crearStoa(canvas, { alAbrirApp }) {
     const brasa = new THREE.Mesh(new THREE.CircleGeometry(0.34, 24), new THREE.MeshBasicMaterial({ color: 0xff7a1a }));
     brasa.rotation.x = -Math.PI / 2;
     brasa.position.set(x, 1.3, z);
-    scene.add(pie, cuenco, brasa);
-    const luz = new THREE.PointLight(0xff9440, 30, 16, 2);
-    luz.position.set(x, 2.1, z);
-    luz.userData.semilla = Math.random() * 100;
-    scene.add(luz);
-    fuegoBases.push({ x, y: 1.32, z, luz });
+    const brillo = new THREE.Sprite(new THREE.SpriteMaterial({ map: texHalo, color: 0xff8a30, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending }));
+    brillo.position.set(x, 1.75, z);
+    brillo.scale.set(2.6, 2.6, 1);
+    scene.add(pie, cuenco, brasa, brillo);
+    fuegoBases.push({ x, y: 1.32, z, semilla: Math.random() * 100, altar: enAltar });
+  });
+  // Luz fija y cálida para el altar
+  const luzAltar = new THREE.PointLight(0xffa452, 0, 18, 2);
+  luzAltar.position.set(0, 4.5, Z_COFRE + 3);
+  scene.add(luzAltar);
+  // Solo las luces de los braseros más cercanos son reales (mucho más liviano)
+  const luces = Array.from({ length: movil ? 3 : 4 }, () => {
+    const l = new THREE.PointLight(0xff9440, 0, 16, 2);
+    scene.add(l);
+    return l;
   });
 
   const porFuego = movil ? 70 : 120;
@@ -454,15 +481,53 @@ export function crearStoa(canvas, { alAbrirApp }) {
     return sp;
   });
 
+  // ——— Estatuas: del cuerpo descuidado al disciplinado, en orden por el pasillo ———
+  const ORDEN = [5, 4, 2, 1, 3, 6];
+  const marmolEstatua = new THREE.MeshStandardMaterial({ color: 0xe9dfcd, roughness: 0.5, metalness: 0.03, emissive: 0x2a1d10, emissiveIntensity: 0.55 });
+  const cargador = new GLTFLoader();
+  cargador.setMeshoptDecoder(MeshoptDecoder);
+  const estatuas = [];
+  const lugaresEstatua = [];
+  ORDEN.forEach((n, i) => {
+    const lado = i % 2 ? 1 : -1;
+    const hueco = 2 + i * 3;
+    const z = 2 - (hueco + 0.5) * PASO;
+    lugaresEstatua.push({ x: lado * X_COL, z });
+    const base = new THREE.Group();
+    base.position.set(lado * X_COL, 0, z);
+    scene.add(base);
+    const pedestal = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.0, 1.15), piedra);
+    pedestal.position.y = 0.5;
+    const moldura = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.12, 1.35), piedra);
+    moldura.position.y = 1.06;
+    base.add(pedestal, moldura);
+    cargador.load(`modelos/estatua-${n}.glb`, (g) => {
+      const o = g.scene;
+      o.traverse((m) => { if (m.isMesh) m.material = marmolEstatua; });
+      const caja = new THREE.Box3().setFromObject(o);
+      const alto = caja.max.y - caja.min.y;
+      const esc = 2.5 / alto;
+      o.scale.setScalar(esc);
+      o.position.y = 1.12 - caja.min.y * esc;
+      o.rotation.y = lado < 0 ? 1.03 : -1.03; // mira hacia quien viene caminando
+      base.add(o);
+      estatuas.push(o);
+    });
+  });
+
   // ——— Posprocesado: brillo (bloom) ———
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camara));
+  composer.setPixelRatio(renderer.getPixelRatio());
   const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), movil ? 0.5 : 0.6, 0.5, 0.86);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
+  let ultW = 0, ultH = 0;
   function medir() {
     const w = innerWidth, h = innerHeight;
+    if (w === ultW && Math.abs(h - ultH) < 160) return; // la barra del navegador aparece y desaparece
+    ultW = w; ultH = h;
     renderer.setSize(w, h, false);
     composer.setSize(w, h);
     bloom.resolution.set(w / 2, h / 2);
@@ -474,30 +539,53 @@ export function crearStoa(canvas, { alAbrirApp }) {
   addEventListener('resize', medir);
 
   // ——— Recorrido de la cámara ———
-  let objetivo = 0, actual = 0, entrada = 0, dentro = false;
+  let objetivo = 0, actual = 0, vel = 0, entrada = 0, dentro = false;
+  // Calidad automática: si el equipo no llega a ~45 cuadros por segundo, baja la resolución
+  let pr = renderer.getPixelRatio(), acum = 0, cuadros = 0;
+  function calidad(dt) {
+    acum += dt; cuadros++;
+    if (acum < 1.5) return;
+    const fps = cuadros / acum;
+    acum = 0; cuadros = 0;
+    if (fps < 42 && pr > 0.75) { pr = Math.max(0.75, pr - 0.25); renderer.setPixelRatio(pr); composer.setPixelRatio(pr); }
+    else if (fps > 58 && pr < Math.min(devicePixelRatio, movil ? 1.5 : 1.75)) { pr = Math.min(pr + 0.25, Math.min(devicePixelRatio, movil ? 1.5 : 1.75)); renderer.setPixelRatio(pr); composer.setPixelRatio(pr); }
+  }
   const raton = new THREE.Vector2(), ratonSuave = new THREE.Vector2();
   addEventListener('pointermove', (e) => {
     raton.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
   });
 
   const posCam = new THREE.Vector3(), mira = new THREE.Vector3();
+  const Z_LLEGADA = Z_COFRE + 7.6;
   function camino(p, t) {
-    const caminar = suave(0, 0.86, p);
-    const llegar = suave(0.84, 0.94, p);
-    const subir = suave(0.93, 1, p);
-    const zCaminar = mezcla(9, Z_FIN + 3, caminar);
-    let z = mezcla(zCaminar, Z_COFRE + 7.2, llegar);
-    z = mezcla(z, Z_COFRE + 8, subir);
-    const paso = caminar * (1 - llegar);
-    const x = Math.sin(zCaminar * 0.22) * 0.35 * paso;
-    let y = 1.72 + (quieto ? 0 : Math.sin(zCaminar * 1.15) * 0.035 * paso);
-    y = mezcla(y, 2.05, llegar);
-    y = mezcla(y, 2.25, subir);
-    posCam.set(x, y, z);
-    const mz = mezcla(z - 25, Z_COFRE, llegar);
-    let my = mezcla(2.5, 1.55, llegar);
-    my = mezcla(my, 2.55, subir);
-    mira.set(x * 0.3, my, mz);
+    // Caminata a velocidad pareja (sale y llega suave), después se acerca al altar y levanta la vista
+    const w = Math.min(1, p / 0.88);
+    const A = 0.08; // tramo para arrancar y para frenar
+    const d = w < A ? (w * w) / (2 * A) : w > 1 - A ? 1 - A - ((1 - w) * (1 - w)) / (2 * A) : w - A / 2;
+    const u = d / (1 - A);
+    const z = mezcla(9, Z_LLEGADA, u);
+    const subir = suave(0.9, 1, p);
+    const paso = Math.sin(Math.min(1, u) * Math.PI);
+    const x = Math.sin(z * 0.16) * 0.3 * paso;
+    let y = 1.72 + (quieto ? 0 : Math.sin(z * 0.9) * 0.025 * paso);
+    const cerca = suave(0.8, 0.9, p);
+    y = mezcla(y, 2.0, cerca);
+    y = mezcla(y, 2.3, subir);
+    posCam.set(x, y, mezcla(z, Z_LLEGADA - 0.6, subir));
+    const mz = mezcla(z - 8, Z_COFRE, cerca);
+    let my = mezcla(2.02, 1.6, cerca);
+    my = mezcla(my, 2.6, subir);
+    mira.set(x * 0.4, my, mz);
+    // al pasar junto a una estatua, la vista gira suave hacia ella
+    if (cerca < 1) {
+      for (const e of lugaresEstatua) {
+        const dz = z - (e.z + 7.5);
+        const peso = Math.exp(-(dz * dz) / 18) * (1 - cerca) * (camara.aspect < 0.8 ? 0.85 : 0.4);
+        mira.x = mezcla(mira.x, e.x, peso);
+        mira.y = mezcla(mira.y, 3.0, peso);
+        mira.z = mezcla(mira.z, e.z, peso);
+      }
+    }
     // en la puerta: respira y espera un poco más atrás; al entrar avanza suave
     posCam.y += Math.sin(t * 0.6) * 0.06 * (1 - entrada);
     posCam.z += (1 - suave(0, 1, entrada)) * 3;
@@ -530,7 +618,15 @@ export function crearStoa(canvas, { alAbrirApp }) {
   function cuadroEscena() {
     const dt = Math.min(reloj.getDelta(), 0.05);
     const t = reloj.elapsedTime;
-    actual += (objetivo - actual) * (1 - Math.exp(-dt * (quieto ? 12 : 4.2)));
+    // Resorte amortiguado: arranca y frena sin saltos aunque el scroll venga a tirones
+    if (quieto) actual = objetivo;
+    else {
+      vel += (objetivo - actual) * 26 * dt;
+      vel *= Math.exp(-10 * dt);
+      actual += vel * dt;
+      if (Math.abs(objetivo - actual) < 0.00005 && Math.abs(vel) < 0.0005) { actual = objetivo; vel = 0; }
+    }
+    calidad(dt);
     if (dentro) entrada = Math.min(1, entrada + dt * 0.5);
     ratonSuave.lerp(raton, 1 - Math.exp(-dt * 3));
 
@@ -543,10 +639,18 @@ export function crearStoa(canvas, { alAbrirApp }) {
     matFuego.uniforms.uTiempo.value = t;
     matFuego.uniforms.uEscala.value = renderer.getPixelRatio() * 2.4;
     matPolvo.uniforms.uTiempo.value = t;
-    for (const b of fuegoBases) {
-      const sem = b.luz.userData.semilla;
-      b.luz.intensity = 26 + Math.sin(t * 9 + sem) * 4 + Math.sin(t * 23 + sem * 2) * 3;
-    }
+    // Las luces reales van a los braseros más cercanos a la cámara
+    const zc = camara.position.z - 4;
+    luzAltar.intensity = 45 * suave(0.7, 0.86, actual) * (0.95 + Math.sin(t * 7) * 0.05);
+    const cercanos = fuegoBases.filter((b) => !b.altar).slice().sort((a, b) => Math.abs(a.z - zc) - Math.abs(b.z - zc));
+    luces.forEach((l, i) => {
+      const b = cercanos[i];
+      if (!b) { l.intensity = 0; return; }
+      l.position.set(b.x, 2.1, b.z);
+      // se apaga de a poco antes de pasar a otro brasero: sin saltos de luz
+      const peso = suave(22, 7, Math.abs(b.z - zc));
+      l.intensity = (30 + Math.sin(t * 9 + b.semilla) * 4 + Math.sin(t * 23 + b.semilla * 2) * 3) * peso;
+    });
 
     // Cofre: se abre y salen las tres apps
     const abrir = suave(0.86, 0.94, actual);
