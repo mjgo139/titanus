@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.34.0',
+    fecha: '26/11/2026',
+    cambios: [
+      'Ya no se muestra el rango (Recluta, Legionario…) ni el nivel: se quitó de Perfil, del resumen al terminar, del widget de Android y del widget para Windows (ahí va la cantidad de entrenamientos).',
+    ],
+  },
+  {
     version: '1.33.0',
     fecha: '26/11/2026',
     cambios: [

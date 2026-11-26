@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { actualizarWidgets, fechaCorta } from '../lib/widget';
 import { buscarPrograma, programasActivos, proximaSesion, totalSesiones } from '../lib/programas';
 import { leerBorrador } from '../lib/borrador';
-import { hechasHoy, rachaSemanas, rango, romano, rutinaDeHoy, rutinasDeHoy, semanaActual, fechaLocal } from '../lib/logica';
+import { hechasHoy, rachaSemanas, romano, rutinaDeHoy, rutinasDeHoy, semanaActual, fechaLocal } from '../lib/logica';
 import type { Rutina } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
@@ -31,7 +31,6 @@ export default function Hoy() {
   const dias = perfil.resumen.dias;
   const racha = rachaSemanas(dias, ahora);
   const semana = semanaActual(dias, ahora);
-  const r = rango(perfil.resumen.total);
   // Todas las rutinas del día, en orden; la tarjeta muestra la próxima pendiente
   const delDia = rutinas ? rutinasDeHoy(rutinas, ahora) : [];
   const listasHoy = hechasHoy(perfil, ahora);
@@ -57,7 +56,7 @@ export default function Hoy() {
     const restan = delDia.filter((x) => !listasHoy.includes(x.id)).length - 1;
     const prox = proxima?.r;
     actualizarWidgets({
-      racha, rango: `${r.nombre} · Nivel ${r.nivel}`,
+      racha, rango: `${perfil.resumen.total} ${perfil.resumen.total === 1 ? 'entrenamiento' : 'entrenamientos'}`,
       fechas: dias.filter((d) => d > ahora - 15 * 86_400_000).map((d) => fechaCorta(d)).join(','),
       esHoy: !!deHoy,
       etiqueta: deHoy ? (delDia.length > 1 ? `HOY TOCA · ${nHoy} DE ${delDia.length}` : 'HOY TOCA') : todoHecho ? 'HOY · CUMPLIDO' : prox ? 'LO PRÓXIMO' : 'ENTRENAMIENTO',

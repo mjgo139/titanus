@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { buscarEjercicio } from '../lib/biblioteca';
 import { rutinaDesdeEntreno } from '../lib/entreno';
-import { contarSeries, duracion, formatoPeso, mejorSerie, rachaSemanas, rango, romano } from '../lib/logica';
+import { contarSeries, duracion, formatoPeso, mejorSerie, rachaSemanas, romano } from '../lib/logica';
 import type { Ejercicio, Entrenamiento, Record as Rec } from '../lib/tipos';
 import { estatuas, foco } from '../ui/estatuas';
 import { useSesion } from '../ui/contexto';
@@ -28,7 +28,6 @@ export default function Resumen() {
 
   const u = perfil.unidad;
   const racha = rachaSemanas(perfil.resumen.dias);
-  const r = rango(perfil.resumen.total);
   const r0 = e.records[0];
 
   async function guardarRutina() {
@@ -60,8 +59,8 @@ export default function Resumen() {
 
       <div className="tarjeta mt-3 flex items-center justify-between">
         <div>
-          <div className="etiqueta">Racha · {r.nombre} nivel {r.nivel}</div>
-          <div className="mt-1 text-[13.5px] text-mu">{racha} {racha === 1 ? 'semana' : 'semanas'} sin aflojar{r.siguiente ? ` · faltan ${r.faltan} para ${r.siguiente}` : ''}</div>
+          <div className="etiqueta">Racha</div>
+          <div className="mt-1 text-[13.5px] text-mu">{racha} {racha === 1 ? 'semana' : 'semanas'} sin aflojar</div>
         </div>
         <div className="num oro text-[40px]">{romano(racha)}</div>
       </div>

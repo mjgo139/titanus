@@ -2,7 +2,7 @@ import { CabeceraPagina } from '../ui/familia';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { mensajeError } from '../data/repo';
-import { NOMBRES_DIA, aUnidad, formatoNumero, rachaSemanas, rango, redondear, romano } from '../lib/logica';
+import { NOMBRES_DIA, aUnidad, formatoNumero, rachaSemanas, redondear, romano } from '../lib/logica';
 import { SOBRECARGA_POR_DEFECTO } from '../lib/sobrecarga';
 import { FormAcceso } from './Acceso';
 import { COMMIT, FECHA_ARMADO, NOVEDADES, VERSION } from '../lib/novedades';
@@ -26,7 +26,6 @@ export default function Perfil() {
   const [crear, setCrear] = useState(false);
   const [editarNombre, setEditarNombre] = useState(false);
   const r = perfil.recordatorio;
-  const rg = rango(perfil.resumen.total);
   const sc = perfil.sobrecarga ?? SOBRECARGA_POR_DEFECTO;
   const racha = rachaSemanas(perfil.resumen.dias);
 
@@ -72,8 +71,7 @@ export default function Perfil() {
 
       <div className="tarjeta mt-6 py-1">
         <div className="flex justify-between border-b border-ln2 py-[13px]"><span>Entrenamientos completados</span><strong className="num" data-testid="completados">{perfil.resumen.total}</strong></div>
-        <div className="flex justify-between border-b border-ln2 py-[13px]"><span>Racha actual</span><strong className="num">{racha ? `${romano(racha)} · ${racha} ${racha === 1 ? 'semana' : 'semanas'}` : '—'}</strong></div>
-        <div className="flex justify-between py-[13px]"><span>Rango</span><strong className="oro">{rg.nombre}</strong></div>
+        <div className="flex justify-between py-[13px]"><span>Racha actual</span><strong className="num">{racha ? `${romano(racha)} · ${racha} ${racha === 1 ? 'semana' : 'semanas'}` : '—'}</strong></div>
       </div>
 
       {usuario.invitado && (

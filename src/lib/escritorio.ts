@@ -9,7 +9,7 @@
 import { DIRECCION } from '../ui/AvisoMudanza';
 import { FIGURAS } from '../../familia/emblema.mjs';
 import { fechasGrilla, type AppEscritorio, type ColorFila, type FilaEscritorio, type ResumenEscritorio } from '../../familia/escritorio';
-import { fechaLocal, hechasHoy, rachaSemanas, rango, rutinasDeHoy } from './logica';
+import { fechaLocal, hechasHoy, rachaSemanas, rutinasDeHoy } from './logica';
 import type { Perfil, Rutina } from './tipos';
 
 export const APP_ESCRITORIO = (proyecto: string): AppEscritorio => ({
@@ -48,7 +48,6 @@ export function resumenStoaGym(perfil: Perfil, rutinas: Rutina[], ahora = Date.n
   const listas = hechasHoy(perfil, ahora);
   const hechasDelDia = delDia.filter((r) => listas.includes(r.id)).length;
   const entrenoHoy = entrenados.has(hoy);
-  const r = rango(perfil.resumen.total);
   const racha = rachaSemanas(perfil.resumen.dias, ahora);
 
   // Tarjeta general: los días que entrenaste
@@ -60,7 +59,7 @@ export function resumenStoaGym(perfil: Perfil, rutinas: Rutina[], ahora = Date.n
     estado: entrenoHoy ? '1' : delDia.length ? '0' : '-',
     racha,
     color: 'Oro',
-    subtitulo: `${r.nombre} · NIVEL ${r.nivel}`.toUpperCase(),
+    subtitulo: `${perfil.resumen.total} ${perfil.resumen.total === 1 ? 'ENTRENAMIENTO' : 'ENTRENAMIENTOS'}`,
     dias: grilla.map((f) => (f > hoy ? 'f' : entrenados.has(f) ? '1' : f === hoy && delDia.length ? 'p' : '-')).join(''),
     pct: (en30 / 30) * 100,
     derecha: `${perfil.resumen.total}`,
