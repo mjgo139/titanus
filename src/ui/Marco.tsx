@@ -7,6 +7,7 @@ import { AvisoPrueba, Avatar, BarraLateral, Emblema, Pestanas } from './familia'
 import { AvisoMudanza } from './AvisoMudanza';
 import { Icono } from './Icono';
 import { useApp } from './contexto';
+import { useResumenEscritorio } from './Escritorio';
 import { useEffect, useState } from 'react';
 
 const PESTANAS_BASE = [
@@ -65,6 +66,7 @@ const activa = (a: string, isActive: boolean, ruta: string) =>
 /** Celular: pestañas abajo. PC: barra lateral. Las dos son piezas de la familia (BarraLateral, Pestanas) */
 export function Marco() {
   const { mensaje, repo, profesional, perfil, usuario } = useApp();
+  useResumenEscritorio();
   // Los profesionales tienen una pestaña más: sus clientes
   const PESTANAS = profesional ? [...PESTANAS_BASE.slice(0, 3), { a: '/clientes', n: 'clientes', t: 'Clientes' }, PESTANAS_BASE[3]] : PESTANAS_BASE;
   const loc = useLocation();

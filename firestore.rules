@@ -44,8 +44,10 @@ service cloud.firestore {
     function perfilValido(uid) {
       let d = request.resource.data;
       return d.keys().hasOnly(['uid', 'nombre', 'email', 'tema', 'unidad', 'recordatorio', 'creado', 'resumen', 'sobrecarga', 'figura',
-          'genero', 'nacimiento', 'altura', 'objetivo', 'nivel', 'conocido', 'programa', 'programas', 'hoy', 'foto'])
+          'genero', 'nacimiento', 'altura', 'objetivo', 'nivel', 'conocido', 'programa', 'programas', 'hoy', 'foto', 'escritorio'])
         && (!('foto' in d) || d.foto == null || (d.foto is string && d.foto.size() <= 100000 && d.foto.matches('data:image/(webp|jpeg);base64,.*')))
+        // Widget para Windows (v1.33.0): código secreto de 24 letras, o null si está apagado
+        && (!('escritorio' in d) || d.escritorio == null || (d.escritorio is string && d.escritorio.matches('[a-zA-Z0-9]{24}')))
         && (!('uid' in d) || d.uid == uid)
         && (!('nombre' in d) || (d.nombre is string && d.nombre.size() <= 80))
         && (!('tema' in d) || d.tema in ['claro', 'oscuro', 'sistema'])
@@ -192,6 +194,25 @@ service cloud.firestore {
     match /config/admins {
       allow read: if conSesion();
       allow write: if false;
+    }
+
+    // ---------- Widget para Windows (v1.33.0) ----------
+    // Un resumen corto de hoy en un documento cuyo nombre es un código secreto al azar (24 letras).
+    // Se puede leer sabiéndolo (lo lee el widget de Rainmeter sin sesión), pero no listar.
+    // Solo su dueño lo crea, lo cambia o lo borra.
+    match /escritorio/{codigo} {
+      allow get: if codigo.matches('[a-zA-Z0-9]{24}');
+      allow list: if false;
+      allow create: if conSesion() && codigo.matches('[a-zA-Z0-9]{24}') && resumenEscritorio();
+      allow update: if conSesion() && resource.data.uid == request.auth.uid && resumenEscritorio();
+      allow delete: if conSesion() && resource.data.uid == request.auth.uid;
+      function resumenEscritorio() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['uid', 't', 'actualizado'])
+          && d.uid == request.auth.uid
+          && d.t is string && d.t.size() <= 2000
+          && d.actualizado is int;
+      }
     }
   }
 }

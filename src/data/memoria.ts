@@ -200,6 +200,17 @@ export class RepoMemoria implements Repo {
     this.avisar();
   }
 
+  /** Resúmenes del widget de Windows (solo para probar) */
+  escritorios = new Map<string, { uid: string; t: string; actualizado: number }>();
+
+  async guardarEscritorio(uid: string, codigo: string, t: string) {
+    this.escritorios.set(codigo, { uid, t, actualizado: Date.now() });
+  }
+
+  async borrarEscritorio(codigo: string) {
+    this.escritorios.delete(codigo);
+  }
+
   async borrarCuenta() {
     if (!this.usuario) return;
     const uid = this.usuario.uid;

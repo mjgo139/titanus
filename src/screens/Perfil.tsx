@@ -14,6 +14,7 @@ import { Icono } from '../ui/Icono';
 import { Hoja, Seccion, Selector } from '../ui/piezas';
 import { Avatar, BotonFoto, TarjetaPerfil, TEMAS } from '../ui/familia';
 import { SeccionPro } from '../pro/SeccionPerfil';
+import { FilaEscritorio } from '../ui/Escritorio';
 
 export default function Perfil() {
   const { repo, usuario, perfil, admin, cambiarPerfil, aviso } = useSesion();
@@ -170,6 +171,7 @@ export default function Perfil() {
               ].filter(Boolean).join(' · ') || 'Género, edad, peso, altura, objetivo y experiencia'}</span></span>
             <Icono n="atras" size={20} className="rotate-180 text-mu" />
           </Link>
+          <FilaEscritorio />
           <button className="fila w-full text-left" onClick={exportar}>
             <Icono n="descargar" className="oro" /><span className="flex-1 font-semibold">Exportar mis datos</span>
           </button>

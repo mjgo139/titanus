@@ -570,3 +570,28 @@ test('programas: ninguna ficha es más ancha que la pantalla', async ({ page }) 
     expect(ancho, h!).toBeLessThanOrEqual(360);
   }
 });
+
+test('perfil: widget para Windows (Rainmeter): activar, bajar el .rmskin, cambiar el enlace y desactivar', async ({ page }) => {
+  await entrar(page);
+  await ir(page, 'Perfil');
+  const fila = page.getByTestId('widget-escritorio');
+  await expect(fila).toContainText('Widget para Windows');
+  await fila.click();
+  const hoja = page.getByRole('dialog', { name: 'Widget para Windows' });
+  await expect(hoja).toContainText('Rainmeter');
+  await captura(page, '20b-widget-windows');
+  const bajada = page.waitForEvent('download');
+  await hoja.getByRole('button', { name: 'Activar y descargar' }).click();
+  const archivo = await bajada;
+  expect(archivo.suggestedFilename()).toBe('StoaGym.rmskin');
+  const datos = (await import('node:fs')).readFileSync((await archivo.path())!);
+  expect(datos.subarray(-7).toString('latin1')).toBe('RMSKIN\0'); // pie de Rainmeter
+  expect(datos.subarray(0, 4).toString('latin1')).toBe('PK\u0003\u0004'); // es un zip
+  await expect(fila).toContainText('Activado');
+  const otra = page.waitForEvent('download');
+  await hoja.getByRole('button', { name: 'Cambiar el enlace' }).click();
+  await otra;
+  await hoja.getByRole('button', { name: 'Desactivar' }).click();
+  await expect(page.getByText('Widget de escritorio desactivado')).toBeVisible();
+  await expect(fila).not.toContainText('Activado');
+});

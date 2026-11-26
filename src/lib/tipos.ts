@@ -146,6 +146,8 @@ export interface Perfil {
   nivel?: Nivel;
   /** Foto de perfil (data URL WebP/JPEG 256×256, v1.26.0); null = sin foto */
   foto?: string | null;
+  /** Widget para Windows (v1.33.0): código secreto de 24 letras del resumen `escritorio/{codigo}`, o null */
+  escritorio?: string | null;
   /** Ya pasó (o salteó) la bienvenida */
   conocido?: boolean;
   /** Programa en curso (formato viejo, hasta v1.19; se lee con programasActivos) */

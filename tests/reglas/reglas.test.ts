@@ -213,3 +213,36 @@ describe('reglas de Firestore', () => {
     });
   });
 });
+
+describe('escritorio/{codigo} · widget para Windows', () => {
+  const C = 'abcdEFGH2345jkmnPQRS6789';
+  const resumen = (uid: string, extra: Record<string, unknown> = {}) => ({ uid, t: '2|Ana|2026-11-26|10:00', actualizado: Date.now(), ...extra });
+  it('el dueño lo crea y lo cambia; cualquiera con el código lo lee; nadie lo lista', async () => {
+    const ana = env.authenticatedContext('ana').firestore();
+    const nadie = env.unauthenticatedContext().firestore();
+    await assertSucceeds(setDoc(doc(ana, `escritorio/${C}`), resumen('ana')));
+    await assertSucceeds(setDoc(doc(ana, `escritorio/${C}`), resumen('ana', { t: '2|Ana|2026-11-26|11:00' })));
+    await assertSucceeds(getDoc(doc(nadie, `escritorio/${C}`)));
+    await assertFails(getDocs(collection(nadie, 'escritorio')));
+    await assertFails(getDocs(collection(ana, 'escritorio')));
+  });
+  it('otro no lo pisa ni lo borra; código corto, sin sesión o campos extra no', async () => {
+    const ana = env.authenticatedContext('ana').firestore();
+    const beto = env.authenticatedContext('beto').firestore();
+    await assertSucceeds(setDoc(doc(ana, `escritorio/${C}`), resumen('ana')));
+    await assertFails(setDoc(doc(beto, `escritorio/${C}`), resumen('beto')));
+    await assertFails(deleteDoc(doc(beto, `escritorio/${C}`)));
+    await assertFails(setDoc(doc(ana, 'escritorio/corto'), resumen('ana')));
+    await assertFails(setDoc(doc(env.unauthenticatedContext().firestore(), 'escritorio/zzzzEFGH2345jkmnPQRS6789'), resumen('ana')));
+    await assertFails(setDoc(doc(ana, 'escritorio/yyyyEFGH2345jkmnPQRS6789'), resumen('ana', { extra: 1 })));
+    await assertFails(setDoc(doc(ana, 'escritorio/xxxxEFGH2345jkmnPQRS6789'), resumen('ana', { t: 'x'.repeat(2001) })));
+    await assertSucceeds(deleteDoc(doc(ana, `escritorio/${C}`)));
+  });
+  it('el perfil guarda el código (24 letras) o null', async () => {
+    const ana = env.authenticatedContext('ana').firestore();
+    await assertSucceeds(setDoc(doc(ana, 'users/ana'), perfil('ana')));
+    await assertSucceeds(setDoc(doc(ana, 'users/ana'), { escritorio: C }, { merge: true }));
+    await assertSucceeds(setDoc(doc(ana, 'users/ana'), { escritorio: null }, { merge: true }));
+    await assertFails(setDoc(doc(ana, 'users/ana'), { escritorio: 'corto' }, { merge: true }));
+  });
+});

@@ -33,6 +33,9 @@ export interface Repo {
   /** Arranque rápido: el perfil recién traído del servidor (null si no hay conexión o no aplica) */
   perfilDelServidor?(u: Usuario): Promise<Perfil | null>;
   guardarPerfil(uid: string, cambios: Partial<Perfil>): Promise<void>;
+  /** Widget para Windows: escribe/borra el resumen `escritorio/{codigo}` = { uid, t, actualizado } */
+  guardarEscritorio(uid: string, codigo: string, t: string): Promise<void>;
+  borrarEscritorio(codigo: string): Promise<void>;
   esAdmin(uid: string): Promise<boolean>;
 
   leerRutinas(uid: string): Promise<Rutina[]>;

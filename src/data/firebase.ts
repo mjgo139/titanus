@@ -106,6 +106,9 @@ export class RepoFirebase implements Repo {
     const uid = fu.uid;
     // Se cortan los vínculos con profesionales antes de borrar
     for (const v of await this.leerMisProfesionales(uid)) await this.terminarVinculo(v.id);
+    // El resumen del widget de Windows vive fuera de users/{uid}: se borra antes
+    const escritorio = (await getDoc(this.u(uid))).data()?.escritorio as string | undefined;
+    if (escritorio) await deleteDoc(doc(this.db, 'escritorio', escritorio)).catch(() => undefined);
     for (const nombre of ['routines', 'customExercises', 'workouts', 'exerciseStats', 'bodyLogs', 'comments', 'goals']) {
       const snap = await getDocs(this.col(uid, nombre));
       let lote = writeBatch(this.db);
@@ -160,6 +163,14 @@ export class RepoFirebase implements Repo {
     }
     const p = s.data() as Partial<Perfil>;
     return { ...base, ...p, uid: u.uid, resumen: p.resumen ?? base.resumen, recordatorio: p.recordatorio ?? base.recordatorio };
+  }
+
+  async guardarEscritorio(uid: string, codigo: string, t: string) {
+    await setDoc(doc(this.db, 'escritorio', codigo), { uid, t, actualizado: Date.now() });
+  }
+
+  async borrarEscritorio(codigo: string) {
+    await deleteDoc(doc(this.db, 'escritorio', codigo));
   }
 
   async guardarPerfil(uid: string, cambios: Partial<Perfil>) {

@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.33.0',
+    fecha: '26/11/2026',
+    cambios: [
+      'Widget para Windows: en Perfil → "Widget para Windows" se baja StoaGym.rmskin para Rainmeter (gratis). En el escritorio quedan tus rutinas de hoy, tu racha y una tarjeta por rutina con las últimas 5 semanas.',
+    ],
+  },
+  {
     version: '1.31.0',
     fecha: '22/11/2026',
     cambios: [
