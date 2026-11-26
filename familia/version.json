@@ -1,12 +1,12 @@
 {
-  "version": "1.10.0",
+  "version": "1.10.1",
   "fecha": "2026-11-26",
   "archivos": {
     "LEEME.md": "ea73258c63923254191278ef1b6946dbffc2487384e1a1d1e225fd8b8da70a83",
     "base.css": "c43b2da1f4e99a4d0d8fbc1dd08f319531effed363c197741529d4cc490fd199",
     "emblema.d.mts": "0c94c73909786a62557eefcbc210a7c0c962e3bb6616f5d4160b5b10ea8f6514",
     "emblema.mjs": "469341b74cc0593bf93f85248e31a9e471a5bac94e54bbdd1b21ebfaaba05398",
-    "escritorio.ts": "3dbfd598c19a3bd6c5f26ceee02b3d57842e2993ec8a4f2686a476aa8baa0b49",
+    "escritorio.ts": "fea75d1e7b24a032ce807fd19300e15fff4284e346785f5874906936d4e9b9f5",
     "familia.css": "3bdd3836557d6348ae79cb3385b1f8a2869864ef76066bfea7561f37dabd351b",
     "figuras.tsx": "5d3fbaf306a25e46f76035e7bd2027d0afa78d476c933373c762569e910e973b",
     "frases.ts": "32f940ac6c9ef9d4132bf9d12630028e7f2c9236aaa3143e6de29932a5e309d4",

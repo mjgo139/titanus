@@ -628,7 +628,7 @@ Meter=String
 MeterStyle=EstiloChico
 X=72
 Y=43
-W=150
+W=140
 ClipString=1
 FontColor=#Oro#
 Text=CARGANDO…
@@ -785,7 +785,7 @@ local function Pintar(texto, hoy)
   poner('MeterRacha', 'Text', romano(tonumber(h[4] or '0') or 0))
   local unidad = h[12]
   if unidad == nil or unidad == '' then unidad = cab[8] or 'DÍAS' end
-  poner('MeterRachaTexto', 'Text', 'RACHA · ' .. unidad)
+  poner('MeterRachaTexto', 'Text', unidad) -- debajo del número romano: "SEMANAS", "VECES" o "DÍAS" (no se pisa con el subtítulo)
   local hoyIdx = 0
   if esHoy and lunes ~= '' then
     local a, b = diaNumero(lunes), diaNumero(hoy)

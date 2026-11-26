@@ -60,7 +60,7 @@ export function resumenStoaGym(perfil: Perfil, rutinas: Rutina[], ahora = Date.n
     estado: entrenoHoy ? '1' : delDia.length ? '0' : '-',
     racha,
     color: 'Oro',
-    subtitulo: `${r.nombre} · NIVEL ${r.nivel} · ${perfil.resumen.total} EN TOTAL`.toUpperCase(),
+    subtitulo: `${r.nombre} · NIVEL ${r.nivel}`.toUpperCase(),
     dias: grilla.map((f) => (f > hoy ? 'f' : entrenados.has(f) ? '1' : f === hoy && delDia.length ? 'p' : '-')).join(''),
     pct: (en30 / 30) * 100,
     derecha: `${perfil.resumen.total}`,
