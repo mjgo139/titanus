@@ -242,10 +242,10 @@ export interface ColoresWidget {
 }
 
 const FILAS = Array.from({ length: MAX_FILAS_ESCRITORIO }, (_, i) => i + 1);
-const urlResumen = (proyecto: string, codigo: string) =>
+export const urlResumen = (proyecto: string, codigo: string) =>
   `https://firestore.googleapis.com/v1/projects/${proyecto}/databases/(default)/documents/escritorio/${codigo}`;
 
-function variablesComunes(c: ColoresWidget) {
+export function variablesComunes(c: ColoresWidget) {
   return `Fondo=${aRainmeter(COLORES_ICONO.fondo, 242)}
 Oro=${aRainmeter(COLORES_ICONO.laurel)}
 Marfil=${aRainmeter(COLORES_ICONO.figura)}
@@ -260,7 +260,8 @@ Serie3=${c.series[2]}
 Serie4=${c.series[3]}`;
 }
 
-const MEDIDAS = `[MeasureDatos]
+/** Medidas WebParser que leen el resumen (#Url#) y la de error; los skins propios las reutilizan */
+export const MEDIDAS = `[MeasureDatos]
 Measure=WebParser
 URL=#Url#
 UpdateRate=900
@@ -275,7 +276,12 @@ URL=[MeasureDatos]
 StringIndex=1`;
 
 /** Widget "Hoy": la lista (<App>/<App>.ini). */
+/** Widget "Hoy" (lista), con tamaños */
 export function skinIni(a: AppEscritorio, codigo: string, c: ColoresWidget): string {
+  return conTamanos(skinIniBase(a, codigo, c));
+}
+
+function skinIniBase(a: AppEscritorio, codigo: string, c: ColoresWidget): string {
   const filas = FILAS.map((i) => `
 [MeterH${i}Marca]
 Meter=String
@@ -412,8 +418,127 @@ LeftMouseUpAction=["#App#"]
 `;
 }
 
-const LUA_COMUN = `local function v(nombre) return SKIN:GetVariable(nombre) or '' end
-local function poner(meter, opcion, valor) SKIN:Bang('!SetOption', meter, opcion, valor) end
+/** Funciones Lua comunes (v, poner, decodificar, partir respetando vacíos, romano, diaNumero) para skins propios */
+// ---------------------------------------------------------------------------------------------
+// Tamaños (v1.11.0, pedido del dueño: "no logro ordenarlos bien en mi escritorio")
+// Todos los widgets miden 300 de ancho en "normal" y se agrandan o achican juntos con la variable E,
+// igual que las tarjetas de StoaHabit: chico = 240, normal = 300, grande = 390. Así se arman en columnas parejas.
+// ---------------------------------------------------------------------------------------------
+
+export const TAMANOS = [
+  { nombre: 'chico', e: 0.8 },
+  { nombre: 'normal', e: 1 },
+  { nombre: 'grande', e: 1.3 },
+] as const;
+
+const OPCIONES_MEDIDA = new Set(['X', 'Y', 'W', 'H', 'FontSize']);
+
+/** "16" → "(16*#E#)", "(#Ancho#-18)" → "((#Ancho#-18)*#E#)", "4R" → "(4*#E#)R". Lo que ya usa #E# no se toca. */
+function medidaConE(valor: string): string {
+  const v = valor.trim();
+  if (v.includes('#E#')) return v;
+  const n = v.match(/^(-?\d+(?:\.\d+)?)([rR]?)$/);
+  if (n) return Number(n[1]) === 0 ? v : `(${n[1]}*#E#)${n[2]}`;
+  const f = v.match(/^(\(.*\)|#\w+#)([rR]?)$/);
+  if (f) return `(${f[1]}*#E#)${f[2]}`;
+  return v;
+}
+
+/** Parte por comas que no estén dentro de paréntesis */
+function partirComas(s: string): string[] {
+  const r: string[] = [];
+  let nivel = 0, actual = '';
+  for (const ch of s) {
+    if (ch === '(') nivel++;
+    if (ch === ')') nivel--;
+    if (ch === ',' && nivel === 0) { r.push(actual); actual = ''; } else actual += ch;
+  }
+  r.push(actual);
+  return r;
+}
+
+/** Shape=Rectangle 0,0,300,40,16 | … → medidas con #E# (en Arc, solo las 6 primeras: el resto son banderas) */
+function formaConE(valor: string): string {
+  const [primera, ...resto] = valor.split('|');
+  const m = primera.match(/^(\s*)(\w+)\s+(.*?)(\s*)$/);
+  if (!m) return valor;
+  const args = partirComas(m[3]).map((a, i) => (m[2] === 'Arc' && i >= 6 ? a : medidaConE(a)));
+  return [`${m[1]}${m[2]} ${args.join(',')}${m[4]}`, ...resto].join('|');
+}
+
+/**
+ * Le da tamaños a un skin: E=1 en [Variables], todas las medidas multiplicadas por #E#
+ * y "Tamaño chico / normal / grande" en el clic derecho (se guarda en el propio .ini).
+ * El Lua tiene que poner sus medidas con el `poner` de LUA_PONER, que también las multiplica.
+ */
+export function conTamanos(ini: string): string {
+  let seccion = '';
+  const lineas = ini.split('\n').map((l) => {
+    const s = l.match(/^\[(.+)\]\s*$/);
+    if (s) { seccion = s[1]; return l; }
+    if (['Rainmeter', 'Metadata', 'Variables'].includes(seccion) || l.startsWith(';')) return l;
+    const o = l.match(/^(\w+)=(.*)$/);
+    if (!o) return l;
+    const [, clave, valor] = o;
+    if (OPCIONES_MEDIDA.has(clave)) return `${clave}=${medidaConE(valor)}`;
+    if (clave === 'Padding') return `${clave}=${partirComas(valor).map(medidaConE).join(',')}`;
+    if (/^Shape\d*$/.test(clave)) return `${clave}=${formaConE(valor)}`;
+    return l;
+  });
+  let texto = lineas.join('\n');
+  if (!/^E=/m.test(texto)) texto = texto.replace(/^\[Variables\]\s*$/m, '[Variables]\nE=1');
+  // Clic derecho: después del último ContextTitle de [Rainmeter]
+  const usados = [...texto.matchAll(/^ContextTitle(\d*)=/gm)].map((x) => Number(x[1] || 1));
+  let n = usados.length ? Math.max(...usados) : 0;
+  const extra = [`ContextTitle${++n}=---`];
+  for (const t of TAMANOS) {
+    n++;
+    extra.push(`ContextTitle${n}=Tamaño ${t.nombre}`, `ContextAction${n}=[!WriteKeyValue Variables E ${t.e}][!Refresh]`);
+  }
+  return texto.replace(/^\[Metadata\]\s*$/m, `${extra.join('\n')}\n\n[Metadata]`);
+}
+
+/** Lua: `poner` que multiplica por E las medidas (X, Y, W, H, FontSize y las formas), igual que conTamanos. */
+export const LUA_PONER = `local MEDIDA = { X = true, Y = true, W = true, H = true, FontSize = true }
+local function tamano() return tonumber(SKIN:GetVariable('E') or '') or 1 end
+local function porE(x)
+  local s = string.format('%.1f', tonumber(x) * tamano())
+  return (s:gsub('%.0$', ''))
+end
+local function escalar(opcion, valor)
+  if type(valor) ~= 'string' or tamano() == 1 then return valor end
+  if MEDIDA[opcion] then
+    local n, suf = valor:match('^(%-?[%d%.]+)([rR]?)$')
+    if n and tonumber(n) then return porE(n) .. suf end
+    return valor
+  end
+  if opcion:match('^Shape%d*$') then
+    local partes = {}
+    for p in (valor .. '|'):gmatch('([^|]*)|') do partes[#partes + 1] = p end
+    local tipo, args = (partes[1] or ''):match('^%s*(%a+)%s+(.-)%s*$')
+    if tipo then
+      local i = 0
+      args = args:gsub('[^,]+', function(a)
+        i = i + 1
+        if tipo == 'Arc' and i > 6 then return a end
+        if tonumber(a) then return porE(a) end
+        return a
+      end)
+      partes[1] = tipo .. ' ' .. args .. ' '
+    end
+    for k = 2, #partes do
+      local w = partes[k]:match('^%s*StrokeWidth%s+([%d%.]+)%s*$')
+      if w then partes[k] = ' StrokeWidth ' .. porE(w) .. ' ' end
+    end
+    return table.concat(partes, '|')
+  end
+  return valor
+end
+local function poner(meter, opcion, valor) SKIN:Bang('!SetOption', meter, opcion, escalar(opcion, valor)) end
+`;
+
+export const LUA_COMUN = `local function v(nombre) return SKIN:GetVariable(nombre) or '' end
+${LUA_PONER}
 
 local function u8(cp)
   if cp < 128 then return string.char(cp) end
@@ -535,7 +660,12 @@ end
 }
 
 /** Tarjeta con las últimas 5 semanas: Tarjeta{n}/Tarjeta.ini. `indice` = cuál muestra al principio. */
+/** Tarjeta (5 semanas), con tamaños */
 export function skinTarjetaIni(a: AppEscritorio, codigo: string, indice: number, c: ColoresWidget): string {
+  return conTamanos(skinTarjetaIniBase(a, codigo, indice, c));
+}
+
+function skinTarjetaIniBase(a: AppEscritorio, codigo: string, indice: number, c: ColoresWidget): string {
   const letras = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((l, i) => `
 [MeterDia${i + 1}]
 Meter=String
@@ -845,7 +975,7 @@ export function coloresDeLaFamilia(): ColoresWidget {
 }
 
 /** Dibuja el emblema de la app como PNG para el widget. */
-async function emblemaPng(figura: string, lado = 120): Promise<Uint8Array> {
+export async function emblemaPng(figura: string, lado = 120): Promise<Uint8Array> {
   const img = new Image();
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgEmblemaSolo(figura, lado))}`;
   await img.decode();

@@ -98,3 +98,23 @@ describe('widget para Windows · StoaGym', () => {
     expect(new DataView(p.buffer).getUint32(14, true)).toBe(0x6fa0f988);
   });
 });
+
+/** Familia 1.11.0: todos los widgets con tamaños chico · normal · grande (pedido del dueño) */
+function revisarTamanos(ini: string) {
+  expect(ini).toMatch(/^E=1$/m);
+  for (const t of ['chico', 'normal', 'grande']) expect(ini).toContain(`Tamaño ${t}`);
+  expect(ini).toContain('[!WriteKeyValue Variables E 1.3][!Refresh]');
+  // ContextTitle seguidos (Rainmeter corta la lista en el primer hueco)
+  const n = [...ini.matchAll(/^ContextTitle(\d*)=/gm)].map((m) => Number(m[1] || 1));
+  expect(n).toEqual(n.map((_, i) => i + 1));
+  // ninguna medida queda fija: todas pasan por #E#
+  expect(ini).not.toMatch(/^(X|Y|W|FontSize)=-?[1-9][\d.]*[rR]?$/m);
+}
+
+describe('widget para Windows · tamaños', () => {
+  it('lista y tarjeta se agrandan y achican con E', () => {
+    const a = APP_ESCRITORIO('titanus-10398');
+    revisarTamanos(skinIni(a, 'C', colores));
+    revisarTamanos(skinTarjetaIni(a, 'C', 1, colores));
+  });
+});

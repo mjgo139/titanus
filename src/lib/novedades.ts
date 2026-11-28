@@ -4,6 +4,13 @@ export const COMMIT = __COMMIT__;
 
 export const NOVEDADES: { version: string; fecha: string; cambios: string[] }[] = [
   {
+    version: '1.35.0',
+    fecha: '28/11/2026',
+    cambios: [
+      'Widget para Windows con tres tamaños: clic derecho → Tamaño chico, normal o grande. Todos los widgets de la familia miden lo mismo (240, 300 o 390 de ancho) para que se acomoden en columnas parejas. Para tenerlo: Perfil → Widget para Windows → Descargar de nuevo.',
+    ],
+  },
+  {
     version: '1.34.0',
     fecha: '26/11/2026',
     cambios: [
